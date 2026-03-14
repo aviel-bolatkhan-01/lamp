@@ -120,9 +120,11 @@ body::after {
   min-height: 100vh;
   min-height: -webkit-fill-available;
   max-width: 480px;
+  width: 100%;
   margin: 0 auto;
   padding-top: calc(var(--safe-t) + 4px);
-  overflow-x: hidden;
+  overflow-x: visible;
+  box-sizing: border-box;
 }
 .screen {
   display: none;
