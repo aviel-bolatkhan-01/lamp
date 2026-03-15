@@ -2063,6 +2063,23 @@ html[data-theme="dark"] .profile-bar .wins-num { color: #E0A860; }
 /* Match history boxes */
 html[data-theme="dark"] .card-sm { background: var(--card-bg); border-color: var(--inp-border); color: var(--ink); }
 html[data-theme="dark"] .card-sm:hover { border-color: #52525E; }
+/* Game screen - answer options */
+html[data-theme="dark"] .opt { background: var(--bg3); border-color: var(--inp-border); color: var(--ink); }
+html[data-theme="dark"] .opt:hover:not(:disabled) { background: var(--card-bg); border-color: #52525E; }
+html[data-theme="dark"] .opt-key { color: var(--ink2); background: var(--card-bg); border-color: var(--inp-border); }
+html[data-theme="dark"] .opt.correct { background: rgba(94,138,94,.18); border-color: #5E8A5E; }
+html[data-theme="dark"] .opt.correct .opt-key { color: #5E8A5E; background: rgba(94,138,94,.12); border-color: #5E8A5E; }
+html[data-theme="dark"] .opt.wrong { background: rgba(200,50,50,.15); border-color: #C83232; }
+html[data-theme="dark"] .opt.wrong .opt-key { color: #FF6B6B; background: rgba(200,50,50,.1); border-color: #C83232; }
+html[data-theme="dark"] .opt.reveal { background: rgba(224,168,96,.12); border-color: #E0A860; }
+html[data-theme="dark"] .opt.reveal .opt-key { color: #E0A860; border-color: #E0A860; }
+/* True/False buttons */
+html[data-theme="dark"] .tf-t { background: rgba(94,138,94,.2); border-color: #5E8A5E; color: #7DD9A4; }
+html[data-theme="dark"] .tf-f { background: rgba(200,50,50,.2); border-color: #C83232; color: #FF8B8B; }
+/* Voter buttons */
+html[data-theme="dark"] .voter { background: var(--bg3); border-color: var(--inp-border); color: var(--ink2); }
+html[data-theme="dark"] .voter.voted { background: rgba(94,138,94,.15); border-color: #5E8A5E; color: var(--ink); }
+html[data-theme="dark"] .voter.cur-voter { background: rgba(224,168,96,.15); border-color: #E0A860; color: #E0A860; }
 /* Settings labels readable in dark */
 html[data-theme="dark"] .settings-section-title { color: var(--ink2); }
 html[data-theme="dark"] .caption { color: var(--ink3); }
