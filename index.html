@@ -1189,7 +1189,7 @@ body::after {
 .btn-share:active { background: rgba(74,144,216,.2); }
 
 /* ─── CHIP SELECTORS (compact mode/sub pickers) ─ */
-.chips-wrap { margin-bottom: 14px; }
+.chips-wrap { margin-bottom: 14px; overflow: hidden; }
 .chips {
   display: flex;
   gap: 7px;
@@ -39788,7 +39788,10 @@ function haptic(type){
 function quitGame(){
   stopTimers();
   if(confirm('Quit this game?')){
-    if(G.roomRef) { G.roomRef.off(); G.roomRef = null; }
+    if(G._votesRef){G._votesRef.off();G._votesRef=null;}
+    if(G._resultTimeout){clearTimeout(G._resultTimeout);G._resultTimeout=null;}
+    if(G.roomRef){G.roomRef.child('gameState').off();G.roomRef.off();G.roomRef=null;}
+    G.onlineGame=false;G.roomPool=null;G.roomOrders=null;G._lastOnlineState=null;
     go('home');
   }
 }
@@ -40004,6 +40007,15 @@ function beginGame(){
   if(G.sub==='truefalse'){ startTF(); return; }
   if(G.sub==='lightning'){ showSplash(0,()=>startLightning(0)); return; }
   showSplash(0,()=>{ go('game'); renderQ(); });
+}
+
+function updateProgress(){
+  const total=(G.roomPool||G.pool||[]).length||1;
+  const pct=Math.min(100,((G.qi+1)/total*100)).toFixed(0);
+  const fill=document.getElementById('g-progress');
+  const lbl=document.getElementById('g-progress-lbl');
+  if(fill)fill.style.width=pct+'%';
+  if(lbl)lbl.textContent='Q'+(G.qi+1)+'/'+total;
 }
 
 /* ── Render a multiple-choice question ── */
@@ -40466,6 +40478,9 @@ function renderMatchHistory(){
 
 function endGame(){
   stopTimers();
+  // Clean up online listeners
+  if(G._votesRef){G._votesRef.off();G._votesRef=null;}
+  if(G._resultTimeout){clearTimeout(G._resultTimeout);G._resultTimeout=null;}
   let win, iWon = false;
   
   if (G.sub === 'team') {
@@ -40513,7 +40528,8 @@ function endGame(){
     saveProfile(); if(G.fbOk)pushProfile();
   }
   saveMatchResult(win, G.players);
-  const v=WIN_VERSES[G.pool.length%WIN_VERSES.length]||WIN_VERSES[0];
+  const poolLen=(G.roomPool||G.pool||[]).length||1;
+  const v=WIN_VERSES[poolLen%WIN_VERSES.length]||WIN_VERSES[0];
   document.getElementById('w-av').textContent=win.avatar;
   document.getElementById('w-name').textContent=win.name;
   document.getElementById('w-pts').textContent=(G.sub==='team' ? G.teamScores[win.name] : G.scores[win.name])+' points';
@@ -40710,8 +40726,9 @@ function joinFromRoom(d){
     G.roomRef.child('gameState').set({pool:poolData,orders:ordersData,qi:0,pi:0,scores:{},hearts:{},phase:'question',t:Date.now()})
       .catch(err=>{console.error('Failed to set gameState:', err);toast('Game sync failed');});
   }
-  showSplash(0,()=>go('game'));
+  showSplash(0,null);
   // Online game: auto-dismiss splash so joiner isn't blocked waiting for a tap
+  // renderOnlineQ handles navigating to game screen when gameState arrives
   setTimeout(()=>{ if(document.getElementById('splash').classList.contains('on')) dismissSplash(); }, 1500);
 }
 
@@ -40724,7 +40741,9 @@ function renderOnlineQ(){
   if(G._resultTimeout){clearTimeout(G._resultTimeout);G._resultTimeout=null;}
   G._myVoteSubmitted=false;
   stopTimers();clearAutoAdvance();
-  go('game');
+  // Only switch screen if not already on game screen (avoids re-triggering animation + double stopTimers)
+  const gameEl=document.getElementById('s-game');
+  if(!gameEl||!gameEl.classList.contains('active')) go('game');
   // Show this player's own info
   const me=G.players.find(p=>p.uid===G.uid)||G.players[0];
   document.getElementById('g-av').textContent=me?me.avatar:'';
@@ -40793,12 +40812,31 @@ function renderOnlineQ(){
   // Timeout fallback if host doesn't tally
   if(G._resultTimeout){clearTimeout(G._resultTimeout);}
   G._resultTimeout=setTimeout(()=>{
-    if(G._votesRef){
-      G._votesRef.off();G._votesRef=null;
-      toast('Game sync issue - check connection');
+    if(G._votesRef&&G.isHost){
+      // Host forces result after timeout — treat missing votes as wrong
+      G._votesRef.once('value').then(sn=>{
+        const v=sn.val()||{};
+        G.players.forEach(p=>{ if(v[p.uid]===undefined) v[p.uid]=-1; });
+        G._votesRef.off();G._votesRef=null;
+        stopTimers();
+        G.players.forEach(p=>{
+          const pVote=v[p.uid];
+          if(pVote===G.roomPool[G.qi].a){G.scores[p.name]=(G.scores[p.name]||0)+1;}
+          else if(G.cfg.hearts){G.hearts[p.name]=Math.max(0,(G.hearts[p.name]!=null?G.hearts[p.name]:3)-1);}
+        });
+        let nqi=G.qi+1;
+        if(nqi>=(G.roomPool?G.roomPool.length:40))nqi=0;
+        const anyGameOver=G.players.some(p=>G.scores[p.name]>=(G.cfg.winScore||10)||(G.cfg.hearts&&G.hearts[p.name]<=0));
+        G.roomRef.child('gameState').update({
+          phase:'result',votes:v,correctA:G.roomPool[G.qi].a,scores:G.scores,hearts:G.hearts,
+          nextQi:nqi,gameOver:anyGameOver||false,t:Date.now()
+        });
+      });
+    } else if(G._votesRef){
+      // Non-host: just warn
       console.warn('Results timeout - host may not be syncing');
     }
-  },5000);
+  },25000);
 }
 
 function answerOnline(btn,isOk,q,timedOut){
@@ -40809,7 +40847,7 @@ function answerOnline(btn,isOk,q,timedOut){
   const origIdx=btn?parseInt(btn.dataset.origIdx):-1;
   if(isOk){sfx.correct();haptic('correct');}else{sfx.wrong();haptic('wrong');}
   if(G.roomRef&&G.uid){
-    G.roomRef.child('gameState/votes/'+G.uid).set(origIdx!==-1?origIdx:null).catch(err=>{
+    G.roomRef.child('gameState/votes/'+G.uid).set(origIdx!==-1?origIdx:-1).catch(err=>{
       console.error('Vote failed:', err);
       toast('Vote failed - ' + err.message);
       G._myVoteSubmitted=false;
