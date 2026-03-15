@@ -3702,12 +3702,7 @@ html[data-theme="warmth"] .divider::before, html[data-theme="warmth"] .divider::
       <div class="mtitle" id="ch-friend-name" style="margin-bottom:0;">Friend</div>
     </div>
 
-    <label class="label">Play Mode</label>
-    <div id="ch-mode-chips" style="display:flex;gap:8px;margin-bottom:16px;">
-      <button class="chip sel" onclick="pickChMode(this,'online')" id="ch-mode-online">🌐 Online Room</button>
-      <button class="chip" onclick="pickChMode(this,'passplay')" id="ch-mode-passplay">🤝 Pass & Play</button>
-    </div>
-    <div id="ch-mode-desc" style="font-size:12px;color:var(--ink3);margin-bottom:16px;line-height:1.5;">Both players join a Firebase room and play live from their own devices.</div>
+    <div style="font-size:12px;color:var(--ink3);margin-bottom:16px;line-height:1.5;">Both players play live from their own devices.</div>
 
     <label class="label">Difficulty</label>
     <div id="ch-diff-chips" style="display:flex;gap:8px;margin-bottom:20px;">
@@ -41506,6 +41501,9 @@ function toggleReady(){
 function startOnline(){ if(!G.roomRef)return; sfx.tap(); G.roomRef.update({status:'playing'}); }
 function joinFromRoom(d){
   // Keep roomRef alive for game sync
+  // Set difficulty from room data so buildPool filters correctly
+  if(d.difficulty) G.diff=d.difficulty;
+  G.TIM=G.diff==='easy'?25:G.diff==='hard'?12:20;
   const playerEntries=Object.entries(d.players||{});
   let players=playerEntries.map(([uid,p])=>({name:p.name,avatar:p.avatar,diff:p.diff||'easy',uid}));
   const usedNames=new Set();
@@ -41560,6 +41558,12 @@ function joinFromRoom(d){
     else if(gs.phase==='result'){G._onlineQKey=null;showOnlineResult(gs);}
     else if(gs.phase==='ended'){G._onlineQKey=null;if(G.roomRef){G.roomRef.child('gameState').off();G.roomRef.off();}endGame();}
   });
+
+  // Set up disconnect handler - remove player from room if they leave
+  if(G.roomRef&&G.uid){
+    G.roomRef.child('players/'+G.uid+'/connected').set(true);
+    G.roomRef.child('players/'+G.uid+'/connected').onDisconnect().set(false);
+  }
 
   if(G.isHost){
     G.pool=buildPool();
@@ -42940,7 +42944,7 @@ function addFriendFromFriends(){
 /* ══════════════════════════════════════════════════
    CHALLENGE SYSTEM
 ══════════════════════════════════════════════════ */
-let _chTargetUid=null, _chMode='online', _chDiff='easy';
+let _chTargetUid=null, _chDiff='easy';
 let _chListener=null, _chNotifTimer=null, _pendingChallenge=null;
 const CH_EXPIRY_MS=30*60*1000; // 30 minutes
 
@@ -42951,7 +42955,6 @@ function challengeFriend(uid){
   sfx.tap();
 
   _chTargetUid=uid;
-  _chMode='online';
   _chDiff='easy';
 
   const f=getFriendData(uid);
@@ -42959,31 +42962,10 @@ function challengeFriend(uid){
   document.getElementById('ch-friend-name').textContent=f.name||'Friend';
 
   // Reset chip selections
-  document.querySelectorAll('#ch-mode-chips .chip').forEach(c=>c.classList.remove('sel'));
-  document.getElementById('ch-mode-online').classList.add('sel');
   document.querySelectorAll('#ch-diff-chips .chip').forEach(c=>c.classList.remove('sel'));
   document.getElementById('ch-diff-easy').classList.add('sel');
-  _updateChModeDesc();
 
   openOv('ov-challenge');
-}
-
-function pickChMode(el,mode){
-  sfx.tap();
-  _chMode=mode;
-  document.querySelectorAll('#ch-mode-chips .chip').forEach(c=>c.classList.remove('sel'));
-  el.classList.add('sel');
-  _updateChModeDesc();
-}
-
-function _updateChModeDesc(){
-  const el=document.getElementById('ch-mode-desc');
-  if(!el) return;
-  if(_chMode==='online'){
-    el.textContent='Both players join a Firebase room and play live from their own devices.';
-  } else {
-    el.textContent='Play together on the same device, passing it back and forth.';
-  }
 }
 
 function pickChDiff(el,diff){
@@ -42997,53 +42979,68 @@ function sendChallenge(){
   if(!_chTargetUid||!G.fbOk||!G.uid){ toast('Cannot send challenge'); return; }
   sfx.tap();
 
+  // Set difficulty globally so buildPool uses it
+  G.diff=_chDiff;
+  G.TIM=_chDiff==='easy'?25:_chDiff==='hard'?12:20;
+
+  // Get target friend data for adding to room
+  const targetF=getFriendData(_chTargetUid);
+
   const challengeData={
     senderUid:G.uid,
     senderName:G.profile.name,
     senderAvatar:G.profile.avatar,
-    mode:_chMode,
+    mode:'online',
     difficulty:_chDiff,
     timestamp:Date.now(),
     status:'pending'
   };
 
-  if(_chMode==='online'){
-    // Create the room immediately so it's ready when they accept
-    const code=mkCode();
-    challengeData.roomCode=code;
-    const ref=G.db.ref('rooms/'+code);
-    ref.set({
-      code, host:G.uid, status:'waiting', sub:'classic', createdAt:Date.now(),
-      challenge:true, difficulty:_chDiff,
-      players:{[G.uid]:{name:G.profile.name,avatar:G.profile.avatar,ready:false,score:0,hearts:3,diff:_chDiff}}
-    }).then(()=>{
-      // Store room ref so host can listen
-      G.roomId=code; G.isHost=true; G.roomRef=ref;
-      ref.on('value',sn=>{
-        const d=sn.val(); if(!d) return;
-        if(d.status==='playing'){ ref.off(); joinFromRoom(d); }
-        // When opponent joins, update lobby if we're viewing it
-        const panel=document.getElementById('lobby-panel');
-        if(panel&&panel.style.display!=='none') updateLobbyUI(d);
-      });
+  // Create the room immediately so it's ready when they accept
+  const code=mkCode();
+  challengeData.roomCode=code;
+  const ref=G.db.ref('rooms/'+code);
+  ref.set({
+    code, host:G.uid, status:'waiting', sub:'classic', createdAt:Date.now(),
+    challenge:true, difficulty:_chDiff,
+    challengeTarget:_chTargetUid,
+    players:{
+      [G.uid]:{name:G.profile.name,avatar:G.profile.avatar,ready:true,score:0,hearts:3,diff:_chDiff},
+      [_chTargetUid]:{name:targetF.name||'Friend',avatar:targetF.avatar||'😊',ready:false,score:0,hearts:3,diff:_chDiff}
+    }
+  }).then(()=>{
+    // Store room ref so host can listen
+    G.roomId=code; G.isHost=true; G.roomRef=ref;
+    ref.on('value',sn=>{
+      const d=sn.val(); if(!d) return;
+      if(d.status==='playing'){ ref.off(); joinFromRoom(d); }
+      // When opponent joins and is ready, auto-start the game
+      if(d.status==='waiting'&&d.challenge){
+        const ps=d.players||{};
+        const allReady=Object.values(ps).every(p=>p.ready);
+        const playerCount=Object.keys(ps).length;
+        if(allReady&&playerCount>=2){
+          ref.update({status:'playing'});
+          return;
+        }
+      }
+      // Update lobby if we're viewing it
+      const panel=document.getElementById('lobby-panel');
+      if(panel&&panel.style.display!=='none') updateLobbyUI(d);
     });
-  }
+  });
 
   // Write challenge to Firebase for the receiver
   G.db.ref('challenges/'+_chTargetUid+'/'+G.uid).set(challengeData)
     .then(()=>{
       closeOv('ov-challenge');
-      if(_chMode==='online'){
-        toast('Challenge sent! Waiting in lobby...');
-        // Navigate to lobby and show the room
-        document.getElementById('rc-disp').textContent=challengeData.roomCode;
-        document.getElementById('lobby-panel').style.display='block';
-        document.getElementById('start-btn').disabled=false;
-        renderQRCode(challengeData.roomCode);
-        go('lobby');
-      } else {
-        toast('Challenge sent! They\'ll be notified.');
-      }
+      toast('Challenge sent! Waiting for opponent...');
+      // Navigate to lobby and show the room
+      document.getElementById('rc-disp').textContent=challengeData.roomCode;
+      document.getElementById('lobby-panel').style.display='block';
+      document.getElementById('start-btn').disabled=false;
+      renderQRCode(challengeData.roomCode);
+      go('lobby');
     })
     .catch(e=>toast('Failed to send: '+e.message));
 }
@@ -43082,9 +43079,8 @@ function showChallengeNotif(ch){
   document.getElementById('cn-av').textContent=ch.senderAvatar||'😊';
   document.getElementById('cn-name').textContent=(ch.senderName||'Someone')+' challenged you!';
 
-  const modeLabel=ch.mode==='online'?'Online Room':'Pass & Play';
   const diffLabel=ch.difficulty==='easy'?'Easy':ch.difficulty==='medium'?'Medium':'Hard';
-  document.getElementById('cn-detail').textContent=modeLabel+' · '+diffLabel;
+  document.getElementById('cn-detail').textContent='Live Match · '+diffLabel;
 
   el.style.display='block';
   el.style.animation='none';
@@ -43121,33 +43117,38 @@ function acceptChallenge(){
   G.diff=ch.difficulty||'easy';
   G.TIM=G.diff==='easy'?25:G.diff==='hard'?12:20;
 
-  if(ch.mode==='online'&&ch.roomCode){
+  if(ch.roomCode){
     // Join the room the sender created
     hideChallengeNotif();
     ch.ref.remove();
     _pendingChallenge=null;
-    joinRoomByCode(ch.roomCode);
-  } else if(ch.mode==='passplay'){
-    // Pass & Play: start a local 2-player game with both names
-    hideChallengeNotif();
-    ch.ref.remove();
-    _pendingChallenge=null;
-
-    G.mode='local'; G.sub='classic';
-    G.players=[
-      {name:G.profile.name, avatar:G.profile.avatar},
-      {name:ch.senderName||'Friend', avatar:ch.senderAvatar||'😊'}
-    ];
-    G.pool=buildPool(); G.qi=0; G.pi=0; G.done=false; G.onlineGame=false;
-    G.scores={}; G.hearts={}; G.streaks={};
-    G.players.forEach(p=>{ G.scores[p.name]=0; G.hearts[p.name]=3; G.streaks[p.name]=0; });
-    showSplash(0,()=>{ go('game'); renderQ(); });
+    joinChallengeRoom(ch.roomCode);
   } else {
     hideChallengeNotif();
     ch.ref.remove();
     _pendingChallenge=null;
-    toast('Challenge accepted!');
+    toast('Challenge accepted but no room found.');
   }
+}
+
+function joinChallengeRoom(code){
+  if(!G.fbOk){ toast('Online features not available'); return; }
+  sfx.tap();
+  const ref=G.db.ref('rooms/'+code); G.roomRef=ref; G.roomId=code; G.isHost=false;
+  ref.once('value').then(sn=>{
+    const d=sn.val();
+    if(!d){ toast('Room not found or expired'); return; }
+    if(d.status==='playing'){ toast('Game already in progress'); return; }
+    // Update existing player entry to mark as ready (sender already added us)
+    ref.child('players/'+G.uid).update({name:G.profile.name,avatar:G.profile.avatar,ready:true,score:0,hearts:3,diff:G.diff});
+    document.getElementById('rc-disp').textContent=code;
+    document.getElementById('lobby-panel').style.display='block';
+    document.getElementById('start-btn').disabled=true;
+    const qrWrap=document.getElementById('lobby-qr'); if(qrWrap) qrWrap.style.display='none';
+    ref.on('value',sn2=>{ const d2=sn2.val(); if(!d2)return; updateLobbyUI(d2); if(d2.status==='playing'){ ref.off(); joinFromRoom(d2); } });
+    go('lobby');
+    toast('Joined challenge room! Starting soon...');
+  }).catch(e=>toast('Error joining: '+e.message));
 }
 
 function declineChallenge(){
