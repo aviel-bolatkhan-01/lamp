@@ -40448,6 +40448,7 @@ function renderHomeBar(){
 const GAME_SCREENS=['game','lightning','tf','auth','setup','winner','scores','chat'];
 function go(id){
   stopTimers();
+  if(id!=='chat' && typeof cleanupChat==='function') cleanupChat();
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   const el=document.getElementById('s-'+id);
   if(el) el.classList.add('active');
@@ -42874,22 +42875,31 @@ function challengeFriend(uid){
 /* ══════════════════════════════════════════════════
    CHAT
 ══════════════════════════════════════════════════ */
-let _chatUid=null, _chatRef=null, _chatListener=null;
+let _chatUid=null, _chatQuery=null, _chatListener=null;
+function cleanupChat(){
+  if(_chatListener && _chatQuery){
+    _chatQuery.off('child_added',_chatListener);
+  }
+  _chatQuery=null;
+  _chatListener=null;
+}
 function openChat(uid,name,avatar){
   _chatUid=uid;
   document.getElementById('chat-partner-name').textContent=name;
   document.getElementById('chat-partner-av').textContent=avatar;
   document.getElementById('chat-msgs').innerHTML='';
+  document.getElementById('chat-inp').value='';
   go('chat');
   loadChat(uid);
 }
 function loadChat(uid){
+  cleanupChat();
   if(!G.fbOk||!G.uid) return;
   const pair=[G.uid,uid].sort().join('_');
-  if(_chatListener && _chatRef) _chatRef.off('child_added',_chatListener);
-  _chatRef=G.db.ref('chats/'+pair+'/messages');
-  _chatListener=_chatRef.limitToLast(80).on('child_added',snap=>{
+  _chatQuery=G.db.ref('chats/'+pair+'/messages').limitToLast(80);
+  _chatListener=_chatQuery.on('child_added',snap=>{
     const m=snap.val();
+    if(!m) return;
     const msgs=document.getElementById('chat-msgs');
     if(!msgs) return;
     const bubble=document.createElement('div');
@@ -42897,7 +42907,6 @@ function loadChat(uid){
     bubble.textContent=m.text;
     msgs.appendChild(bubble);
     msgs.scrollTop=msgs.scrollHeight;
-    // Track preview
     if(!G._convPreviews) G._convPreviews={};
     G._convPreviews[uid]={text:m.text,ts:m.ts||Date.now()};
   });
@@ -42906,8 +42915,7 @@ function sendMessage(){
   const inp=document.getElementById('chat-inp');
   const text=(inp.value||'').trim();
   if(!text||!_chatUid) return;
-  if(!G.fbOk){
-    // Offline fallback: show locally only
+  if(!G.fbOk||!G.uid){
     const msgs=document.getElementById('chat-msgs');
     const bubble=document.createElement('div');
     bubble.className='chat-bubble me';
@@ -42919,7 +42927,6 @@ function sendMessage(){
   const pair=[G.uid,_chatUid].sort().join('_');
   const ts=Date.now();
   G.db.ref('chats/'+pair+'/messages').push({from:G.uid,text,ts});
-  // Store preview for conversation list
   if(!G._convPreviews) G._convPreviews={};
   G._convPreviews[_chatUid]={text,ts};
   inp.value='';
