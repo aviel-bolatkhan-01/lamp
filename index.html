@@ -316,6 +316,7 @@ body::after {
   color: var(--ink2);
 }
 .btn-ghost:active { background: rgba(196,136,10,.07); color: var(--gold1); border-color: rgba(196,136,10,.35); }
+.btn-ghost.active { background: rgba(196,136,10,.12); color: var(--gold1); border-color: rgba(196,136,10,.35); }
 .btn-sm { padding: 10px 16px; font-size: 12px; min-height: 40px; }
 .btn-icon { font-size: 15px; line-height: 1; }
 
@@ -393,6 +394,14 @@ body::after {
   background: radial-gradient(circle, rgba(232,184,64,.15) 0, transparent 70%);
   border-radius: 50%;
 }
+.nb-join {
+  background: rgba(232,184,64,.18);
+  border-radius: 12px;
+  margin: 4px;
+  color: var(--gold1);
+}
+.nb-join:hover { background: rgba(232,184,64,.25); }
+.nb-join.on { background: rgba(232,184,64,.35); }
 .nb:active { opacity: .6; }
 
 /* ─── GAME HEADER ────────────────────────────────── */
@@ -2638,51 +2647,66 @@ html[data-theme="warmth"] .nb.on, html[data-theme="warmth"] .nb.on svg { color: 
   </div>
 </div>
 
-<!-- ████████  LEADERBOARD  ████████ -->
-<div class="screen" id="s-lb">
+<!-- ████████  COMMUNITY  ████████ -->
+<div class="screen" id="s-community">
   <div style="padding:16px 0 12px;flex-shrink:0;">
-    <div class="eyebrow">Hall of Faith</div>
-    <div class="h1">Global <em>Rankings</em></div>
+    <div class="eyebrow">Community</div>
+    <div class="h1">Connect & <em>Compete</em></div>
     <div style="display:flex;gap:7px;margin-top:11px;">
-      <button class="btn btn-ghost btn-sm" style="flex:1;padding:8px;" id="lb-global" onclick="lbTab('global')">🌍 Global</button>
-      <button class="btn btn-ghost btn-sm" style="flex:1;padding:8px;" id="lb-clan"   onclick="lbTab('clan')">⛪ Clan</button>
-      <button class="btn btn-ghost btn-sm" style="flex:1;padding:8px;" id="lb-friends" onclick="lbTab('friends')">👥 Friends</button>
-      <button class="btn btn-ghost btn-sm" style="flex:1;padding:8px;" id="lb-weekly" onclick="lbTab('weekly')">📅 Weekly</button>
+      <button class="btn btn-ghost btn-sm" style="flex:1;padding:8px;" id="comm-tab-rankings" onclick="communityTab('rankings')">🏆 Rankings</button>
+      <button class="btn btn-ghost btn-sm" style="flex:1;padding:8px;" id="comm-tab-clans" onclick="communityTab('clans')">⛪ Clans</button>
     </div>
   </div>
   <div class="scroller">
-    <div id="lb-list"></div>
-    <div id="friends-add-box" style="display:none;margin-top:20px;padding:0 16px;">
-      <div class="divider"><span>Add Friend</span></div>
-      <div style="display:flex;gap:10px;margin-top:15px;">
-        <input class="setup-inp" style="flex:1;" id="friend-code-inp" placeholder="Enter Friend Code" maxlength="6">
-        <button class="btn btn-gold btn-sm" style="width:auto;" onclick="addFriend()">Add</button>
+    <!-- Rankings Panel -->
+    <div id="comm-panel-rankings">
+      <div style="padding:0 16px;">
+        <div style="display:flex;gap:7px;margin-bottom:16px;">
+          <button class="btn btn-ghost btn-sm" style="flex:1;padding:8px;" id="lb-global" onclick="lbTab('global')">🌍 Global</button>
+          <button class="btn btn-ghost btn-sm" style="flex:1;padding:8px;" id="lb-clan"   onclick="lbTab('clan')">⛪ Clan</button>
+          <button class="btn btn-ghost btn-sm" style="flex:1;padding:8px;" id="lb-friends" onclick="lbTab('friends')">👥 Friends</button>
+          <button class="btn btn-ghost btn-sm" style="flex:1;padding:8px;" id="lb-weekly" onclick="lbTab('weekly')">📅 Weekly</button>
+        </div>
       </div>
-      <div style="font-size:11px;color:var(--ink3);margin-top:10px;text-align:center;">Your Code: <strong id="my-friend-code" style="color:var(--gold1);">------</strong></div>
+      <div id="lb-list"></div>
+      <div id="friends-add-box" style="display:none;margin-top:20px;padding:0 16px;">
+        <div class="divider"><span>Add Friend</span></div>
+        <div style="display:flex;gap:10px;margin-top:15px;">
+          <input class="setup-inp" style="flex:1;" id="friend-code-inp" placeholder="Enter Friend Code" maxlength="6">
+          <button class="btn btn-gold btn-sm" style="width:auto;" onclick="addFriend()">Add</button>
+        </div>
+        <div style="font-size:11px;color:var(--ink3);margin-top:10px;text-align:center;">Your Code: <strong id="my-friend-code" style="color:var(--gold1);">------</strong></div>
+      </div>
     </div>
-    <div class="pb"></div>
-  </div>
-</div>
 
-<!-- ████████  CLANS  ████████ -->
-<div class="screen" id="s-clans">
-  <div style="padding:16px 0 12px;flex-shrink:0;">
-    <div class="eyebrow">Church Clans</div>
-    <div class="h1">Your <em>Congregation</em></div>
-  </div>
-  <div class="scroller">
-    <div id="my-clan" style="margin-bottom:12px;"></div>
-    <div class="divider"><span>⚔️ Clan Wars</span></div>
-    <div class="card" style="text-align:center;padding:18px;margin-bottom:12px;">
-      <div style="font-size:28px;margin-bottom:7px;">⚔️</div>
-      <div class="eyebrow" style="margin-bottom:4px;">Coming This Month</div>
-      <p class="small dim" style="line-height:1.65;">Challenge other churches to weekly Scripture battles. The clan with the most correct answers wins glory for their congregation.</p>
+    <!-- Clans Panel -->
+    <div id="comm-panel-clans" style="display:none;">
+      <div style="padding:0 16px;margin-bottom:12px;">
+        <div id="my-clan"></div>
+      </div>
+      <div style="padding:0 16px;">
+        <div class="divider"><span>⚔️ Clan Wars</span></div>
+      </div>
+      <div class="card" style="text-align:center;padding:18px;margin:0 16px 12px;">
+        <div style="font-size:28px;margin-bottom:7px;">⚔️</div>
+        <div class="eyebrow" style="margin-bottom:4px;">Coming This Month</div>
+        <p class="small dim" style="line-height:1.65;">Challenge other churches to weekly Scripture battles. The clan with the most correct answers wins glory for their congregation.</p>
+      </div>
+      <div style="padding:0 16px;margin-bottom:9px;">
+        <div class="eyebrow">Top Clans This Week</div>
+      </div>
+      <div style="padding:0 16px;">
+        <div id="clan-lb"></div>
+      </div>
+      <div style="padding:0 16px;margin:12px 0;">
+        <div class="divider"><span>✦</span></div>
+      </div>
+      <div style="padding:0 16px;">
+        <button class="btn btn-gold" onclick="openOv('ov-clan-create')" style="margin-bottom:8px;width:100%;"><span class="btn-icon">⛪</span>Create a Clan</button>
+        <button class="btn btn-ghost btn-sm" onclick="openOv('ov-clan-join')" style="width:100;">🔑 Join by Code</button>
+      </div>
     </div>
-    <div class="eyebrow" style="margin-bottom:9px;">Top Clans This Week</div>
-    <div id="clan-lb"></div>
-    <div class="divider"><span>✦</span></div>
-    <button class="btn btn-gold" onclick="openOv('ov-clan-create')" style="margin-bottom:8px;"><span class="btn-icon">⛪</span>Create a Clan</button>
-    <button class="btn btn-ghost btn-sm" onclick="openOv('ov-clan-join')">🔑 Join by Code</button>
+
     <div class="pb"></div>
   </div>
 </div>
@@ -2850,18 +2874,18 @@ html[data-theme="warmth"] .nb.on, html[data-theme="warmth"] .nb.on svg { color: 
     </svg>
     Home
   </button>
-  <button class="nb" id="nb-lb" onclick="go('lb');setNb(this)">
+  <button class="nb" id="nb-community" onclick="go('community');setNb(this)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
       <path d="M8 21h8M12 21v-5"/><path d="M6 4h12l-1.5 6H7.5L6 4z"/><path d="M7.5 10Q7 14 12 16Q16.5 14 16.5 10"/>
       <path d="M4 4h2M18 4h2M4 4Q3 7 5 9M20 4Q21 7 19 9"/>
     </svg>
-    Ranks
+    Community
   </button>
-  <button class="nb" id="nb-clans" onclick="go('clans');setNb(this)">
+  <button class="nb nb-join" id="nb-join" onclick="go('lobby');setNb(this)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M11 2h2v8h8v2h-8v8h-2v-8H3v-2h8V2z"/>
+      <rect x="3" y="7" width="18" height="12" rx="2"/><circle cx="9" cy="14" r="1.5" fill="currentColor"/><circle cx="15" cy="12" r="1.5" fill="currentColor"/><circle cx="15" cy="14" r="1.5" fill="currentColor"/>
     </svg>
-    Clans
+    Play
   </button>
   <button class="nb" id="nb-friends" onclick="go('friends');setNb(this)">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -39748,8 +39772,7 @@ function go(id){
   if(sc) sc.scrollTop=0;
   // hooks
   if(id==='home') initGreeting();
-  if(id==='lb') lbTab('global');
-  if(id==='clans') renderClans();
+  if(id==='community') communityTab('rankings');
   if(id==='profile') renderProfile();
   if(id==='lobby') renderLobby();
   if(id==='friends') renderFriends();
@@ -39757,6 +39780,21 @@ function go(id){
 function setNb(btn){
   document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
+}
+function communityTab(tab){
+  // Update tab buttons
+  document.querySelectorAll('#comm-tab-rankings, #comm-tab-clans').forEach(b=>b.classList.remove('active'));
+  if(tab==='rankings'){
+    document.getElementById('comm-tab-rankings').classList.add('active');
+    document.getElementById('comm-panel-rankings').style.display='block';
+    document.getElementById('comm-panel-clans').style.display='none';
+    lbTab('global');
+  }else if(tab==='clans'){
+    document.getElementById('comm-tab-clans').classList.add('active');
+    document.getElementById('comm-panel-rankings').style.display='none';
+    document.getElementById('comm-panel-clans').style.display='block';
+    renderClans();
+  }
 }
 
 /* ══════════════════════════════════════════════════
@@ -41285,7 +41323,7 @@ function renderProfile(){
     <span style="font-size:22px;">${p.clanIcon||'⛪'}</span>
     <div><div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;">${p.clanName}</div>
     <div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;">Your Clan · ${p.clanCode||''}</div></div></div>`:
-    `<div class="empty" style="padding:8px 0;">Not in a clan. <button onclick="go('clans')" style="background:none;border:none;color:var(--gold);font-family:'Cinzel',serif;font-size:10px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;">Join one →</button></div>`;
+    `<div class="empty" style="padding:8px 0;">Not in a clan. <button onclick="go('community');communityTab('clans')" style="background:none;border:none;color:var(--gold);font-family:'Cinzel',serif;font-size:10px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;">Join one →</button></div>`;
   
   const churchCta = document.getElementById('church-tools-cta');
   if(churchCta) churchCta.style.display = (p.tier === 'church') ? 'block' : 'none';
