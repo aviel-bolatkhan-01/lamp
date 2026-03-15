@@ -39921,7 +39921,10 @@ function pickMode(el,m){
   el.classList.add('sel');
   
   const subRow=document.getElementById('sub-row');
-  if(subRow) subRow.style.display=(m==='battle' || m==='practice')?'none':'';
+  if(subRow) subRow.style.display=(m==='practice')?'none':'';
+
+  // Practice mode always uses classic sub
+  if(m==='practice'){ G.sub='classic'; }
 
   const prRow = document.getElementById('practice-cat-row');
   if(prRow) {
@@ -40058,9 +40061,9 @@ function buildPool(){
     }
   }
 
-  // Filter out seen questions
-  let unseen = raw.filter(q => !G.seen.has(q.q));
-  
+  // Filter out seen questions (use q.q for classic/TF, q.r for verse)
+  let unseen = raw.filter(q => !G.seen.has(q.q || q.r));
+
   // If we've seen everything or pool is empty due to filter, reset seen
   if(unseen.length === 0){
     G.seen.clear();
@@ -40151,7 +40154,7 @@ function renderQ(){
       q = matchingQs[Math.floor(Math.random() * matchingQs.length)];
     }
   }
-  G.seen.add(q.q);
+  G.seen.add(q.q || q.r);
 
   document.getElementById('g-av').textContent=p.avatar;
   document.getElementById('g-nm').textContent=p.name + (p.team ? ` (${p.team})` : '');
@@ -40642,9 +40645,17 @@ function endGame(){
 }
 
 function playAgain(){
-  sfx.tap(); G.qi=0; G.pi=0;
+  sfx.tap(); stopTimers(); clearAutoAdvance();
+  G.qi=0; G.pi=0; G.seen.clear(); G.done=false;
+  G.scores={}; G.hearts={}; G.streaks={};
   G.players.forEach(p=>{ G.scores[p.name]=0; G.hearts[p.name]=3; G.streaks[p.name]=0; });
-  beginGame();
+  if(G.sub==='team'){
+    G.teamScores={"Team 1":0,"Team 2":0};
+  }
+  G.pool=buildPool();
+  if(G.sub==='truefalse'){ startTF(); return; }
+  if(G.sub==='lightning'){ showSplash(0,()=>startLightning(0)); return; }
+  showSplash(0,()=>{ go('game'); renderQ(); });
 }
 
 /* ══════════════════════════════════════════════════
