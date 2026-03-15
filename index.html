@@ -1196,6 +1196,7 @@ body::after {
   padding: 0 16px 4px;
   margin: 0 -16px;
 }
+#mode-chips { flex-wrap: wrap; overflow-x: visible; padding: 0; margin: 0; }
 .chips::-webkit-scrollbar { display: none; }
 .chip {
   flex-shrink: 0;
@@ -2230,8 +2231,8 @@ html[data-theme="warmth"] .nb.on, html[data-theme="warmth"] .nb.on svg { color: 
       <div class="btn btn-gold btn-sm" style="width:auto;padding:8px 16px;">Play</div>
     </div>
 
-    <!-- Premium CTA -->
-    <div id="premium-cta" class="card" style="margin-bottom:16px;padding:12px 16px;background:linear-gradient(135deg, rgba(201,145,13,0.15) 0%, rgba(13,9,6,0) 100%);border:1px solid rgba(201,145,13,0.3);display:none;" onclick="go('premium')">
+    <!-- Donate CTA -->
+    <div class="card" style="margin-bottom:16px;padding:12px 16px;background:linear-gradient(135deg, rgba(201,145,13,0.15) 0%, rgba(13,9,6,0) 100%);border:1px solid rgba(201,145,13,0.3);" onclick="go('donation')">
       <div style="display:flex;align-items:center;gap:12px;">
         <div style="font-size:24px;">👑</div>
         <div style="flex:1;">
@@ -2260,7 +2261,6 @@ html[data-theme="warmth"] .nb.on, html[data-theme="warmth"] .nb.on svg { color: 
       <div class="chips" id="mode-chips">
         <button class="chip sel" onclick="pickMode(this,'local')">👥 Pass &amp; Play</button>
         <button class="chip" onclick="pickMode(this,'online')">🌐 Online Room</button>
-        <button class="chip" onclick="pickMode(this,'battle')">⚔️ Battle Royale</button>
         <button class="chip" onclick="pickMode(this,'nearby')">📡 Nearby</button>
         <button class="chip" onclick="pickMode(this,'practice')">🎓 Practice</button>
       </div>
@@ -2572,28 +2572,6 @@ html[data-theme="warmth"] .nb.on, html[data-theme="warmth"] .nb.on svg { color: 
   </div>
 </div>
 
-<!-- ████████  BATTLE ROYALE  ████████ -->
-<div class="screen" id="s-battle">
-  <div class="g-hdr" style="border-color:rgba(139,28,28,.22);">
-    <button class="g-quit" onclick="quitGame()" aria-label="Quit game" style="border-color:rgba(139,28,28,.3);">✕</button>
-    <div style="font-family:'Cinzel',serif;font-size:10px;font-weight:600;letter-spacing:.1em;color:#e08080;text-transform:uppercase;flex:1;text-align:center;">⚔️ Battle Royale</div>
-    <div id="br-round" style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;margin-right:6px;flex-shrink:0;"></div>
-    <div class="score-num" id="br-alive" style="color:#e08080;font-size:14px;flex-shrink:0;"></div>
-  </div>
-  <div class="timer-row" style="margin-bottom:8px;">
-    <div class="timer-track"><div class="timer-bar" id="br-tbar"></div></div>
-  </div>
-  <div class="br-strip" id="br-strip"></div>
-  <div class="scroller">
-    <div class="q-cat" id="br-cat"></div>
-    <div class="q-text" id="br-txt"></div>
-    <div id="br-opts" class="opts"></div>
-    <div class="fb" id="br-fb" style="display:none;"></div>
-    <button class="btn btn-ghost btn-sm" id="br-next" style="display:none;margin-top:12px;" onclick="brNext()">Next Round →</button>
-    <div class="pb"></div>
-  </div>
-</div>
-
 <!-- ████████  TRUE / FALSE  ████████ -->
 <div class="screen" id="s-tf">
   <div class="g-hdr">
@@ -2658,53 +2636,6 @@ html[data-theme="warmth"] .nb.on, html[data-theme="warmth"] .nb.on svg { color: 
     <button class="btn btn-share btn-sm" onclick="shareResult()" style="margin-bottom:8px;">↗ Share Result</button>
     <button class="btn btn-ghost btn-sm" style="margin-bottom:8px;" onclick="go('home')">Home</button>
     <button class="btn btn-ghost btn-sm" onclick="go('donation')">❤️ Support This Ministry</button>
-    <div class="pb"></div>
-  </div>
-</div>
-
-<!-- ████████  PREMIUM  ████████ -->
-<div class="screen" id="s-premium">
-  <div style="padding:16px 0 12px;flex-shrink:0;">
-    <button class="g-quit" style="position:static;margin-bottom:10px;margin-left:16px;" onclick="go('home')">← Back</button>
-    <div class="eyebrow" style="margin-left:16px;">Membership</div>
-    <div class="h1" style="margin-left:16px;">Premium <em>Access</em></div>
-  </div>
-  <div class="scroller">
-    <div class="card" style="padding:24px 20px;text-align:center;background:linear-gradient(180deg, rgba(201,145,13,0.1) 0%, rgba(13,9,6,0) 100%); margin: 0 16px;">
-      <div style="font-size:48px;margin-bottom:15px;">👑</div>
-      <div style="font-family:'Playfair Display',serif;font-size:22px;color:var(--gold1);margin-bottom:10px;">Go Unlimited</div>
-      <p style="color:var(--ink2);font-size:14px;line-height:1.6;margin-bottom:20px;">Support our ministry and unlock the full Lamp experience for your family and friends.</p>
-      
-      <div style="text-align:left;margin-bottom:25px;display:grid;gap:12px;">
-        <div style="font-size:13px;color:var(--ink1);"><span style="color:var(--gold1);margin-right:8px;">✓</span> Unlimited daily games (Free: 10/day)</div>
-        <div style="font-size:13px;color:var(--ink1);"><span style="color:var(--gold1);margin-right:8px;">✓</span> Unlock all 19 question categories</div>
-        <div style="font-size:13px;color:var(--ink1);"><span style="color:var(--gold1);margin-right:8px;">✓</span> Daily Challenges & Leaderboards</div>
-        <div style="font-size:13px;color:var(--ink1);"><span style="color:var(--gold1);margin-right:8px;">✓</span> Special Power-up earnings</div>
-        <div style="font-size:13px;color:var(--ink1);"><span style="color:var(--gold1);margin-right:8px;">✓</span> Custom Room Themes & Avatars</div>
-      </div>
-
-      <div style="display:grid;gap:12px;">
-        <button class="btn btn-gold" onclick="upgradeTier('premium')">
-          <div style="display:flex;justify-content:space-between;width:100%;padding:0 10px;">
-            <span>Monthly Premium</span>
-            <span>$4.99/mo</span>
-          </div>
-        </button>
-        <button class="btn btn-blue" onclick="upgradeTier('family')">
-          <div style="display:flex;justify-content:space-between;width:100%;padding:0 10px;">
-            <span>Family Plan (6 users)</span>
-            <span>$6.99/mo</span>
-          </div>
-        </button>
-        <button class="btn btn-green" onclick="upgradeTier('church')">
-          <div style="display:flex;justify-content:space-between;width:100%;padding:0 10px;">
-            <span>Church / Org Plan</span>
-            <span>$19.99/mo</span>
-          </div>
-        </button>
-      </div>
-      <div style="margin-top:15px;font-size:11px;color:var(--ink3);">Cancel anytime. Payments handled via App Store / Play Store.</div>
-    </div>
     <div class="pb"></div>
   </div>
 </div>
@@ -39801,14 +39732,12 @@ function renderHomeBar(){
     </div>
   </div>`;
   el.style.display='block';
-  const cta = document.getElementById('premium-cta');
-  if(cta) cta.style.display = (p.tier === 'free') ? 'block' : 'none';
 }
 
 /* ══════════════════════════════════════════════════
    NAVIGATION
 ══════════════════════════════════════════════════ */
-const GAME_SCREENS=['game','lightning','battle','tf','auth','setup','winner','scores','chat'];
+const GAME_SCREENS=['game','lightning','tf','auth','setup','winner','scores','chat'];
 function go(id){
   stopTimers();
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -40053,32 +39982,7 @@ function buildPool(){
   return shuf(unseen);
 }
 
-function upgradeTier(t){
-  if(!G.profile)return;
-  sfx.levelUp();
-  G.profile.tier = t;
-  saveProfile();
-  if(G.fbOk) pushProfile();
-  go('home');
-  toast(`👑 Welcome to ${t.toUpperCase()} tier!`);
-  renderHomeBar();
-}
-
 function beginGame(){
-  if (G.profile && G.profile.tier === 'free') {
-    const today = new Date().toISOString().split('T')[0];
-    if (G.profile.lastGameDate !== today) {
-      G.profile.gamesToday = 0;
-      G.profile.lastGameDate = today;
-    }
-    if (G.profile.gamesToday >= 10) {
-      toast('Daily limit reached! Upgrade to Premium for unlimited games.');
-      go('premium');
-      return;
-    }
-    G.profile.gamesToday++;
-    saveProfile();
-  }
 
   // Sync names and ensure uniqueness
   const names = new Set();
@@ -40106,7 +40010,6 @@ function beginGame(){
     });
   }
 
-  if(G.mode==='battle'){ startBR(); return; }
   if(G.sub==='truefalse'){ startTF(); return; }
   if(G.sub==='lightning'){ showSplash(0,()=>startLightning(0)); return; }
   showSplash(0,()=>{ go('game'); renderQ(); });
@@ -40425,93 +40328,6 @@ function endLightning(){
     document.getElementById('scores-cta').onclick=()=>{ sfx.tap(); showSplash(next,()=>startLightning(next)); };
   }else{ showScores(true); }
 }
-
-/* ── Battle Royale ── */
-function startBR(){
-  G.alive=[...G.players]; G.brRound=0;
-  G.pool=buildPool(); G.qi=0;
-  G.players.forEach(p=>{ G.hearts[p.name]=3; G.scores[p.name]=0; });
-  go('battle'); renderBR();
-}
-function renderBR(){
-  G.done=false;
-  if(G.qi>=G.pool.length){ G.pool=buildPool(); G.qi=0; }
-  const q=G.pool[G.qi]; G.qi++;
-  G.seen.add(q.q);
-  G.brRound++;
-  document.getElementById('br-round').textContent='Round '+G.brRound;
-  document.getElementById('br-alive').textContent=G.alive.length+'❤️';
-  document.getElementById('br-cat').textContent=catLabel(q.cat||'');
-  document.getElementById('br-fb').style.display='none';
-  document.getElementById('br-next').style.display='none';
-  renderBRStrip();
-
-  const order=shuf([0,1,2,3]);
-  document.getElementById('br-txt').textContent=q.q;
-  const wrap=document.getElementById('br-opts'); wrap.innerHTML='';
-  const keys=['A','B','C','D'];
-  order.forEach((orig,di)=>{
-    const btn=document.createElement('button'); btn.className='opt';
-    btn.style.cssText=`animation:scrIn .3s ${di*.06}s both`;
-    btn.innerHTML=`<span class="opt-key">${keys[di]}</span><span>${q.o[orig]}</span>`;
-    btn.onclick=()=>answerBR(btn,orig===q.a,q,order);
-    wrap.appendChild(btn);
-  });
-  if(G.cfg.timer) startTimer('br-tbar',null,G.TIM,()=>{
-    if(G.done)return; G.done=true;
-    document.querySelectorAll('#br-opts .opt').forEach(b=>b.disabled=true);
-    const p=G.alive[0];
-    const fb=document.getElementById('br-fb'); fb.style.display='block';
-    fb.className='fb to'; fb.innerHTML=`<strong>⏰ Time's up!</strong> ${q.e}`;
-    loseHeart(p.name);
-    sfx.wrong();
-    if(G.alive.length<=1){ setTimeout(endGame,1400); return; }
-    document.getElementById('br-next').style.display='flex';
-  });
-}
-function answerBR(btn,isOk,q,order){
-  if(G.done)return; G.done=true; stopTimers();
-  document.querySelectorAll('#br-opts .opt').forEach(b=>b.disabled=true);
-  const p=G.alive[0];
-  const fb=document.getElementById('br-fb'); fb.style.display='block';
-  if(isOk){
-    btn.classList.add('correct'); G.scores[p.name]++;
-    fb.className='fb ok'; fb.innerHTML=`<strong>✓ Correct!</strong> ${q.e}${typeof getTranslationBadge==='function'?getTranslationBadge():''}`;
-    sfx.correct();
-    G.alive.push(G.alive.shift());// move to back of rotation
-  }else{
-    btn.classList.add('wrong');
-    document.querySelectorAll('#br-opts .opt').forEach((b,i)=>{ if(order[i]===q.a)b.classList.add('reveal'); });
-    fb.className='fb no'; fb.innerHTML=`<strong>✗</strong> ${q.e}<br><span style="color:#e08080;">${p.name} loses a life! (${Math.max(0,(G.hearts[p.name]||0)-1)} left)</span>`;
-    sfx.wrong();
-    loseHeart(p.name);
-  }
-  renderBRStrip();
-  if(G.alive.length<=1){ setTimeout(endGame,1500); return; }
-  document.getElementById('br-next').style.display='flex';
-}
-function loseHeart(name){
-  G.hearts[name]=Math.max(0,(G.hearts[name]||0)-1);
-  if(G.hearts[name]===0){
-    G.alive=G.alive.filter(a=>a.name!==name);
-    showElim(name);
-  }else{ G.alive.push(G.alive.shift()); }
-}
-function renderBRStrip(){
-  const strip=document.getElementById('br-strip'); strip.innerHTML='';
-  G.players.forEach((p,i)=>{
-    const alive=G.alive.find(a=>a.name===p.name);
-    const isCur=alive&&G.alive[0].name===p.name;
-    const div=document.createElement('div');
-    div.className='br-p'+(isCur?' cur':alive?'':' dead');
-    const h=G.hearts[p.name]||0;
-    div.innerHTML=`<span class="br-av">${p.avatar}</span>
-      <span class="br-nm">${p.name}</span>
-      <div class="br-hh">${Array.from({length:3},(_,j)=>`<span>${j<h?'❤️':'🖤'}</span>`).join('')}</div>`;
-    strip.appendChild(div);
-  });
-}
-function brNext(){ sfx.tap(); haptic('tap'); renderBR(); }
 
 /* ── True/False ── */
 function startTF(){
@@ -40875,12 +40691,13 @@ function joinFromRoom(d){
   G.scores={};G.hearts={};G.streaks={};
   G.players.forEach(p=>{G.scores[p.name]=0;G.hearts[p.name]=3;G.streaks[p.name]=0;});
 
+  G._myVoteSubmitted=false; G._votesRef=null;
   G.roomRef.child('gameState').on('value',sn=>{
     const gs=sn.val();if(!gs)return;
     if(gs.pool&&!G.roomPool){G.roomPool=gs.pool;G.roomOrders=gs.orders;}
     if(gs.scores)Object.assign(G.scores,gs.scores);
     if(gs.hearts)Object.assign(G.hearts,gs.hearts);
-    const stateKey=gs.phase+':'+gs.qi+':'+gs.pi+':'+(gs.t||0);
+    const stateKey=gs.phase+':'+gs.qi+':'+(gs.t||0);
     if(stateKey===G._lastOnlineState)return;
     G._lastOnlineState=stateKey;
     if(gs.phase==='question'){G.qi=gs.qi;G.pi=gs.pi;G.done=false;renderOnlineQ();}
@@ -40903,17 +40720,23 @@ function renderOnlineQ(){
   if(!G.roomPool)return;
   const q=G.roomPool[G.qi];if(!q){if(G.roomRef)G.roomRef.child('gameState').update({phase:'ended'});return;}
   const order=G.roomOrders[G.qi];
-  const p=G.players[G.pi];if(!p)return;
-  const isMyTurn=p.uid===G.uid;
+  // Clean up old vote watcher
+  if(G._votesRef){G._votesRef.off();G._votesRef=null;}
+  G._myVoteSubmitted=false;
   stopTimers();clearAutoAdvance();
   go('game');
-  document.getElementById('g-av').textContent=p.avatar;
-  document.getElementById('g-nm').textContent=p.name+(isMyTurn?' (You)':'');
-  document.getElementById('g-score').textContent=G.scores[p.name]||0;
-  document.getElementById('g-round').textContent=(G.scores[p.name]||0)+' / '+G.cfg.winScore;
-  renderHearts('g-hearts',G.hearts[p.name]!=null?G.hearts[p.name]:3);
+  // Show this player's own info
+  const me=G.players.find(p=>p.uid===G.uid)||G.players[0];
+  document.getElementById('g-av').textContent=me?me.avatar:'';
+  document.getElementById('g-nm').textContent=me?me.name+' (You)':'';
+  document.getElementById('g-score').textContent=me?(G.scores[me.name]||0):0;
+  document.getElementById('g-round').textContent='Q '+(G.qi+1);
+  renderHearts('g-hearts',me&&G.hearts[me.name]!=null?G.hearts[me.name]:3);
   document.getElementById('g-cat').textContent=catLabel(q.cat||q.r||'');
-  document.getElementById('g-fb').style.display='none';
+  const fb=document.getElementById('g-fb');
+  fb.style.display='block';fb.className='fb ok';
+  fb.style.background='rgba(100,80,20,0.15)';fb.style.color='var(--gold)';
+  fb.innerHTML=`<strong>0/${G.players.length} voted</strong>`;
   document.getElementById('g-next-row').style.display='none';
   document.getElementById('g-auto-bar').style.display='none';
   const sb=document.getElementById('g-streak-badge');if(sb){sb.style.display='none';sb.classList.remove('streak-pulse');}
@@ -40926,75 +40749,98 @@ function renderOnlineQ(){
     btn.style.cssText=`animation:scrIn .3s ${di*.06}s both`;
     btn.innerHTML=`<span class="opt-key">${keys[di]}</span><span>${q.o[orig]}</span>`;
     btn.dataset.origIdx=orig;
-    if(isMyTurn)btn.onclick=()=>answerOnline(btn,orig===q.a,q);
-    else btn.disabled=true;
+    btn.onclick=()=>answerOnline(btn,orig===q.a,q);
     wrap.appendChild(btn);
   });
-  if(!isMyTurn){
-    const fb=document.getElementById('g-fb');fb.style.display='block';fb.style.background='rgba(100,80,20,0.15)';fb.style.color='var(--gold)';
-    fb.innerHTML=`<strong>Waiting for ${p.name}…</strong>`;
-  }
   updateProgress();
-  if(G.cfg.timer&&isMyTurn){const pTim=p.diff==='easy'?25:p.diff==='hard'?12:20;startTimer('g-tbar','g-tsecs',pTim,()=>answerOnline(null,false,q,true));}
-  else{document.getElementById('g-tbar').style.transform='scaleX(1)';document.getElementById('g-tsecs').textContent='';}
+  if(G.cfg.timer){
+    startTimer('g-tbar','g-tsecs',20,()=>{if(!G._myVoteSubmitted)answerOnline(null,false,q,true);});
+  } else {
+    document.getElementById('g-tbar').style.transform='scaleX(1)';
+    document.getElementById('g-tsecs').textContent='';
+  }
+  // Watch votes in real time
+  G._votesRef=G.roomRef.child('gameState/votes');
+  G._votesRef.on('value',sn=>{
+    const votes=sn.val()||{};
+    const votedCount=Object.keys(votes).length;
+    const total=G.players.length;
+    const fb2=document.getElementById('g-fb');
+    if(fb2&&!G.done){
+      fb2.style.display='block';fb2.className='fb ok';
+      fb2.style.background='rgba(100,80,20,0.15)';fb2.style.color='var(--gold)';
+      fb2.innerHTML=`<strong>${votedCount}/${total} voted</strong>`;
+    }
+    // Host tallies when everyone has voted
+    if(G.isHost&&votedCount>=total){
+      G._votesRef.off();G._votesRef=null;
+      stopTimers();
+      G.players.forEach(p=>{
+        const pVote=votes[p.uid];
+        if(pVote===q.a){G.scores[p.name]=(G.scores[p.name]||0)+1;}
+        else if(G.cfg.hearts){G.hearts[p.name]=Math.max(0,(G.hearts[p.name]!=null?G.hearts[p.name]:3)-1);}
+      });
+      const anyGameOver=G.players.some(p=>G.scores[p.name]>=(G.cfg.winScore||10)||(G.cfg.hearts&&G.hearts[p.name]<=0));
+      let nqi=G.qi+1;
+      if(nqi>=(G.roomPool?G.roomPool.length:40))nqi=0;
+      G.roomRef.child('gameState').update({
+        phase:'result',votes,correctA:q.a,scores:G.scores,hearts:G.hearts,
+        nextQi:nqi,gameOver:anyGameOver||false,t:Date.now()
+      });
+    }
+  });
 }
 
 function answerOnline(btn,isOk,q,timedOut){
-  if(G.done)return;G.done=true;G.isAnswerer=true;stopTimers();
+  if(G._myVoteSubmitted)return;
+  G._myVoteSubmitted=true;
   document.querySelectorAll('#g-opts .opt').forEach(b=>b.disabled=true);
-  const p=G.players[G.pi];
+  if(btn)btn.classList.add('selected-vote');
   const origIdx=btn?parseInt(btn.dataset.origIdx):-1;
-  if(isOk){
-    G.scores[p.name]=(G.scores[p.name]||0)+1;G.streaks[p.name]=(G.streaks[p.name]||0)+1;
-    sfx.correct();haptic('correct');addXP(10);
-    if(G.profile){G.profile.correct=(G.profile.correct||0)+1;saveProfile();}
-  } else {
-    G.streaks[p.name]=0;
-    if(G.cfg.hearts)G.hearts[p.name]=Math.max(0,(G.hearts[p.name]!=null?G.hearts[p.name]:3)-1);
-    sfx.wrong();haptic('wrong');
+  if(isOk){sfx.correct();haptic('correct');}else{sfx.wrong();haptic('wrong');}
+  if(G.roomRef&&G.uid){
+    G.roomRef.child('gameState/votes/'+G.uid).set(origIdx!==-1?origIdx:null);
   }
-  const gameOver=G.scores[p.name]>=(G.cfg.winScore||10)||(G.cfg.hearts&&G.hearts[p.name]<=0);
-  G.roomRef.child('gameState').update({
-    phase:'result',
-    result:{correct:isOk,selectedOrig:origIdx,correctA:q.a,timedOut:timedOut||false},
-    scores:G.scores,hearts:G.hearts,
-    nextQi:G.qi+1,nextPi:(G.pi+1)%G.players.length,
-    gameOver:gameOver||false,t:Date.now()
-  });
 }
 
 function showOnlineResult(gs){
-  const result=gs.result;if(!result)return;
+  if(G._votesRef){G._votesRef.off();G._votesRef=null;}
+  const votes=gs.votes||{};
   if(gs.scores)Object.assign(G.scores,gs.scores);
   if(gs.hearts)Object.assign(G.hearts,gs.hearts);
-  const p=G.players[gs.pi];if(!p)return;
-  const q=G.roomPool?G.roomPool[gs.qi]:null;
-  const fb=document.getElementById('g-fb');fb.style.display='block';fb.style.background='';fb.style.color='';
-  if(result.timedOut){
-    fb.className='fb bad';const ct=q?q.o[q.a]:'';fb.innerHTML=`<strong>⏱ Time's up!</strong> Correct: ${ct}. ${q?q.e:''}`;
-  } else if(result.correct){
-    fb.className='fb ok';fb.innerHTML=`<strong>✓ Correct!</strong> ${q?q.e:''}`;
-  } else {
-    fb.className='fb bad';const ct=q?q.o[q.a]:'';fb.innerHTML=`<strong>✗ Wrong.</strong> Correct: ${ct}. ${q?q.e:''}`;
-  }
+  const q=G.roomPool?G.roomPool[gs.qi]:null;if(!q)return;
+  stopTimers();
+  const me=G.players.find(p=>p.uid===G.uid)||G.players[0];
+  document.getElementById('g-score').textContent=me?(G.scores[me.name]||0):0;
+  renderHearts('g-hearts',me&&G.hearts[me.name]!=null?G.hearts[me.name]:3);
+  // Highlight correct and this player's wrong answer
   document.querySelectorAll('#g-opts .opt').forEach(b=>{
     const orig=parseInt(b.dataset.origIdx);
-    if(orig===result.selectedOrig)b.classList.add(result.correct?'correct':'wrong');
-    if(orig===result.correctA&&!result.correct)b.classList.add('correct');
+    if(orig===gs.correctA)b.classList.add('correct');
+    const myVote=me?votes[me.uid]:undefined;
+    if(myVote!==undefined&&orig===myVote&&orig!==gs.correctA)b.classList.add('wrong');
     b.disabled=true;
   });
-  document.getElementById('g-score').textContent=G.scores[p.name]||0;
-  document.getElementById('g-round').textContent=(G.scores[p.name]||0)+' / '+G.cfg.winScore;
-  renderHearts('g-hearts',G.hearts[p.name]!=null?G.hearts[p.name]:3);
-  if(!G.isAnswerer)return;
-  G.isAnswerer=false;
-  if(gs.gameOver){setTimeout(()=>{if(G.roomRef){G.roomRef.child('gameState').update({phase:'ended'});}endGame();},2200);return;}
+  // Build result summary
+  const correctName=q.o[gs.correctA]||'';
+  let html=`<strong>✓ ${correctName}</strong> — ${q.e||''}<br><div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;">`;
+  G.players.forEach(p=>{
+    const pVote=votes[p.uid];
+    const pOk=(pVote===gs.correctA);
+    html+=`<span style="background:rgba(255,255,255,.06);border-radius:8px;padding:4px 8px;font-size:12px;color:${pVote===undefined?'var(--ink3)':pOk?'#6dda9a':'#e08080'}">${p.avatar} ${p.name} ${pVote===undefined?'—':pOk?'✓':'✗'}</span>`;
+  });
+  html+=`</div>`;
+  const fb=document.getElementById('g-fb');
+  fb.style.display='block';fb.style.background='';fb.style.color='';
+  fb.className='fb ok';fb.innerHTML=html;
+  if(!G.isHost)return;
+  if(gs.gameOver){setTimeout(()=>{if(G.roomRef){G.roomRef.child('gameState').update({phase:'ended'});}endGame();},2500);return;}
   setTimeout(()=>{
     if(!G.roomRef)return;
-    let nqi=gs.nextQi||G.qi+1,npi=gs.nextPi!=null?gs.nextPi:(G.pi+1)%G.players.length;
+    let nqi=gs.nextQi!=null?gs.nextQi:G.qi+1;
     if(nqi>=(G.roomPool?G.roomPool.length:40))nqi=0;
-    G.roomRef.child('gameState').update({phase:'question',qi:nqi,pi:npi,t:Date.now()});
-  },2200);
+    G.roomRef.child('gameState').update({phase:'question',qi:nqi,pi:0,votes:{},t:Date.now()});
+  },2500);
 }
 function copyCode(){
   const code=document.getElementById('rc-disp').textContent;
