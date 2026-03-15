@@ -2374,7 +2374,7 @@ html[data-theme="warmth"] .nb.on, html[data-theme="warmth"] .nb.on svg { color: 
         <div style="font-size:11px;color:var(--ink3);margin-top:4px;">Tap to copy · Share with friends</div>
       </div>
       <div style="display:flex;gap:8px;margin-bottom:18px;">
-        <input class="inp" id="friend-code-inp" placeholder="Enter a friend's code…" style="flex:1;" maxlength="8" autocomplete="off">
+        <input class="inp" id="friends-screen-code-inp" placeholder="Enter a friend's code…" style="flex:1;" maxlength="8" autocomplete="off">
         <button class="btn btn-primary" style="flex-shrink:0;width:auto;padding:0 20px;" onclick="addFriendFromFriends()">Add</button>
       </div>
       <div class="settings-section-title">Your Friends</div>
@@ -40837,6 +40837,48 @@ function copyCode(){
   if(navigator.clipboard) navigator.clipboard.writeText(txt).then(()=>toast('Code copied! ✦'));
   else{ const t=document.createElement('textarea'); t.value=txt; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); toast('Code copied! ✦'); }
 }
+function startNearby(){
+  if(!G.profile){ go('auth'); return; }
+  sfx.tap();
+  if(!('BroadcastChannel' in window)){
+    toast('Nearby play requires a modern browser. Use Online Room for cross-device play.');
+    return;
+  }
+  // BroadcastChannel works within the same browser on the same device.
+  // For cross-device LAN play, use Online Room with a shared code.
+  const code = mkCode();
+  try {
+    if(G.nearbyChannel) G.nearbyChannel.close();
+    G.nearbyChannel = new BroadcastChannel('lamp-nearby-' + code);
+    G.roomId = code; G.isHost = true;
+    const hostPlayers = { [G.uid||'host']: { name: G.profile.name, avatar: G.profile.avatar, ready: false, score: 0, hearts: 3 } };
+    document.getElementById('rc-disp').textContent = code;
+    document.getElementById('lobby-panel').style.display = 'block';
+    document.getElementById('start-btn').disabled = false;
+    const qrWrap = document.getElementById('lobby-qr'); if(qrWrap) qrWrap.style.display = 'none';
+    G.nearbyChannel.onmessage = e => {
+      if(e.data.type === 'join') {
+        hostPlayers[e.data.uid] = { name: e.data.name, avatar: e.data.avatar, ready: false, score: 0, hearts: 3 };
+        updateLobbyUI({ host: G.uid||'host', players: hostPlayers });
+        G.nearbyChannel.postMessage({ type: 'roster', players: hostPlayers, host: G.uid||'host' });
+      }
+    };
+    document.getElementById('start-btn').onclick = () => {
+      sfx.tap();
+      G.nearbyChannel.postMessage({ type: 'start', players: hostPlayers });
+      G.players = Object.values(hostPlayers).map(p => ({ name: p.name, avatar: p.avatar }));
+      G.pool = buildPool(); G.qi = 0; G.pi = 0;
+      G.scores = {}; G.hearts = {}; G.streaks = {};
+      G.players.forEach(p => { G.scores[p.name] = 0; G.hearts[p.name] = 3; G.streaks[p.name] = 0; });
+      G.nearbyChannel.close(); G.nearbyChannel = null;
+      showSplash(0, () => { go('game'); renderQ(); });
+    };
+    updateLobbyUI({ host: G.uid||'host', players: hostPlayers });
+    toast('Nearby room ' + code + ' open — share with others on this device.');
+  } catch(e) {
+    toast('Nearby play unavailable. Use Online Room instead.');
+  }
+}
 function startDailyChallenge(){
   if(!G.profile){ go('auth'); return; }
   sfx.tap();
@@ -41948,7 +41990,7 @@ function copyMyCode(){
 function addFriendFromFriends(){
   if(!G.profile){ toast('Create a profile first'); return; }
   if(!G.fbOk){ toast('Online not available'); return; }
-  const code=(document.getElementById('friend-code-inp').value||'').toUpperCase().trim();
+  const code=(document.getElementById('friends-screen-code-inp').value||'').toUpperCase().trim();
   if(code.length<5){ toast('Enter a valid code'); return; }
   if(code===G.profile.friendCode){ toast("That's your own code!"); return; }
   // Search leaderboard (same as original addFriend)
@@ -41966,7 +42008,7 @@ function addFriendFromFriends(){
       G._friendCache[uid]={name:p.name||'Friend',avatar:p.avatar||'😊',xp:p.xp||0};
     });
     saveProfile(); pushProfile();
-    document.getElementById('friend-code-inp').value='';
+    document.getElementById('friends-screen-code-inp').value='';
     toast('Friend added! 🎉');
     renderFriends();
   });

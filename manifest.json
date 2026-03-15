@@ -2,7 +2,7 @@
   "name": "Lamp - Bible Trivia with friends",
   "short_name": "Lamp",
   "description": "Lamp - Bible trivia game for families and churches. Play locally or online with friends.",
-  "start_url": "./Bible game.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#FAFAF8",
   "theme_color": "#58CC02",
