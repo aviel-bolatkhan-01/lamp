@@ -40642,6 +40642,7 @@ function joinRoomByCode(code){
     // Hide QR for joiners
     const qrWrap = document.getElementById('lobby-qr'); if(qrWrap) qrWrap.style.display='none';
     ref.on('value',sn2=>{ const d2=sn2.val(); if(!d2)return; updateLobbyUI(d2); if(d2.status==='playing'){ ref.off(); joinFromRoom(d2); } });
+    go('lobby');
     toast('Joined room '+code+'!');
   }).catch(e=>toast('Error: '+e.message));
 }
@@ -40795,6 +40796,7 @@ function answerOnline(btn,isOk,q,timedOut){
 
 function showOnlineResult(gs){
   if(G._votesRef){G._votesRef.off();G._votesRef=null;}
+  G._myVoteSubmitted=true;
   const votes=gs.votes||{};
   if(gs.scores)Object.assign(G.scores,gs.scores);
   if(gs.hearts)Object.assign(G.hearts,gs.hearts);
