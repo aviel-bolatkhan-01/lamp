@@ -1196,7 +1196,7 @@ body::after {
   padding: 0 16px 4px;
   margin: 0 -16px;
 }
-#mode-chips { flex-wrap: wrap; overflow-x: visible; padding: 0; margin: 0; }
+#mode-chips { flex-wrap: nowrap; }
 .chips::-webkit-scrollbar { display: none; }
 .chip {
   flex-shrink: 0;
@@ -2231,17 +2231,6 @@ html[data-theme="warmth"] .nb.on, html[data-theme="warmth"] .nb.on svg { color: 
       <div class="btn btn-gold btn-sm" style="width:auto;padding:8px 16px;">Play</div>
     </div>
 
-    <!-- Donate CTA -->
-    <div class="card" style="margin-bottom:16px;padding:12px 16px;background:linear-gradient(135deg, rgba(201,145,13,0.15) 0%, rgba(13,9,6,0) 100%);border:1px solid rgba(201,145,13,0.3);" onclick="go('donation')">
-      <div style="display:flex;align-items:center;gap:12px;">
-        <div style="font-size:24px;">👑</div>
-        <div style="flex:1;">
-          <div style="font-family:'Cinzel',serif;font-size:12px;color:var(--gold1);letter-spacing:0.1em;">Upgrade to Premium</div>
-          <div style="font-size:11px;color:var(--ink3);">Unlimited games, all categories & more</div>
-        </div>
-        <div style="font-size:18px;color:var(--gold1);">→</div>
-      </div>
-    </div>
 
     <!-- Seasonal Event Banner -->
     <div id="seasonal-banner" class="card" style="margin-bottom:16px;padding:12px 16px;background:linear-gradient(135deg, rgba(56,189,248,0.1) 0%, rgba(13,9,6,0) 100%);border:1px solid rgba(56,189,248,0.3);display:none;" onclick="startSeasonalEvent()">
