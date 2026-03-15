@@ -1497,6 +1497,13 @@ body { background: var(--bg); color: var(--ink); }
   border-bottom-width: 1px !important;
   opacity: 1 !important;
 }
+.btn-primary {
+  background: var(--green1);
+  border-bottom-color: var(--green);
+  color: #FFFFFF;
+  box-shadow: none;
+}
+.btn-primary:hover:not(:disabled) { background: #62DE02; box-shadow: none; }
 .btn-gold {
   background: var(--green1);
   border-bottom-color: var(--green);
@@ -2379,7 +2386,7 @@ html[data-theme="warmth"] .nb.on, html[data-theme="warmth"] .nb.on svg { color: 
       </div>
       <div style="display:flex;gap:8px;margin-bottom:18px;">
         <input class="inp" id="friend-code-inp" placeholder="Enter a friend's code…" style="flex:1;" maxlength="8" autocomplete="off">
-        <button class="btn btn-primary" style="flex-shrink:0;padding:0 16px;" onclick="addFriendFromFriends()">Add</button>
+        <button class="btn btn-primary" style="flex-shrink:0;width:auto;padding:0 20px;" onclick="addFriendFromFriends()">Add</button>
       </div>
       <div class="settings-section-title">Your Friends</div>
       <div id="friends-list">
