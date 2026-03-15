@@ -39774,6 +39774,8 @@ function createProfile(){
   initTheme();
   go('home'); toast('Welcome, '+name+'! ✦');
   if(G.fbOk) pushProfile();
+  const pendingRoom = sessionStorage.getItem('pending_room');
+  if(pendingRoom){ sessionStorage.removeItem('pending_room'); setTimeout(()=>joinRoomByCode(pendingRoom.toUpperCase()), 400); }
 }
 function doReset(){
   if(!confirm('Reset your profile? This cannot be undone.'))return;
@@ -40893,6 +40895,8 @@ function joinFromRoom(d){
     G.roomRef.child('gameState').set({pool:poolData,orders:ordersData,qi:0,pi:0,scores:{},hearts:{},phase:'question',t:Date.now()});
   }
   showSplash(0,()=>go('game'));
+  // Online game: auto-dismiss splash so joiner isn't blocked waiting for a tap
+  setTimeout(()=>{ if(document.getElementById('splash').classList.contains('on')) dismissSplash(); }, 1500);
 }
 
 function renderOnlineQ(){
