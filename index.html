@@ -40718,6 +40718,7 @@ function renderOnlineQ(){
   const order=G.roomOrders[G.qi];
   // Clean up old vote watcher
   if(G._votesRef){G._votesRef.off();G._votesRef=null;}
+  if(G._resultTimeout){clearTimeout(G._resultTimeout);G._resultTimeout=null;}
   G._myVoteSubmitted=false;
   stopTimers();clearAutoAdvance();
   go('game');
@@ -40770,6 +40771,7 @@ function renderOnlineQ(){
     // Host tallies when everyone has voted
     if(G.isHost&&votedCount>=total){
       G._votesRef.off();G._votesRef=null;
+      if(G._resultTimeout){clearTimeout(G._resultTimeout);G._resultTimeout=null;}
       stopTimers();
       G.players.forEach(p=>{
         const pVote=votes[p.uid];
@@ -40782,9 +40784,18 @@ function renderOnlineQ(){
       G.roomRef.child('gameState').update({
         phase:'result',votes,correctA:q.a,scores:G.scores,hearts:G.hearts,
         nextQi:nqi,gameOver:anyGameOver||false,t:Date.now()
-      });
+      }).catch(err=>console.error('Update gameState failed:', err));
     }
   });
+  // Timeout fallback if host doesn't tally
+  if(G._resultTimeout){clearTimeout(G._resultTimeout);}
+  G._resultTimeout=setTimeout(()=>{
+    if(G._votesRef){
+      G._votesRef.off();G._votesRef=null;
+      toast('Game sync issue - check connection');
+      console.warn('Results timeout - host may not be syncing');
+    }
+  },5000);
 }
 
 function answerOnline(btn,isOk,q,timedOut){
@@ -40795,7 +40806,17 @@ function answerOnline(btn,isOk,q,timedOut){
   const origIdx=btn?parseInt(btn.dataset.origIdx):-1;
   if(isOk){sfx.correct();haptic('correct');}else{sfx.wrong();haptic('wrong');}
   if(G.roomRef&&G.uid){
-    G.roomRef.child('gameState/votes/'+G.uid).set(origIdx!==-1?origIdx:null);
+    G.roomRef.child('gameState/votes/'+G.uid).set(origIdx!==-1?origIdx:null).catch(err=>{
+      console.error('Vote failed:', err);
+      toast('Vote failed - ' + err.message);
+      G._myVoteSubmitted=false;
+      document.querySelectorAll('#g-opts .opt').forEach(b=>b.disabled=false);
+    });
+  } else {
+    console.error('Cannot submit vote - roomRef or uid missing', {roomRef: !!G.roomRef, uid: G.uid});
+    toast('Vote error - not connected to room');
+    G._myVoteSubmitted=false;
+    document.querySelectorAll('#g-opts .opt').forEach(b=>b.disabled=false);
   }
 }
 
