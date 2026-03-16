@@ -42847,7 +42847,16 @@ function handleAuthError(e, label){
     return true;
   }
   if(e.code==='auth/operation-not-allowed'){
+    if(label.toLowerCase().includes('facebook')){
+      showFacebookAuthErrorModal(e);
+      return true;
+    }
     showAuthMethodDisabledModal();
+    return true;
+  }
+  const msg=(e.message||'').toLowerCase();
+  if(label.toLowerCase().includes('facebook')&&(msg.includes('not active')||msg.includes('app_not_set_up')||msg.includes('app not set up')||e.code==='auth/invalid-credential'||e.code==='auth/admin-restricted-operation')){
+    showFacebookAuthErrorModal(e);
     return true;
   }
   toast(label+': '+e.message);
@@ -42925,6 +42934,38 @@ function showAuthMethodDisabledModal(){
         <li>Click <strong>Save</strong></li>
       </ol>
       <p style="margin-bottom:14px;font-size:13px;color:var(--ink2,#b09068);">After enabling, refresh this page and try signing in again.</p>
+    </div>`;
+  document.body.appendChild(m);
+  m.addEventListener('click',ev=>{ if(ev.target===m) m.remove(); });
+}
+function showFacebookAuthErrorModal(err){
+  const existing=document.getElementById('fb-auth-error-modal');
+  if(existing) existing.remove();
+  const errMsg=err&&err.message?err.message:'Unknown error';
+  const m=document.createElement('div');
+  m.id='fb-auth-error-modal';
+  m.style.cssText='position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.75);padding:20px;';
+  m.innerHTML=`
+    <div style="background:var(--bg2,#221608);border:1px solid var(--line,rgba(200,158,72,.15));border-radius:16px;max-width:440px;width:100%;padding:28px 24px;color:var(--ink,#f2e8d0);font-family:'Nunito',sans-serif;position:relative;">
+      <button onclick="this.closest('#fb-auth-error-modal').remove()" style="position:absolute;top:12px;right:14px;background:none;border:none;color:var(--ink2,#b09068);font-size:22px;cursor:pointer;line-height:1;">&times;</button>
+      <div style="font-size:18px;font-weight:700;margin-bottom:12px;">Facebook Sign-In Not Configured</div>
+      <p style="margin-bottom:14px;font-size:14px;line-height:1.6;color:var(--ink2,#b09068);">
+        Facebook OAuth is not set up for this app yet. The Facebook provider needs to be configured in Firebase before users can sign in with Facebook.
+      </p>
+      <p style="margin-bottom:14px;font-size:14px;font-weight:600;">To set it up:</p>
+      <ol style="margin:0 0 16px 18px;font-size:13px;line-height:1.9;color:var(--ink,#f2e8d0);">
+        <li>Open <a href="https://console.firebase.google.com/" target="_blank" rel="noopener" style="color:var(--gold1,#D4A574);text-decoration:underline;">Firebase Console</a> &rarr; <strong>Authentication</strong> &rarr; <strong>Sign-in method</strong></li>
+        <li>Click <strong>Add new provider</strong> and select <strong>Facebook</strong></li>
+        <li>Go to <a href="https://developers.facebook.com/" target="_blank" rel="noopener" style="color:var(--gold1,#D4A574);text-decoration:underline;">Facebook Developer Console</a> and create an app (or use an existing one)</li>
+        <li>Copy the <strong>App ID</strong> and <strong>App Secret</strong> into Firebase</li>
+        <li>Copy the <strong>OAuth redirect URI</strong> from Firebase and paste it into your Facebook app's <strong>Valid OAuth Redirect URIs</strong> under Facebook Login settings</li>
+        <li>Make sure the Facebook app is set to <strong>Live</strong> mode (not Development)</li>
+      </ol>
+      <p style="margin-bottom:14px;font-size:12px;color:var(--ink2,#b09068);background:var(--bg3,#2c1e0f);padding:8px 10px;border-radius:8px;word-break:break-word;">Error: ${errMsg.replace(/</g,'&lt;')}</p>
+      <div style="display:flex;gap:8px;">
+        <a href="https://console.firebase.google.com/" target="_blank" rel="noopener" style="flex:1;display:block;text-align:center;padding:12px;background:var(--gold,#C89E48);color:#1a0f00;border:none;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;text-decoration:none;">Open Firebase Console</a>
+        <button onclick="this.closest('#fb-auth-error-modal').remove()" style="flex:1;padding:12px;background:var(--bg3,#2c1e0f);color:var(--ink,#f2e8d0);border:1px solid var(--line,rgba(200,158,72,.15));border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;">Close</button>
+      </div>
     </div>`;
   document.body.appendChild(m);
   m.addEventListener('click',ev=>{ if(ev.target===m) m.remove(); });
