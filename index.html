@@ -40503,10 +40503,16 @@ function createProfile(){
 }
 function doReset(){
   if(!confirm('Reset your profile? This cannot be undone.'))return;
-  localStorage.removeItem('bgn3'); G.profile=null;
+  localStorage.removeItem('bgn3');
+  G.profile=null;
+  if(G.auth && G.auth.currentUser) {
+    G.auth.signOut().catch(e=>console.error('Sign out error:', e));
+  }
   document.getElementById('main-nav').style.display='none';
   document.getElementById('home-profile-bar').style.display='none';
-  go('home'); toast('Profile reset.');
+  go('auth');
+  buildAvGrid();
+  toast('Profile reset. Ready to sign in again.');
 }
 function renderHomeBar(){
   if(!G.profile)return;
