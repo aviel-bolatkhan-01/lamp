@@ -42818,22 +42818,62 @@ if ('serviceWorker' in navigator) {
 G.diff='easy'; G.TIM=25;
 
 /* ══════════════════════════════════════════════════
+   AUTH ERROR HANDLING
+══════════════════════════════════════════════════ */
+function handleAuthError(e, label){
+  if(e.code==='auth/unauthorized-domain'){
+    showDomainErrorModal();
+    return true;
+  }
+  toast(label+': '+e.message);
+  return false;
+}
+function showDomainErrorModal(){
+  const existing=document.getElementById('domain-error-modal');
+  if(existing) existing.remove();
+  const domain=document.location.hostname||'(unknown)';
+  const m=document.createElement('div');
+  m.id='domain-error-modal';
+  m.style.cssText='position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.75);padding:20px;';
+  m.innerHTML=`
+    <div style="background:var(--bg2,#221608);border:1px solid var(--line,rgba(200,158,72,.15));border-radius:16px;max-width:420px;width:100%;padding:28px 24px;color:var(--ink,#f2e8d0);font-family:'Nunito',sans-serif;position:relative;">
+      <button onclick="this.closest('#domain-error-modal').remove()" style="position:absolute;top:12px;right:14px;background:none;border:none;color:var(--ink2,#b09068);font-size:22px;cursor:pointer;line-height:1;">&times;</button>
+      <div style="font-size:18px;font-weight:700;margin-bottom:12px;">Domain Not Authorized</div>
+      <p style="margin-bottom:10px;font-size:14px;line-height:1.6;color:var(--ink2,#b09068);">
+        Firebase doesn't recognize <strong style="color:var(--gold,#C89458);">${domain}</strong> as an allowed domain for sign-in.
+      </p>
+      <p style="margin-bottom:14px;font-size:14px;font-weight:600;">To fix this, add the domain in Firebase Console:</p>
+      <ol style="margin:0 0 16px 18px;font-size:13px;line-height:1.9;color:var(--ink,#f2e8d0);">
+        <li>Open <a href="https://console.firebase.google.com/" target="_blank" rel="noopener" style="color:var(--gold1,#D4A574);text-decoration:underline;">Firebase Console</a></li>
+        <li>Go to <strong>Authentication</strong> &rarr; <strong>Settings</strong></li>
+        <li>Scroll to <strong>Authorized domains</strong></li>
+        <li>Click <strong>Add domain</strong></li>
+        <li>Paste: <code style="background:var(--bg3,#2c1e0f);padding:2px 6px;border-radius:4px;font-size:12px;user-select:all;">${domain}</code></li>
+        <li>Click <strong>Save</strong></li>
+      </ol>
+      <button onclick="navigator.clipboard.writeText('${domain}');this.textContent='Copied!';setTimeout(()=>this.textContent='Copy domain',1500)" style="width:100%;padding:12px;background:var(--gold,#C89458);color:var(--bg,#0d0906);border:none;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;">Copy domain</button>
+    </div>`;
+  document.body.appendChild(m);
+  m.addEventListener('click',ev=>{ if(ev.target===m) m.remove(); });
+}
+
+/* ══════════════════════════════════════════════════
    SOCIAL AUTH
 ══════════════════════════════════════════════════ */
 function signInWithGoogle(){
   if(!G.auth){ toast('Firebase not configured'); return; }
   const provider=new firebase.auth.GoogleAuthProvider();
-  G.auth.signInWithPopup(provider).catch(e=>toast('Google sign-in failed: '+e.message));
+  G.auth.signInWithPopup(provider).catch(e=>handleAuthError(e,'Google sign-in failed'));
 }
 function signInWithFacebook(){
   if(!G.auth){ toast('Firebase not configured'); return; }
   const provider=new firebase.auth.FacebookAuthProvider();
-  G.auth.signInWithPopup(provider).catch(e=>toast('Facebook sign-in failed: '+e.message));
+  G.auth.signInWithPopup(provider).catch(e=>handleAuthError(e,'Facebook sign-in failed'));
 }
 function signInWithApple(){
   if(!G.auth){ toast('Firebase not configured'); return; }
   const provider=new firebase.auth.OAuthProvider('apple.com');
-  G.auth.signInWithPopup(provider).catch(e=>toast('Apple sign-in failed: '+e.message));
+  G.auth.signInWithPopup(provider).catch(e=>handleAuthError(e,'Apple sign-in failed'));
 }
 function toggleEmailAuth(){
   const f=document.getElementById('email-auth-form');
@@ -42844,14 +42884,14 @@ function signInWithEmail(){
   const email=document.getElementById('auth-email').value.trim();
   const pass=document.getElementById('auth-password').value;
   if(!email||!pass){ toast('Enter email and password'); return; }
-  G.auth.signInWithEmailAndPassword(email,pass).catch(e=>toast('Sign-in failed: '+e.message));
+  G.auth.signInWithEmailAndPassword(email,pass).catch(e=>handleAuthError(e,'Sign-in failed'));
 }
 function createEmailAccount(){
   if(!G.auth){ toast('Firebase not configured'); return; }
   const email=document.getElementById('auth-email').value.trim();
   const pass=document.getElementById('auth-password').value;
   if(!email||pass.length<6){ toast('Valid email + 6-char password required'); return; }
-  G.auth.createUserWithEmailAndPassword(email,pass).catch(e=>toast('Account creation failed: '+e.message));
+  G.auth.createUserWithEmailAndPassword(email,pass).catch(e=>handleAuthError(e,'Account creation failed'));
 }
 
 /* ══════════════════════════════════════════════════
@@ -42884,20 +42924,21 @@ function profileSignIn(method){
       toast('Account linked! Your progress is saved.');
       updateProfileSigninCard();
     }).catch(e=>{
+      if(e.code==='auth/unauthorized-domain'){ showDomainErrorModal(); return; }
       if(e.code==='auth/credential-already-in-use'||e.code==='auth/email-already-in-use'){
         G.auth.signInWithPopup(provider).then(()=>{
           toast('Signed in! Progress synced.');
           updateProfileSigninCard();
-        }).catch(e2=>toast('Sign-in failed: '+e2.message));
+        }).catch(e2=>handleAuthError(e2,'Sign-in failed'));
       } else {
-        toast('Sign-in failed: '+e.message);
+        handleAuthError(e,'Sign-in failed');
       }
     });
   } else {
     G.auth.signInWithPopup(provider).then(()=>{
       toast('Signed in!');
       updateProfileSigninCard();
-    }).catch(e=>toast('Sign-in failed: '+e.message));
+    }).catch(e=>handleAuthError(e,'Sign-in failed'));
   }
 }
 function profileEmailSignIn(){
@@ -42912,20 +42953,21 @@ function profileEmailSignIn(){
       toast('Account linked! Progress saved.');
       updateProfileSigninCard();
     }).catch(e=>{
+      if(e.code==='auth/unauthorized-domain'){ showDomainErrorModal(); return; }
       if(e.code==='auth/credential-already-in-use'||e.code==='auth/email-already-in-use'){
         G.auth.signInWithEmailAndPassword(email,pass).then(()=>{
           toast('Signed in!');
           updateProfileSigninCard();
-        }).catch(e2=>toast('Sign-in failed: '+e2.message));
+        }).catch(e2=>handleAuthError(e2,'Sign-in failed'));
       } else {
-        toast('Sign-in failed: '+e.message);
+        handleAuthError(e,'Sign-in failed');
       }
     });
   } else {
     G.auth.signInWithEmailAndPassword(email,pass).then(()=>{
       toast('Signed in!');
       updateProfileSigninCard();
-    }).catch(e=>toast('Sign-in failed: '+e.message));
+    }).catch(e=>handleAuthError(e,'Sign-in failed'));
   }
 }
 function profileEmailCreate(){
@@ -42939,12 +42981,12 @@ function profileEmailCreate(){
     currentUser.linkWithCredential(cred).then(()=>{
       toast('Account created & linked! Progress saved.');
       updateProfileSigninCard();
-    }).catch(e=>toast('Failed: '+e.message));
+    }).catch(e=>handleAuthError(e,'Account creation failed'));
   } else {
     G.auth.createUserWithEmailAndPassword(email,pass).then(()=>{
       toast('Account created!');
       updateProfileSigninCard();
-    }).catch(e=>toast('Failed: '+e.message));
+    }).catch(e=>handleAuthError(e,'Account creation failed'));
   }
 }
 
