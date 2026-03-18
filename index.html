@@ -41175,8 +41175,8 @@ function startPracticeGame(){
   G.hearts={[G.profile.name]:3};
   G.streaks={[G.profile.name]:0};
   if(G.sub==='truefalse'){ startTF(); return; }
-  if(G.sub==='lightning'){ showSplash(0,()=>startLightning(0)); return; }
-  showSplash(0,()=>{ go('game'); renderQ(); });
+  if(G.sub==='lightning'){ startLightning(0); return; }
+  go('game'); renderQ();
 }
 
 function updateProgress(){
@@ -41368,6 +41368,10 @@ function answerQ(btn,isOk,q,order){
     sb.style.display='';
     sb.classList.add('streak-pulse');
   }
+  if(G.mode==='practice' && G.players.length===1){
+    showAutoAdvance('g-auto-bar','g-auto-fill',1100,()=>nextTurn());
+    return;
+  }
   document.getElementById('g-next-row').style.display='flex';
 }
 
@@ -41392,6 +41396,10 @@ function timeOut(q,pfx){
         if(shouldEndByHearts()){ setTimeout(endGame, 1500); return; }
       }
     }
+  }
+  if(G.mode==='practice' && G.players.length===1){
+    showAutoAdvance('g-auto-bar','g-auto-fill',1100,()=>nextTurn());
+    return;
   }
   const nxt=pfx==='g'?document.getElementById('g-next-row'):document.getElementById(`${pfx}-next`);
   if(nxt) nxt.style.display='flex';
@@ -41435,6 +41443,9 @@ function nextTurn(){
   }
 
   G.pi = nextPi;
+  if(G.mode==='practice' && G.players.length===1){
+    go('game'); renderQ(); return;
+  }
   showSplash(G.pi, () => { go('game'); renderQ(); });
 }
 
@@ -41634,6 +41645,9 @@ function revealTF(q){
     const nxt=document.getElementById('tf-next'); nxt.style.display='flex';
     nxt.textContent='See Results →';
     nxt.onclick=()=>{ sfx.tap(); haptic('tap'); showScores(true); };
+    if(G.mode==='practice'&&G.players.length===1){
+      setTimeout(()=>showScores(true),1200);
+    }
     return;
   }
 
@@ -41641,6 +41655,12 @@ function revealTF(q){
   const totalRounds=Math.min(currentRounds(),G.pool.length);
   nxt.textContent=G.tfRound>=totalRounds-1?'See Results →':'Next Round →';
   nxt.onclick=()=>{ nextTF(); };
+  if(G.mode==='practice'&&G.players.length===1){
+    setTimeout(()=>{
+      if(G.tfRound>=totalRounds-1) showScores(true);
+      else nextTF();
+    },1200);
+  }
 }
 function total(){ return Math.min(currentRounds(),G.pool.length); }
 function nextTF(){ sfx.tap(); haptic('tap'); G.tfRound++; renderTF(); }
