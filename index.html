@@ -3155,6 +3155,27 @@ html[data-theme="warmth"] .divider::before, html[data-theme="warmth"] .divider::
       + Add Player
     </button>
 
+    <div id="setup-room-mode-wrap" style="display:none;margin-bottom:14px;">
+      <div class="chips-wrap" style="margin-bottom:12px;">
+        <div class="label" style="margin-bottom:7px;">Game Mode</div>
+        <div class="chips" id="setup-room-sub-chips">
+          <button class="chip sel" data-sub="classic" onclick="pickSetupSub(this,'classic')">🎯 Classic</button>
+          <button class="chip" data-sub="truefalse" onclick="pickSetupSub(this,'truefalse')">✅ True / False</button>
+          <button class="chip" data-sub="verse" onclick="pickSetupSub(this,'verse')">📖 Fill-in-Verse</button>
+          <button class="chip" data-sub="lightning" onclick="pickSetupSub(this,'lightning')">⚡ Lightning</button>
+          <button class="chip" data-sub="team" onclick="pickSetupSub(this,'team')">👥 Team Mode</button>
+        </div>
+      </div>
+      <div>
+        <div class="label" style="margin-bottom:7px;">Difficulty</div>
+        <div class="diff-row" id="setup-room-diff-chips">
+          <button class="diff-chip sel" data-diff="easy" onclick="pickSetupDiff(this,'easy')">🌿 Easy</button>
+          <button class="diff-chip" data-diff="medium" onclick="pickSetupDiff(this,'medium')">📖 Medium</button>
+          <button class="diff-chip" data-diff="hard" onclick="pickSetupDiff(this,'hard')">⚔️ Hard</button>
+        </div>
+      </div>
+    </div>
+
     <div class="eyebrow" style="margin-bottom:9px;">Options</div>
     <div id="opt-list" class="gap-8" style="margin-bottom:16px;"></div>
     <button class="btn btn-gold" id="setup-go-btn" onclick="beginFromSetup()">
@@ -40904,6 +40925,7 @@ function buildSetup(){
   document.getElementById('setup-subtitle').textContent='2–6 players · Tap avatar to cycle';
   document.getElementById('setup-list').style.display='block';
   document.getElementById('add-p-btn').style.display='flex';
+  document.getElementById('setup-room-mode-wrap').style.display='none';
   document.getElementById('setup-go-btn').innerHTML='<span class="btn-icon">🕯️</span> Let\'s Play!';
   setupPs=[
     {name:G.profile.name,avatar:G.profile.avatar},
@@ -40916,6 +40938,7 @@ function buildModeSetup(kind){
   document.getElementById('setup-list').innerHTML='';
   document.getElementById('setup-list').style.display='none';
   document.getElementById('add-p-btn').style.display='none';
+  document.getElementById('setup-room-mode-wrap').style.display=(kind==='online'||kind==='nearby')?'block':'none';
   if(kind==='online'){
     document.getElementById('setup-eyebrow').textContent='Online Room';
     document.getElementById('setup-title').innerHTML='Game <em>Settings</em>';
@@ -40933,6 +40956,30 @@ function buildModeSetup(kind){
     document.getElementById('setup-go-btn').innerHTML='<span class="btn-icon">🎓</span> Start Practice';
   }
   renderOpts();
+  renderSetupRoomModeChips();
+}
+function renderSetupRoomModeChips(){
+  const subWrap=document.getElementById('setup-room-sub-chips');
+  const diffWrap=document.getElementById('setup-room-diff-chips');
+  if(subWrap){
+    subWrap.querySelectorAll('.chip').forEach(c=>c.classList.toggle('sel',c.dataset.sub===G.sub));
+  }
+  if(diffWrap){
+    diffWrap.querySelectorAll('.diff-chip').forEach(c=>c.classList.toggle('sel',c.dataset.diff===G.diff));
+  }
+}
+function pickSetupSub(el,s){
+  sfx.tap(); haptic('tap');
+  G.sub=s; G.seen.clear();
+  document.querySelectorAll('#setup-room-sub-chips .chip').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel');
+}
+function pickSetupDiff(el,d){
+  sfx.tap(); haptic('tap');
+  G.diff=d;
+  G.TIM = d==='easy'?25 : d==='hard'?12 : 20;
+  document.querySelectorAll('#setup-room-diff-chips .diff-chip').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel');
 }
 function renderSetup(){
   const el=document.getElementById('setup-list'); el.innerHTML='';
