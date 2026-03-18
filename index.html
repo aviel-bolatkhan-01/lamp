@@ -40908,8 +40908,12 @@ function pickSub(el,s){
 function onPlay(){
   sfx.tap();
   if(!G.profile){ go('auth'); buildAvGrid(); return; }
-  if(G.mode==='online'){ go('setup'); buildModeSetup('online'); return; }
-  if(G.mode==='nearby'){ go('setup'); buildModeSetup('nearby'); return; }
+  if(G.mode==='online' || G.mode==='nearby'){
+    go('lobby');
+    const nbJoin=document.getElementById('nb-join');
+    if(nbJoin) setNb(nbJoin);
+    return;
+  }
   if(G.mode==='practice'){ go('setup'); buildModeSetup('practice'); return; }
   go('setup'); buildSetup();
 }
@@ -40938,7 +40942,7 @@ function buildModeSetup(kind){
   document.getElementById('setup-list').innerHTML='';
   document.getElementById('setup-list').style.display='none';
   document.getElementById('add-p-btn').style.display='none';
-  document.getElementById('setup-room-mode-wrap').style.display=(kind==='online'||kind==='nearby')?'block':'none';
+  document.getElementById('setup-room-mode-wrap').style.display=(kind==='online')?'block':'none';
   if(kind==='online'){
     document.getElementById('setup-eyebrow').textContent='Online Room';
     document.getElementById('setup-title').innerHTML='Game <em>Settings</em>';
@@ -42854,6 +42858,12 @@ function togGlobal(k){
 ══════════════════════════════════════════════════ */
 let _splashCb=null;
 function showSplash(idx,cb){
+  if(G.mode==='practice'){
+    const ov=document.getElementById('splash');
+    if(ov) ov.classList.remove('on');
+    if(typeof cb==='function') cb();
+    return;
+  }
   const p=G.players[idx];
   document.getElementById('sp-av').textContent=p.avatar;
   document.getElementById('sp-nm').textContent=p.name;
