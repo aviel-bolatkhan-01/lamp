@@ -42177,8 +42177,7 @@ function roomSettingsLine(d){
   const cfg=(d&&d.cfg)||{};
   const rounds=clampRounds(cfg.winScore||DEFAULT_ROUNDS);
   const hearts=cfg.hearts===false?'Hearts Off':'Hearts On';
-  const sudden=cfg.sudden===true?'Sudden On':'Sudden Off';
-  return `${hearts} · ${sudden} · ${rounds} rounds`;
+  return `${hearts} · ${rounds} rounds`;
 }
 function updateLobbyModeNote(d){
   const note=document.getElementById('lobby-mode-note');
