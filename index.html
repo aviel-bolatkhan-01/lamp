@@ -41548,18 +41548,33 @@ function renderTFHeader(){
   renderHearts('tf-hearts',G.hearts[p.name]||0);
 }
 function renderTF(){
-  if(G.tfRound>=G.pool.length){ showScores(true); return; }
+  const isPracticeSolo=G.mode==='practice'&&G.players.length===1;
+  if(G.tfRound>=G.pool.length){
+    if(isPracticeSolo){ endGame(); }
+    else{ showScores(true); }
+    return;
+  }
   const totalRounds=Math.min(currentRounds(),G.pool.length);
-  if(G.tfRound>=totalRounds){ showScores(true); return; }
+  if(G.tfRound>=totalRounds){
+    if(isPracticeSolo){ endGame(); }
+    else{ showScores(true); }
+    return;
+  }
 
   // Check if all players are eliminated (hearts)
-  if(shouldEndByHearts()){ showScores(true); return; }
+  if(shouldEndByHearts()){
+    if(isPracticeSolo){ endGame(); }
+    else{ showScores(true); }
+    return;
+  }
 
   const q=G.pool[G.tfRound]; G.seen.add(questionKey(q)); G.tfVotes={}; G.tfVoterIdx=0;
   G.done=false;
   document.getElementById('tf-round').textContent=`Round ${G.tfRound+1}/${totalRounds}`;
   document.getElementById('tf-txt').textContent=q.q;
-  document.getElementById('tf-cat').textContent='';
+  const tfCat=document.getElementById('tf-cat');
+  tfCat.textContent=q.cat||q.r||'';
+  tfCat.style.display=tfCat.textContent?'inline-flex':'none';
   document.getElementById('tf-fb').style.display='none';
   document.getElementById('tf-next').style.display='none';
   document.getElementById('tf-scores').textContent=G.players.map(p=>p.avatar+' '+G.scores[p.name]).join('  ');
@@ -41618,6 +41633,7 @@ function revealTF(q){
   stopTimers();
   document.getElementById('tf-tbtn').disabled=true;
   document.getElementById('tf-fbtn').disabled=true;
+  const isPracticeSolo=G.mode==='practice'&&G.players.length===1;
   let elimMsg='';
   const activePlayers=G._tfActivePlayers||G.players;
   activePlayers.forEach(p=>{
@@ -41646,25 +41662,27 @@ function revealTF(q){
 
   // Check if game should end due to eliminations
   if(shouldEndByHearts()){
+    if(isPracticeSolo){
+      setTimeout(()=>endGame(),900);
+      return;
+    }
     const nxt=document.getElementById('tf-next'); nxt.style.display='flex';
     nxt.textContent='See Results →';
     nxt.onclick=()=>{ sfx.tap(); haptic('tap'); showScores(true); };
-    if(G.mode==='practice'&&G.players.length===1){
-      setTimeout(()=>showScores(true),1200);
-    }
     return;
   }
 
-  const nxt=document.getElementById('tf-next'); nxt.style.display='flex';
   const totalRounds=Math.min(currentRounds(),G.pool.length);
+  if(isPracticeSolo){
+    setTimeout(()=>{
+      if(G.tfRound>=totalRounds-1) endGame();
+      else nextTF();
+    },900);
+    return;
+  }
+  const nxt=document.getElementById('tf-next'); nxt.style.display='flex';
   nxt.textContent=G.tfRound>=totalRounds-1?'See Results →':'Next Round →';
   nxt.onclick=()=>{ nextTF(); };
-  if(G.mode==='practice'&&G.players.length===1){
-    setTimeout(()=>{
-      if(G.tfRound>=totalRounds-1) showScores(true);
-      else nextTF();
-    },1200);
-  }
 }
 function total(){ return Math.min(currentRounds(),G.pool.length); }
 function nextTF(){ sfx.tap(); haptic('tap'); G.tfRound++; renderTF(); }
@@ -41798,6 +41816,10 @@ function endGame(){
 
 function playAgain(){
   sfx.tap(); stopTimers(); clearAutoAdvance();
+  if(G.mode==='practice'){
+    startPracticeGame();
+    return;
+  }
   if((G.mode==='online'||G.mode==='nearby'||G.onlineGame) && G.roomRef && G.roomId){
     G._awaitingRematchStart=true;
     G.meReady=false;
