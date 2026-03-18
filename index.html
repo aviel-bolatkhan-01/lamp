@@ -41541,8 +41541,24 @@ function playAgain(){
     const qrWrap=document.getElementById('lobby-qr');
     if(qrWrap) qrWrap.style.display=G.isHost?'block':'none';
     if(G.isHost) renderQRCode(G.roomId);
-    G.roomRef.child('players/'+G.uid+'/ready').set(false);
-    if(G.isHost) G.roomRef.update({status:'waiting'});
+    if(G.isHost){
+      G.roomRef.once('value').then(sn=>{
+        const d=sn.val()||{};
+        const roomDiff=d.difficulty||G.diff||'easy';
+        G.diff=roomDiff;
+        G.TIM=G.diff==='easy'?25:G.diff==='hard'?12:20;
+        const upd={status:'waiting',difficulty:roomDiff,sub:d.sub||G.sub||'classic'};
+        Object.keys(d.players||{}).forEach(uid=>{
+          upd['players/'+uid+'/ready']=false;
+          upd['players/'+uid+'/diff']=roomDiff;
+        });
+        G.roomRef.update(upd);
+      }).catch(()=>{
+        G.roomRef.update({status:'waiting'});
+      });
+    } else {
+      G.roomRef.child('players/'+G.uid+'/ready').set(false);
+    }
     G.roomRef.off();
     G.roomRef.on('value',sn=>{
       const d=sn.val(); if(!d) return;
@@ -41749,7 +41765,12 @@ function startOnline(){
     const ps=Object.values(d.players||{});
     const allReady=ps.length>=2 && ps.every(p=>!!p.ready);
     if(!allReady){ toast('Both players must press Ready first.'); return; }
-    G.roomRef.update({status:'playing'});
+    const roomDiff=d.difficulty||G.diff||'easy';
+    G.diff=roomDiff;
+    G.TIM=G.diff==='easy'?25:G.diff==='hard'?12:20;
+    const upd={status:'playing',difficulty:roomDiff,sub:d.sub||G.sub||'classic'};
+    Object.keys(d.players||{}).forEach(uid=>{ upd['players/'+uid+'/diff']=roomDiff; });
+    G.roomRef.update(upd);
   }).catch(()=>toast('Unable to start room right now.'));
 }
 function joinFromRoom(d){
