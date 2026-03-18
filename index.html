@@ -40962,7 +40962,7 @@ function buildModeSetup(kind,fromHomeSelection){
   document.getElementById('setup-list').innerHTML='';
   document.getElementById('setup-list').style.display='none';
   document.getElementById('add-p-btn').style.display='none';
-  const showModeDiff=(kind==='online')&&!_setupUseHomeSelection;
+  const showModeDiff=(kind==='online'||kind==='nearby')&&!_setupUseHomeSelection;
   document.getElementById('setup-room-mode-wrap').style.display=showModeDiff?'block':'none';
   if(kind==='online'){
     document.getElementById('setup-eyebrow').textContent='Online Room';
