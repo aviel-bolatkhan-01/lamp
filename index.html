@@ -40370,7 +40370,10 @@ const VERSE_Q=[
     ]
   }
 ];
-const ROUND_LIMIT=15;
+const DEFAULT_ROUNDS=15;
+const MIN_ROUNDS=10;
+const MAX_ROUNDS=33;
+const ROUND_LIMIT=DEFAULT_ROUNDS;
 const MODE_EXTRA_QUESTIONS=500;
 const ORIGINAL_TF_FACTS=[
   {t:'Jesus was born in Bethlehem.',f:'Jesus was born in Nazareth.',e:'Matthew 2:1 — Jesus was born in Bethlehem of Judea.'},
@@ -40439,6 +40442,12 @@ const ORIGINAL_VERSE_SEEDS=[
 const ORIGINAL_VERSE_WORD_BANK=['grace','truth','peace','mercy','hope','glory','light','wisdom','power','life','love','joy','faith','strength','salvation','righteousness','kindness','patience','victory','blessing','promise','kingdom','spirit','gospel','courage'];
 function questionKey(q){
   return q&& (q._id || q.q || q.r || q.b || '');
+}
+function clampRounds(n){
+  return Math.max(MIN_ROUNDS,Math.min(MAX_ROUNDS,parseInt(n,10)||DEFAULT_ROUNDS));
+}
+function currentRounds(){
+  return clampRounds(G.cfg&&G.cfg.winScore);
 }
 function normTxt(s){
   return String(s||'').toLowerCase().replace(/\s+/g,' ').trim();
@@ -40634,6 +40643,7 @@ function wk(){ const d=new Date(),dt=d.getDate()-d.getDay()+(d.getDay()===0?-6:1
 function loadProfile(){
   try{ G.profile=JSON.parse(localStorage.getItem('bgn3')||'null'); }catch(e){}
   G.cfg.timer=true;
+  G.cfg.winScore=clampRounds(G.cfg.winScore);
   if(G.profile){
     document.getElementById('main-nav').style.display='';
     renderHomeBar();
@@ -40959,6 +40969,7 @@ function renderOpts(){
   const el=document.getElementById('opt-list'); el.innerHTML='';
   const setupKind=_setupAction||'local';
   const isRoom=setupKind==='online'||setupKind==='nearby';
+  if(isRoom) G.cfg.sudden=false;
   const opts=[
     {k:'sound',l:'🔔 Sound Effects'},
     {k:'hearts',l:'❤️ Lives / Hearts'},
@@ -40972,10 +40983,14 @@ function renderOpts(){
       <button class="toggle-btn ${G.cfg[o.k]?'on':'off'}" id="tog-${o.k}" onclick="togCfg('${o.k}')">${G.cfg[o.k]?'ON':'OFF'}</button>`;
     el.appendChild(row);
   });
-  // Fixed rounds for consistency across modes
+  // Rounds
   const wr=document.createElement('div'); wr.className='toggle-row';
   wr.innerHTML=`<span class="toggle-lbl">🏁 Rounds</span>
-    <div class="stepper"><span class="step-val" id="win-disp">${ROUND_LIMIT}</span></div>`;
+    <div class="stepper">
+      <button class="step-btn" onclick="adjWin(-1)">−</button>
+      <span class="step-val" id="win-disp">${currentRounds()}</span>
+      <button class="step-btn" onclick="adjWin(1)">+</button>
+    </div>`;
   el.appendChild(wr);
 }
 function beginFromSetup(){
@@ -41005,7 +41020,7 @@ function togCfg(k){
   if(b){ b.textContent=G.cfg[k]?'ON':'OFF'; b.className='toggle-btn '+(G.cfg[k]?'on':'off'); }
 }
 function adjWin(n){
-  G.cfg.winScore=ROUND_LIMIT;
+  G.cfg.winScore=clampRounds((G.cfg.winScore||DEFAULT_ROUNDS)+n);
   const el=document.getElementById('win-disp'); if(el)el.textContent=G.cfg.winScore;
 }
 
@@ -41070,6 +41085,7 @@ function buildPool(){
 
 function beginGame(){
   if(G.mode==='local'&&setupPs.length<2){ toast('Pass & Play requires at least 2 players.'); return; }
+  G.cfg.winScore=clampRounds(G.cfg.winScore);
 
   // Sync names and ensure uniqueness
   const names = new Set();
@@ -41086,8 +41102,7 @@ function beginGame(){
     return { ...p, name: finalName };
   });
 
-  G.pool=buildPool().slice(0,ROUND_LIMIT); G.qi=0; G.pi=0; G.done=false; G.onlineGame=false;
-  G.cfg.winScore=ROUND_LIMIT;
+  G.pool=buildPool().slice(0,currentRounds()); G.qi=0; G.pi=0; G.done=false; G.onlineGame=false;
   G.scores={}; G.hearts={}; G.streaks={};
   G.players.forEach(p=>{ G.scores[p.name]=0; G.hearts[p.name]=3; G.streaks[p.name]=0; });
 
@@ -41105,11 +41120,11 @@ function beginGame(){
 function startPracticeGame(){
   if(!G.profile){ go('auth'); buildAvGrid(); return; }
   if(G.sub==='team') G.sub='classic';
+  G.cfg.winScore=clampRounds(G.cfg.winScore);
   syncSubChipSelection();
   G.players=[{name:G.profile.name,avatar:G.profile.avatar}];
-  G.pool=buildPool().slice(0,ROUND_LIMIT);
+  G.pool=buildPool().slice(0,currentRounds());
   G.qi=0; G.pi=0; G.done=false; G.onlineGame=false;
-  G.cfg.winScore=ROUND_LIMIT;
   G.scores={[G.profile.name]:0};
   G.hearts={[G.profile.name]:3};
   G.streaks={[G.profile.name]:0};
@@ -41383,7 +41398,7 @@ function startLightning(pIdx){
     endLightning();
     return;
   }
-  G.pi=pIdx; G.lScore=0; G.pool=buildPool().slice(0,ROUND_LIMIT); G.qi=0;
+  G.pi=pIdx; G.lScore=0; G.pool=buildPool().slice(0,currentRounds()); G.qi=0;
   const p=G.players[pIdx];
   document.getElementById('l-av').textContent=p.avatar;
   document.getElementById('l-nm').textContent=p.name;
@@ -41449,7 +41464,7 @@ function endLightning(){
 
 /* ── True/False ── */
 function startTF(){
-  G.pool=buildPool().slice(0,ROUND_LIMIT); G.tfRound=0;
+  G.pool=buildPool().slice(0,currentRounds()); G.tfRound=0;
   G.players.forEach(p=>{ G.scores[p.name]=0; });
   go('tf'); renderTF();
 }
@@ -41465,7 +41480,7 @@ function renderTFHeader(){
 }
 function renderTF(){
   if(G.tfRound>=G.pool.length){ showScores(true); return; }
-  const totalRounds=Math.min(ROUND_LIMIT,G.pool.length);
+  const totalRounds=Math.min(currentRounds(),G.pool.length);
   if(G.tfRound>=totalRounds){ showScores(true); return; }
 
   // Check if all players are eliminated (hearts)
@@ -41569,11 +41584,11 @@ function revealTF(q){
   }
 
   const nxt=document.getElementById('tf-next'); nxt.style.display='flex';
-  const totalRounds=Math.min(ROUND_LIMIT,G.pool.length);
+  const totalRounds=Math.min(currentRounds(),G.pool.length);
   nxt.textContent=G.tfRound>=totalRounds-1?'See Results →':'Next Round →';
   nxt.onclick=()=>{ nextTF(); };
 }
-function total(){ return Math.min(ROUND_LIMIT,G.pool.length); }
+function total(){ return Math.min(currentRounds(),G.pool.length); }
 function nextTF(){ sfx.tap(); haptic('tap'); G.tfRound++; renderTF(); }
 
 /* ── Scoreboard + End ── */
@@ -41725,7 +41740,7 @@ function playAgain(){
         const roomDiff=d.difficulty||G.diff||'easy';
         G.diff=roomDiff;
         G.TIM=G.diff==='easy'?25:G.diff==='hard'?12:20;
-        const upd={status:'waiting',difficulty:roomDiff,sub:roomSub,qtype:roomSub,cfg:{sound:!!G.cfg.sound,hearts:!!G.cfg.hearts,sudden:!!G.cfg.sudden,winScore:ROUND_LIMIT}};
+        const upd={status:'waiting',difficulty:roomDiff,sub:roomSub,qtype:roomSub,cfg:{sound:!!G.cfg.sound,hearts:!!G.cfg.hearts,sudden:!!G.cfg.sudden,winScore:clampRounds(G.cfg.winScore)}};
         Object.keys(d.players||{}).forEach(uid=>{
           upd['players/'+uid+'/ready']=false;
           upd['players/'+uid+'/diff']=roomDiff;
@@ -41800,12 +41815,12 @@ function createRoom(){
   const ref=G.db.ref('rooms/'+code); G.roomRef=ref;
   ref.set({
     code, host:G.uid, status:'waiting', sub:roomSub, qtype:roomSub, difficulty:G.diff, createdAt:Date.now(),
-    cfg:{sound:!!G.cfg.sound,hearts:!!G.cfg.hearts,sudden:!!G.cfg.sudden,winScore:ROUND_LIMIT},
+    cfg:{sound:!!G.cfg.sound,hearts:!!G.cfg.hearts,sudden:!!G.cfg.sudden,winScore:clampRounds(G.cfg.winScore)},
     players:{[G.uid]:{name:G.profile.name,avatar:G.profile.avatar,ready:false,score:0,hearts:3,diff:G.diff}}
   }).then(()=>{
     document.getElementById('rc-disp').textContent=code;
     document.getElementById('lobby-panel').style.display='block';
-    updateLobbyModeNote({sub:roomSub,qtype:roomSub,difficulty:G.diff});
+    updateLobbyModeNote({sub:roomSub,qtype:roomSub,difficulty:G.diff,cfg:{sound:!!G.cfg.sound,hearts:!!G.cfg.hearts,sudden:!!G.cfg.sudden,winScore:clampRounds(G.cfg.winScore)}});
     document.getElementById('start-btn').disabled=false;
     renderQRCode(code);
     ref.on('value',sn=>{ const d=sn.val(); if(!d)return; updateLobbyUI(d); if(d.status==='playing'){ ref.off(); joinFromRoom(d); } });
@@ -41866,12 +41881,14 @@ function joinRoomByCode(code){
     const d=sn.val();
     if(!d){ toast('Room not found'); return; }
     if(d.status==='playing'){ toast('Game already in progress'); return; }
+    const joinPreview=`Mode: ${chQTypeLabel((d&& (d.qtype||d.sub))||'classic')}\nDifficulty: ${chDiffLabel((d&&d.difficulty)||'easy')}\nRules: ${roomSettingsLine(d)}`;
+    if(!confirm(`Join room ${code}?\n\n${joinPreview}`)) return;
     G.sub=normalizeOnlineSub((d&& (d.qtype||d.sub)) || G.sub);
     if(d.difficulty){
       G.diff=d.difficulty;
       G.TIM=G.diff==='easy'?25:G.diff==='hard'?12:20;
     }
-    if(d.cfg) G.cfg={...G.cfg,...d.cfg,winScore:ROUND_LIMIT,timer:true};
+    if(d.cfg) G.cfg={...G.cfg,...d.cfg,winScore:clampRounds(d.cfg.winScore),timer:true};
     ref.child('players/'+G.uid).set({name:G.profile.name,avatar:G.profile.avatar,ready:false,score:0,hearts:3,diff:d.difficulty||G.diff});
     document.getElementById('rc-disp').textContent=code;
     document.getElementById('lobby-panel').style.display='block';
@@ -41944,7 +41961,7 @@ function toOnlineQuestion(q,sub){
   };
 }
 function shouldEndOnlineGame(){
-  const winTarget=G.cfg.winScore||10;
+  const winTarget=clampRounds(G.cfg.winScore||DEFAULT_ROUNDS);
   const scoreReached=G.players.some(p=>(G.scores[p.name]||0)>=winTarget);
   return scoreReached||shouldEndByHearts();
 }
@@ -41954,6 +41971,14 @@ function chQTypeLabel(qtype){
 }
 function chDiffLabel(diff){
   return diff==='easy'?'Easy':diff==='medium'?'Medium':'Hard';
+}
+function roomSettingsLine(d){
+  const cfg=(d&&d.cfg)||{};
+  const rounds=clampRounds(cfg.winScore||DEFAULT_ROUNDS);
+  const hearts=cfg.hearts===false?'Hearts Off':'Hearts On';
+  const sound=cfg.sound===false?'Sound Off':'Sound On';
+  const sudden=cfg.sudden===true?'Sudden On':'Sudden Off';
+  return `${hearts} · ${sound} · ${sudden} · ${rounds} rounds`;
 }
 function updateLobbyModeNote(d){
   const note=document.getElementById('lobby-mode-note');
@@ -41965,7 +41990,8 @@ function updateLobbyModeNote(d){
     note.textContent='';
     return;
   }
-  note.textContent='Mode: '+chQTypeLabel(qtype||'classic')+' · Difficulty: '+chDiffLabel(diff||'easy');
+  note.innerHTML='Mode: '+chQTypeLabel(qtype||'classic')+' · Difficulty: '+chDiffLabel(diff||'easy')+
+    '<br>Rules: '+roomSettingsLine(d);
   note.style.display='block';
 }
 function updateLobbyUI(d){
@@ -41994,7 +42020,7 @@ function toggleReady(){
 function startOnline(){
   if(!G.roomRef)return;
   sfx.tap();
-  G.cfg.winScore=ROUND_LIMIT;
+  G.cfg.winScore=clampRounds(G.cfg.winScore);
   G.roomRef.once('value').then(sn=>{
     const d=sn.val()||{};
     const ps=Object.values(d.players||{});
@@ -42005,7 +42031,7 @@ function startOnline(){
     const roomDiff=d.difficulty||G.diff||'easy';
     G.diff=roomDiff;
     G.TIM=G.diff==='easy'?25:G.diff==='hard'?12:20;
-    const upd={status:'playing',difficulty:roomDiff,sub:roomSub,qtype:roomSub,cfg:{sound:!!G.cfg.sound,hearts:!!G.cfg.hearts,sudden:!!G.cfg.sudden,winScore:ROUND_LIMIT}};
+    const upd={status:'playing',difficulty:roomDiff,sub:roomSub,qtype:roomSub,cfg:{sound:!!G.cfg.sound,hearts:!!G.cfg.hearts,sudden:!!G.cfg.sudden,winScore:clampRounds(G.cfg.winScore)}};
     Object.keys(d.players||{}).forEach(uid=>{ upd['players/'+uid+'/diff']=roomDiff; });
     G.roomRef.update(upd);
   }).catch(()=>toast('Unable to start room right now.'));
@@ -42014,8 +42040,8 @@ function joinFromRoom(d){
   // Keep roomRef alive for game sync
   // Set difficulty from room data so buildPool filters correctly
   if(d.difficulty) G.diff=d.difficulty;
-  if(d.cfg) G.cfg={...G.cfg,...d.cfg,winScore:ROUND_LIMIT,timer:true};
-  G.cfg.winScore=ROUND_LIMIT;
+  if(d.cfg) G.cfg={...G.cfg,...d.cfg,winScore:clampRounds(d.cfg.winScore),timer:true};
+  G.cfg.winScore=clampRounds(G.cfg.winScore);
   G.TIM=G.diff==='easy'?25:G.diff==='hard'?12:20;
   const playerEntries=Object.entries(d.players||{});
   let players=playerEntries.map(([uid,p])=>({name:p.name,avatar:p.avatar,diff:p.diff||'easy',uid}));
@@ -42049,10 +42075,10 @@ function joinFromRoom(d){
         stopTimers();
         const q=G.roomPool[G.qi];
         const correctA=tallyVotes(votes,q);
-        const reachedRoundLimit=(G.qi+1)>=(G.roomPool?G.roomPool.length:ROUND_LIMIT);
+        const reachedRoundLimit=(G.qi+1)>=(G.roomPool?G.roomPool.length:currentRounds());
         const anyGameOver=shouldEndOnlineGame()||reachedRoundLimit;
         let nqi=G.qi+1;
-        if(nqi>=(G.roomPool?G.roomPool.length:ROUND_LIMIT))nqi=G.qi;
+        if(nqi>=(G.roomPool?G.roomPool.length:currentRounds()))nqi=G.qi;
         G.roomRef.child('gameState').update({
           phase:'result',votes,correctA:correctA,scores:G.scores,hearts:G.hearts,
           nextQi:nqi,gameOver:anyGameOver||false,t:Date.now()
@@ -42078,7 +42104,7 @@ function joinFromRoom(d){
   if(G.isHost){
     G.pool=buildPool();
     const roomSub=normalizeOnlineSub(G.sub);
-    const poolData=G.pool.slice(0,ROUND_LIMIT).map(q=>toOnlineQuestion(q,roomSub));
+    const poolData=G.pool.slice(0,currentRounds()).map(q=>toOnlineQuestion(q,roomSub));
     const ordersData=poolData.map(()=>shuf([0,1,2,3]));
     G.roomRef.child('gameState').set({pool:poolData,orders:ordersData,qi:0,pi:0,scores:{},hearts:{},phase:'question',t:Date.now()})
       .catch(err=>{console.error('Failed to set gameState:', err);toast('Game sync failed');});
@@ -42184,10 +42210,10 @@ function renderOnlineQ(){
       if(G._resultTimeout){clearTimeout(G._resultTimeout);G._resultTimeout=null;}
       stopTimers();
       const correctA=tallyVotes(votes,q);
-      const reachedRoundLimit=(G.qi+1)>=(G.roomPool?G.roomPool.length:ROUND_LIMIT);
+      const reachedRoundLimit=(G.qi+1)>=(G.roomPool?G.roomPool.length:currentRounds());
       const anyGameOver=shouldEndOnlineGame()||reachedRoundLimit;
       let nqi=G.qi+1;
-      if(nqi>=(G.roomPool?G.roomPool.length:ROUND_LIMIT))nqi=G.qi;
+      if(nqi>=(G.roomPool?G.roomPool.length:currentRounds()))nqi=G.qi;
       G.roomRef.child('gameState').update({
         phase:'result',votes,correctA:correctA,scores:G.scores,hearts:G.hearts,
         nextQi:nqi,gameOver:anyGameOver||false,t:Date.now()
@@ -42213,9 +42239,9 @@ function renderOnlineQ(){
         stopTimers();
         const tq=G.roomPool[G.qi];
         const correctA2=tallyVotes(v,tq);
-        const reachedRoundLimit=(G.qi+1)>=(G.roomPool?G.roomPool.length:ROUND_LIMIT);
+        const reachedRoundLimit=(G.qi+1)>=(G.roomPool?G.roomPool.length:currentRounds());
         let nqi=G.qi+1;
-        if(nqi>=(G.roomPool?G.roomPool.length:ROUND_LIMIT))nqi=G.qi;
+        if(nqi>=(G.roomPool?G.roomPool.length:currentRounds()))nqi=G.qi;
         const anyGameOver=shouldEndOnlineGame()||reachedRoundLimit;
         G.roomRef.child('gameState').update({
           phase:'result',votes:v,correctA:correctA2,scores:G.scores,hearts:G.hearts,
@@ -42320,7 +42346,7 @@ function showOnlineResult(gs){
   setTimeout(()=>{
     if(!G.roomRef)return;
     let nqi=gs.nextQi!=null?gs.nextQi:G.qi+1;
-    if(nqi>=(G.roomPool?G.roomPool.length:ROUND_LIMIT))nqi=0;
+    if(nqi>=(G.roomPool?G.roomPool.length:currentRounds()))nqi=0;
     G.roomRef.child('gameState').update({phase:'question',qi:nqi,pi:0,votes:{},t:Date.now()});
   },2500);
 }
@@ -42339,13 +42365,13 @@ function startNearby(){
   const ref=G.db.ref('rooms/'+code); G.roomRef=ref;
   ref.set({
     code, host:G.uid, status:'waiting', sub:G.sub, difficulty:G.diff, createdAt:Date.now(),
-    cfg:{sound:!!G.cfg.sound,hearts:!!G.cfg.hearts,sudden:!!G.cfg.sudden,winScore:ROUND_LIMIT},
+    cfg:{sound:!!G.cfg.sound,hearts:!!G.cfg.hearts,sudden:!!G.cfg.sudden,winScore:clampRounds(G.cfg.winScore)},
     nearby:true,
     players:{[G.uid]:{name:G.profile.name,avatar:G.profile.avatar,ready:false,score:0,hearts:3,diff:G.diff}}
   }).then(()=>{
     document.getElementById('rc-disp').textContent=code;
     document.getElementById('lobby-panel').style.display='block';
-    updateLobbyModeNote({sub:G.sub,difficulty:G.diff});
+    updateLobbyModeNote({sub:G.sub,difficulty:G.diff,cfg:{sound:!!G.cfg.sound,hearts:!!G.cfg.hearts,sudden:!!G.cfg.sudden,winScore:clampRounds(G.cfg.winScore)}});
     document.getElementById('start-btn').disabled=false;
     renderQRCode(code);
     ref.on('value',sn=>{ const d=sn.val(); if(!d)return; updateLobbyUI(d); if(d.status==='playing'){ ref.off(); joinFromRoom(d); } });
@@ -43735,6 +43761,7 @@ function sendChallenge(){
     mode:'online',
     difficulty:_chDiff,
     qtype:challengeSub,
+    cfg:{sound:!!G.cfg.sound,hearts:!!G.cfg.hearts,sudden:!!G.cfg.sudden,winScore:clampRounds(G.cfg.winScore)},
     timestamp:Date.now(),
     status:'pending'
   };
@@ -43746,7 +43773,7 @@ function sendChallenge(){
   ref.set({
     code, host:G.uid, status:'waiting', sub:challengeSub, qtype:challengeSub, createdAt:Date.now(),
     challenge:true, difficulty:_chDiff,
-    cfg:{sound:!!G.cfg.sound,hearts:!!G.cfg.hearts,sudden:!!G.cfg.sudden,winScore:ROUND_LIMIT},
+    cfg:{sound:!!G.cfg.sound,hearts:!!G.cfg.hearts,sudden:!!G.cfg.sudden,winScore:clampRounds(G.cfg.winScore)},
     challengeTarget:_chTargetUid,
     players:{
       [G.uid]:{name:G.profile.name,avatar:G.profile.avatar,ready:false,score:0,hearts:3,diff:_chDiff},
@@ -43774,7 +43801,7 @@ function sendChallenge(){
       // Navigate to lobby and show the room
       document.getElementById('rc-disp').textContent=challengeData.roomCode;
       document.getElementById('lobby-panel').style.display='block';
-      updateLobbyModeNote({qtype:challengeSub,difficulty:_chDiff});
+      updateLobbyModeNote({qtype:challengeSub,difficulty:_chDiff,cfg:{sound:!!G.cfg.sound,hearts:!!G.cfg.hearts,sudden:!!G.cfg.sudden,winScore:clampRounds(G.cfg.winScore)}});
       document.getElementById('start-btn').disabled=false;
       renderQRCode(challengeData.roomCode);
       go('lobby');
@@ -43816,7 +43843,7 @@ function showChallengeNotif(ch){
   document.getElementById('cn-av').textContent=ch.senderAvatar||'😊';
   document.getElementById('cn-name').textContent=(ch.senderName||'Someone')+' challenged you!';
 
-  document.getElementById('cn-detail').textContent='Mode: '+chQTypeLabel(ch.qtype||'classic')+' · Difficulty: '+chDiffLabel(ch.difficulty||'easy');
+  document.getElementById('cn-detail').textContent='Mode: '+chQTypeLabel(ch.qtype||'classic')+' · Difficulty: '+chDiffLabel(ch.difficulty||'easy')+' · '+roomSettingsLine(ch);
 
   el.style.display='block';
   el.style.animation='none';
@@ -43882,7 +43909,7 @@ function joinChallengeRoom(code,chMeta){
     ref.child('players/'+G.uid).update({name:G.profile.name,avatar:G.profile.avatar,ready:false,score:0,hearts:3,diff:G.diff});
     document.getElementById('rc-disp').textContent=code;
     document.getElementById('lobby-panel').style.display='block';
-    updateLobbyModeNote({qtype:(chMeta&&chMeta.qtype)||d.qtype||d.sub,difficulty:(chMeta&&chMeta.difficulty)||d.difficulty});
+    updateLobbyModeNote({qtype:(chMeta&&chMeta.qtype)||d.qtype||d.sub,difficulty:(chMeta&&chMeta.difficulty)||d.difficulty,cfg:(chMeta&&chMeta.cfg)||d.cfg||{sound:!!G.cfg.sound,hearts:!!G.cfg.hearts,sudden:!!G.cfg.sudden,winScore:clampRounds(G.cfg.winScore)}});
     document.getElementById('start-btn').disabled=true;
     const qrWrap=document.getElementById('lobby-qr'); if(qrWrap) qrWrap.style.display='none';
     ref.on('value',sn2=>{ const d2=sn2.val(); if(!d2)return; updateLobbyUI(d2); if(d2.status==='playing'){ ref.off(); joinFromRoom(d2); } });
