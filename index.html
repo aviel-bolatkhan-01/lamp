@@ -3419,10 +3419,6 @@ html[data-theme="warmth"] .divider::before, html[data-theme="warmth"] .divider::
           <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#4285F4" d="M44.5 20H24v8.5h11.8C34.7 33.9 30.1 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 5.1 29.6 3 24 3 12.4 3 3 12.4 3 24s9.4 21 21 21c10.5 0 20-7.6 20-21 0-1.4-.2-2.7-.5-4z"/><path fill="#34A853" d="M6.3 14.7l7 5.1C15.2 16 19.3 13 24 13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 5.1 29.6 3 24 3c-7.7 0-14.4 4.4-17.7 11.7z"/><path fill="#FBBC05" d="M24 45c5.5 0 10.5-1.9 14.4-5l-6.7-5.5C29.7 36.2 27 37 24 37c-6 0-11.1-4-12.9-9.5l-7 5.4C7.7 40.7 15.3 45 24 45z"/><path fill="#EA4335" d="M44.5 20H24v8.5h11.8c-.9 2.7-2.7 5-5.1 6.5l6.7 5.5C41.6 37.5 45 31.3 45 24c0-1.4-.2-2.7-.5-4z"/></svg>
           Google
         </button>
-        <button class="btn-social btn-facebook" style="padding:11px 14px;font-size:14px;border-radius:12px;" onclick="profileSignIn('facebook')">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3l-.5 3H13v6.8c4.56-.93 8-4.96 8-9.8z"/></svg>
-          Facebook
-        </button>
         <button class="btn-social btn-apple" style="padding:11px 14px;font-size:14px;border-radius:12px;" onclick="profileSignIn('apple')">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M17.05 20.28c-.98.95-2.05.86-3.08.42-1.07-.46-2.04-.47-3.16 0-1.42.6-2.17.42-3.05-.42C2.2 14.73 3.02 6.42 8.7 6.13c1.35.07 2.29.74 3.08.8 1.17-.22 2.3-.9 3.56-.77 1.51.17 2.65.77 3.38 1.95-3.12 1.87-2.37 5.98.48 7.14-.6 1.53-1.38 3.06-2.15 4.03zM12.03 6.08C11.84 3.78 13.7 1.9 15.84 1.7c.28 2.63-2.39 4.58-3.81 4.38z"/></svg>
           Apple
@@ -43040,7 +43036,6 @@ function profileSignIn(method){
   if(!G.auth){ toast('Firebase not configured'); return; }
   let provider;
   if(method==='google') provider=new firebase.auth.GoogleAuthProvider();
-  else if(method==='facebook') provider=new firebase.auth.FacebookAuthProvider();
   else if(method==='apple') provider=new firebase.auth.OAuthProvider('apple.com');
   else return;
   const currentUser=G.auth.currentUser;
