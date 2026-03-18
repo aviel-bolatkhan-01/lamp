@@ -41125,6 +41125,34 @@ function shuf(a){ const r=[...a]; for(let i=r.length-1;i>0;i--){ const j=0|Math.
 function slug(s){ return (s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); }
 function isTFQuestion(q){ return typeof q.a === 'boolean'; }
 function getOptionButtons(){ return document.querySelectorAll('#g-opts .opt, #g-opts .tf-btn'); }
+function normDiff(d){
+  if(d==='easy'||d==='medium'||d==='hard') return d;
+  return null;
+}
+function diffFromHash(key,mode){
+  let h=0;
+  const s=String(key||'');
+  for(let i=0;i<s.length;i++){ h=((h<<5)-h+s.charCodeAt(i))|0; }
+  const v=Math.abs(h)%100;
+  if(mode==='verse'){
+    if(v<30) return 'easy';
+    if(v<70) return 'medium';
+    return 'hard';
+  }
+  if(mode==='truefalse'){
+    if(v<50) return 'easy';
+    if(v<82) return 'medium';
+    return 'hard';
+  }
+  if(v<45) return 'easy';
+  if(v<80) return 'medium';
+  return 'hard';
+}
+function ensureQuestionDifficulty(q,mode){
+  const d=normDiff(q&&q.d);
+  if(d) return {...q,d};
+  return {...q,d:diffFromHash(questionKey(q),mode)};
+}
 function isAlivePlayerName(name){ return !G.cfg.hearts || ((G.hearts[name]||0)>0); }
 function alivePlayersNow(){ return G.players.filter(p=>isAlivePlayerName(p.name)); }
 function shouldEndByHearts(){
@@ -41152,17 +41180,19 @@ function buildPool(){
   else {
     Object.keys(QB).forEach(cat => QB[cat].forEach(q => raw.push({...q, cat})));
   }
-  raw=dedupeQuestions(raw,G.sub);
+  raw=dedupeQuestions(raw,G.sub).map(q=>ensureQuestionDifficulty(q,G.sub));
+  const allDiffRaw=[...raw];
 
   // Filter by difficulty
-  if (G.sub !== 'truefalse' && G.sub !== 'verse') {
-    if (G.diff === 'easy') {
-      raw = raw.filter(q => q.d === 'easy');
-    } else if (G.diff === 'medium') {
-      raw = raw.filter(q => q.d === 'easy' || q.d === 'medium');
-    } else if (G.diff === 'hard') {
-      raw = raw.filter(q => q.d === 'medium' || q.d === 'hard');
-    }
+  if (G.diff === 'easy') {
+    raw = raw.filter(q => q.d === 'easy');
+  } else if (G.diff === 'medium') {
+    raw = raw.filter(q => q.d === 'easy' || q.d === 'medium');
+  } else if (G.diff === 'hard') {
+    raw = raw.filter(q => q.d === 'medium' || q.d === 'hard');
+  }
+  if(!raw.length){
+    raw=allDiffRaw;
   }
 
   // Filter out seen questions
