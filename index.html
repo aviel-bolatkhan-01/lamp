@@ -2978,7 +2978,7 @@ html[data-theme="warmth"] .divider::before, html[data-theme="warmth"] .divider::
       <div style="font-size:32px;">🔥</div>
       <div style="flex:1;">
         <div class="eyebrow" style="color:var(--gold1);">Daily Challenge</div>
-        <div style="font-family:'Playfair Display',serif;font-size:16px;color:var(--ink);">10 Questions · Time Attack</div>
+        <div style="font-family:'Playfair Display',serif;font-size:16px;color:var(--ink);">15 Tasks · Time Attack</div>
         <div id="daily-streak-info" style="font-size:11px;color:var(--ink3);margin-top:2px;">Streak: 0 days</div>
       </div>
       <div class="btn btn-gold btn-sm" style="width:auto;padding:8px 16px;">Play</div>
@@ -40368,6 +40368,31 @@ const VERSE_Q=[
     ]
   }
 ];
+const ROUND_LIMIT=15;
+const MODE_EXTRA_QUESTIONS=500;
+function questionKey(q){
+  return q&& (q._id || q.q || q.r || q.b || '');
+}
+function expandModeQuestionBanks(){
+  const localShuf=(a)=>{
+    const r=[...a];
+    for(let i=r.length-1;i>0;i--){
+      const j=0|Math.random()*(i+1);
+      [r[i],r[j]]=[r[j],r[i]];
+    }
+    return r;
+  };
+  const tfBase=[...TF_Q];
+  const verseBase=[...VERSE_Q];
+  for(let i=0;i<MODE_EXTRA_QUESTIONS;i++){
+    const t=tfBase[i%tfBase.length];
+    TF_Q.push({...t,_id:`tf-extra-${i}`});
+    const v=verseBase[i%verseBase.length];
+    const opts=Array.isArray(v.o)?localShuf(v.o):[];
+    VERSE_Q.push({...v,o:opts,_id:`verse-extra-${i}`});
+  }
+}
+expandModeQuestionBanks();
 
 /* ══════════════════════════════════════════════════
    STATE
@@ -40390,7 +40415,7 @@ const G={
   // lightning
   lScore:0, lTimId:null,
   // cfg
-  cfg:{sound:true,timer:true,hearts:true,sudden:false,winScore:10},
+  cfg:{sound:true,timer:true,hearts:true,sudden:false,winScore:ROUND_LIMIT},
   donAmt:'$10',
 };
 function setAuthRedirectPending(v){
@@ -40838,7 +40863,7 @@ function togCfg(k){
   if(b){ b.textContent=G.cfg[k]?'ON':'OFF'; b.className='toggle-btn '+(G.cfg[k]?'on':'off'); }
 }
 function adjWin(n){
-  G.cfg.winScore=Math.max(5,Math.min(30,G.cfg.winScore+n));
+  G.cfg.winScore=ROUND_LIMIT;
   const el=document.getElementById('win-disp'); if(el)el.textContent=G.cfg.winScore;
 }
 
@@ -40885,8 +40910,8 @@ function buildPool(){
     }
   }
 
-  // Filter out seen questions (use q.q for classic/TF, q.r for verse)
-  let unseen = raw.filter(q => !G.seen.has(q.q || q.r));
+  // Filter out seen questions
+  let unseen = raw.filter(q => !G.seen.has(questionKey(q)));
 
   // If we've seen everything or pool is empty due to filter, reset seen
   if(unseen.length === 0){
@@ -40914,7 +40939,8 @@ function beginGame(){
     return { ...p, name: finalName };
   });
 
-  G.pool=buildPool(); G.qi=0; G.pi=0; G.done=false; G.onlineGame=false;
+  G.pool=buildPool().slice(0,ROUND_LIMIT); G.qi=0; G.pi=0; G.done=false; G.onlineGame=false;
+  G.cfg.winScore=ROUND_LIMIT;
   G.scores={}; G.hearts={}; G.streaks={};
   G.players.forEach(p=>{ G.scores[p.name]=0; G.hearts[p.name]=3; G.streaks[p.name]=0; });
 
@@ -40979,7 +41005,7 @@ function renderQ(){
       q = matchingQs[Math.floor(Math.random() * matchingQs.length)];
     }
   }
-  G.seen.add(q.q || q.r);
+  G.seen.add(questionKey(q));
 
   document.getElementById('g-av').textContent=p.avatar;
   document.getElementById('g-nm').textContent=p.name + (p.team ? ` (${p.team})` : '');
@@ -41196,7 +41222,7 @@ function nextTurn(){
 
 /* ── Lightning ── */
 function startLightning(pIdx){
-  G.pi=pIdx; G.lScore=0; G.pool=buildPool(); G.qi=0;
+  G.pi=pIdx; G.lScore=0; G.pool=buildPool().slice(0,ROUND_LIMIT); G.qi=0;
   const p=G.players[pIdx];
   document.getElementById('l-av').textContent=p.avatar;
   document.getElementById('l-nm').textContent=p.name;
@@ -41214,8 +41240,8 @@ function startLightning(pIdx){
   },1000);
 }
 function renderLQ(){
-  if(G.qi>=G.pool.length){ G.pool=buildPool(); G.qi=0; }
-  const q=G.pool[G.qi]; G.seen.add(q.q); G.done=false;
+  if(G.qi>=G.pool.length){ endLightning(); return; }
+  const q=G.pool[G.qi]; G.seen.add(questionKey(q)); G.done=false;
   document.getElementById('l-cat').textContent=q.cat||'';
   document.getElementById('l-fb').style.display='none';
   renderMCQ(q,'l-txt','l-opts',(btn,isOk,q2,order)=>{
@@ -41247,13 +41273,13 @@ function endLightning(){
 
 /* ── True/False ── */
 function startTF(){
-  G.pool=buildPool(); G.tfRound=0;
+  G.pool=buildPool().slice(0,ROUND_LIMIT); G.tfRound=0;
   G.players.forEach(p=>{ G.scores[p.name]=0; });
   go('tf'); renderTF();
 }
 function renderTF(){
-  if(G.tfRound>=G.pool.length){ G.pool=buildPool(); G.tfRound=0; }
-  const totalRounds=Math.min(20,G.pool.length);
+  if(G.tfRound>=G.pool.length){ showScores(true); return; }
+  const totalRounds=Math.min(ROUND_LIMIT,G.pool.length);
   if(G.tfRound>=totalRounds){ showScores(true); return; }
 
   // Check if all players are eliminated (hearts)
@@ -41262,7 +41288,7 @@ function renderTF(){
     if(alive.length<=1){ showScores(true); return; }
   }
 
-  const q=G.pool[G.tfRound]; G.seen.add(q.q); G.tfVotes={}; G.tfVoterIdx=0;
+  const q=G.pool[G.tfRound]; G.seen.add(questionKey(q)); G.tfVotes={}; G.tfVoterIdx=0;
   G.done=false;
   document.getElementById('tf-round').textContent=`Round ${G.tfRound+1}/${totalRounds}`;
   document.getElementById('tf-txt').textContent=q.q;
@@ -41379,11 +41405,11 @@ function revealTF(q){
   }
 
   const nxt=document.getElementById('tf-next'); nxt.style.display='flex';
-  const totalRounds=Math.min(20,G.pool.length);
+  const totalRounds=Math.min(ROUND_LIMIT,G.pool.length);
   nxt.textContent=G.tfRound>=totalRounds-1?'See Results →':'Next Round →';
   nxt.onclick=()=>{ nextTF(); };
 }
-function total(){ return Math.min(20,G.pool.length); }
+function total(){ return Math.min(ROUND_LIMIT,G.pool.length); }
 function nextTF(){ sfx.tap(); haptic('tap'); G.tfRound++; renderTF(); }
 
 /* ── Scoreboard + End ── */
@@ -41804,6 +41830,7 @@ function toggleReady(){
 function startOnline(){
   if(!G.roomRef)return;
   sfx.tap();
+  G.cfg.winScore=ROUND_LIMIT;
   G.roomRef.once('value').then(sn=>{
     const d=sn.val()||{};
     const ps=Object.values(d.players||{});
@@ -41823,6 +41850,7 @@ function joinFromRoom(d){
   // Keep roomRef alive for game sync
   // Set difficulty from room data so buildPool filters correctly
   if(d.difficulty) G.diff=d.difficulty;
+  G.cfg.winScore=ROUND_LIMIT;
   G.TIM=G.diff==='easy'?25:G.diff==='hard'?12:20;
   const playerEntries=Object.entries(d.players||{});
   let players=playerEntries.map(([uid,p])=>({name:p.name,avatar:p.avatar,diff:p.diff||'easy',uid}));
@@ -41856,9 +41884,10 @@ function joinFromRoom(d){
         stopTimers();
         const q=G.roomPool[G.qi];
         const correctA=tallyVotes(votes,q);
-        const anyGameOver=shouldEndOnlineGame();
+        const reachedRoundLimit=(G.qi+1)>=(G.roomPool?G.roomPool.length:ROUND_LIMIT);
+        const anyGameOver=shouldEndOnlineGame()||reachedRoundLimit;
         let nqi=G.qi+1;
-        if(nqi>=(G.roomPool?G.roomPool.length:40))nqi=0;
+        if(nqi>=(G.roomPool?G.roomPool.length:ROUND_LIMIT))nqi=G.qi;
         G.roomRef.child('gameState').update({
           phase:'result',votes,correctA:correctA,scores:G.scores,hearts:G.hearts,
           nextQi:nqi,gameOver:anyGameOver||false,t:Date.now()
@@ -41884,7 +41913,7 @@ function joinFromRoom(d){
   if(G.isHost){
     G.pool=buildPool();
     const roomSub=normalizeOnlineSub(G.sub);
-    const poolData=G.pool.slice(0,40).map(q=>toOnlineQuestion(q,roomSub));
+    const poolData=G.pool.slice(0,ROUND_LIMIT).map(q=>toOnlineQuestion(q,roomSub));
     const ordersData=poolData.map(()=>shuf([0,1,2,3]));
     G.roomRef.child('gameState').set({pool:poolData,orders:ordersData,qi:0,pi:0,scores:{},hearts:{},phase:'question',t:Date.now()})
       .catch(err=>{console.error('Failed to set gameState:', err);toast('Game sync failed');});
@@ -41990,9 +42019,10 @@ function renderOnlineQ(){
       if(G._resultTimeout){clearTimeout(G._resultTimeout);G._resultTimeout=null;}
       stopTimers();
       const correctA=tallyVotes(votes,q);
-      const anyGameOver=shouldEndOnlineGame();
+      const reachedRoundLimit=(G.qi+1)>=(G.roomPool?G.roomPool.length:ROUND_LIMIT);
+      const anyGameOver=shouldEndOnlineGame()||reachedRoundLimit;
       let nqi=G.qi+1;
-      if(nqi>=(G.roomPool?G.roomPool.length:40))nqi=0;
+      if(nqi>=(G.roomPool?G.roomPool.length:ROUND_LIMIT))nqi=G.qi;
       G.roomRef.child('gameState').update({
         phase:'result',votes,correctA:correctA,scores:G.scores,hearts:G.hearts,
         nextQi:nqi,gameOver:anyGameOver||false,t:Date.now()
@@ -42018,9 +42048,10 @@ function renderOnlineQ(){
         stopTimers();
         const tq=G.roomPool[G.qi];
         const correctA2=tallyVotes(v,tq);
+        const reachedRoundLimit=(G.qi+1)>=(G.roomPool?G.roomPool.length:ROUND_LIMIT);
         let nqi=G.qi+1;
-        if(nqi>=(G.roomPool?G.roomPool.length:40))nqi=0;
-        const anyGameOver=shouldEndOnlineGame();
+        if(nqi>=(G.roomPool?G.roomPool.length:ROUND_LIMIT))nqi=G.qi;
+        const anyGameOver=shouldEndOnlineGame()||reachedRoundLimit;
         G.roomRef.child('gameState').update({
           phase:'result',votes:v,correctA:correctA2,scores:G.scores,hearts:G.hearts,
           nextQi:nqi,gameOver:anyGameOver||false,t:Date.now()
@@ -42124,7 +42155,7 @@ function showOnlineResult(gs){
   setTimeout(()=>{
     if(!G.roomRef)return;
     let nqi=gs.nextQi!=null?gs.nextQi:G.qi+1;
-    if(nqi>=(G.roomPool?G.roomPool.length:40))nqi=0;
+    if(nqi>=(G.roomPool?G.roomPool.length:ROUND_LIMIT))nqi=0;
     G.roomRef.child('gameState').update({phase:'question',qi:nqi,pi:0,votes:{},t:Date.now()});
   },2500);
 }
@@ -42164,35 +42195,74 @@ function startDailyChallenge(){
     return;
   }
 
-  // Create a predictable pool based on the date
-  const seed = today.split('-').reduce((a, b) => a + parseInt(b), 0);
-  let all = [];
-  Object.keys(QB).forEach(cat => QB[cat].forEach(q => all.push({...q, cat})));
-  
-  // Deterministic shuffle using seed
-  const seededRandom = (s) => {
-    const x = Math.sin(s) * 10000;
-    return x - Math.floor(x);
+  const xp=G.profile.xp||0;
+  const dailyDiff=xp>=2000?'hard':xp>=700?'medium':'easy';
+  const seed=today.split('-').reduce((a,b)=>a+parseInt(b,10),0)+(G.uid?G.uid.length:0);
+  const seededRandom=(s)=>{const x=Math.sin(s)*10000;return x-Math.floor(x);};
+  const pickSeeded=(arr,count,seedOffset)=>{
+    const out=[]; const tmp=[...arr];
+    for(let i=0;i<count&&tmp.length;i++){
+      const idx=Math.floor(seededRandom(seed+seedOffset+i)*tmp.length);
+      out.push(tmp.splice(idx,1)[0]);
+    }
+    return out;
   };
-  
-  let pool = [];
-  let tempAll = [...all];
-  for(let i=0; i<10; i++) {
-    const idx = Math.floor(seededRandom(seed + i) * tempAll.length);
-    pool.push(tempAll.splice(idx, 1)[0]);
-  }
+  const byDiff=(q)=>{
+    if(dailyDiff==='easy') return q.d==='easy';
+    if(dailyDiff==='medium') return q.d==='easy'||q.d==='medium';
+    return q.d==='medium'||q.d==='hard';
+  };
+  const classicAll=[];
+  Object.keys(QB).forEach(cat=>QB[cat].forEach(q=>classicAll.push({...q,cat})));
+  let classicPool=classicAll.filter(byDiff);
+  if(classicPool.length<7) classicPool=classicAll;
+
+  const tfAsMcq=TF_Q.map((q,idx)=>({
+    _id:`daily-tf-${idx}-${q._id||idx}`,
+    q:`[True/False] ${q.q}`,
+    o:['True','False','Both','Neither'],
+    a:q.a?0:1,
+    e:q.e||'',
+    d:dailyDiff,
+    cat:'True/False'
+  }));
+  const verseAsMcq=VERSE_Q.map((q,idx)=>{
+    const opts=Array.isArray(q.o)?q.o.slice(0,4):[];
+    const blank=(q.blank||'').trim();
+    let ai=opts.findIndex(o=>String(o||'').trim().toLowerCase()===blank.toLowerCase());
+    if(ai===-1&&blank){
+      opts.unshift(blank);
+      while(opts.length>4) opts.pop();
+      ai=0;
+    }
+    return {
+      _id:`daily-verse-${idx}-${q._id||idx}`,
+      q:`[Fill Verse] ${q.b||''} ________ ${q.a||''}`,
+      o:opts,
+      a:ai>-1?ai:0,
+      e:q.r?`${q.r} — "${(q.b||'')}${blank}${q.a||''}"`:'',
+      d:dailyDiff,
+      cat:'Fill Verse'
+    };
+  });
+  const pool=[
+    ...pickSeeded(classicPool,7,100),
+    ...pickSeeded(tfAsMcq,4,500),
+    ...pickSeeded(verseAsMcq,4,900),
+  ];
+  const dailyPool=pickSeeded(pool,ROUND_LIMIT,1200);
 
   G.mode = 'daily';
   G.sub = 'classic';
   G.players = [{name: G.profile.name, avatar: G.profile.avatar}];
-  G.pool = pool;
+  G.pool = dailyPool;
   G.qi = 0; G.pi = 0;
   G.scores = {[G.profile.name]: 0};
   G.hearts = {[G.profile.name]: 3};
   G.streaks = {[G.profile.name]: 0};
-  G.cfg.winScore = 10;
+  G.cfg.winScore = ROUND_LIMIT;
   G.cfg.timer = true;
-  G.TIM = 15; // Faster for daily challenge
+  G.TIM = dailyDiff==='hard'?12:dailyDiff==='medium'?16:20;
 
   showSplash(0, ()=>{ go('game'); renderQ(); });
 }
@@ -42222,12 +42292,12 @@ function startSeasonalEvent(){
   G.mode = 'seasonal';
   G.sub = 'classic';
   G.players = [{name: G.profile?.name || 'Player', avatar: G.profile?.avatar || '😊'}];
-  G.pool = shuf([...currentActiveEvent.questions]);
+  G.pool = shuf([...currentActiveEvent.questions]).slice(0,ROUND_LIMIT);
   G.qi = 0; G.pi = 0;
   G.scores = {[G.players[0].name]: 0};
   G.hearts = {[G.players[0].name]: 3};
   G.streaks = {[G.players[0].name]: 0};
-  G.cfg.winScore = G.pool.length;
+  G.cfg.winScore = ROUND_LIMIT;
   
   showSplash(0, ()=>{ go('game'); renderQ(); });
 }
