@@ -3770,6 +3770,20 @@ html[data-theme="warmth"] .divider::before, html[data-theme="warmth"] .divider::
       <button class="chip" onclick="pickChQType(this,'team')" id="ch-qtype-team">👥 Team Mode</button>
     </div>
 
+    <label class="label">Options</label>
+    <div class="toggle-row" style="margin-bottom:8px;">
+      <span class="toggle-lbl">❤️ Lives / Hearts</span>
+      <button class="toggle-btn on" id="ch-tog-hearts" onclick="togChHearts()">ON</button>
+    </div>
+    <div class="toggle-row" style="margin-bottom:16px;">
+      <span class="toggle-lbl">🏁 Rounds</span>
+      <div class="stepper">
+        <button class="step-btn" onclick="adjChRounds(-1)">−</button>
+        <span class="step-val" id="ch-win-disp">15</span>
+        <button class="step-btn" onclick="adjChRounds(1)">+</button>
+      </div>
+    </div>
+
     <button class="btn btn-gold" onclick="sendChallenge()" id="ch-send-btn">
       <span class="btn-icon">⚔️</span> Send Challenge
     </button>
@@ -44033,7 +44047,7 @@ function addFriendFromFriends(){
 /* ══════════════════════════════════════════════════
    CHALLENGE SYSTEM
 ══════════════════════════════════════════════════ */
-let _chTargetUid=null, _chDiff='easy', _chQType='classic';
+let _chTargetUid=null, _chDiff='easy', _chQType='classic', _chCfg={hearts:true,winScore:15};
 let _chListener=null, _chNotifTimer=null, _pendingChallenge=null;
 const CH_EXPIRY_MS=30*60*1000; // 30 minutes
 
@@ -44044,8 +44058,12 @@ function challengeFriend(uid){
   sfx.tap();
 
   _chTargetUid=uid;
-  _chDiff='easy';
-  _chQType='classic';
+  _chDiff=G.diff||'easy';
+  _chQType=normalizeOnlineSub(G.sub||'classic');
+  _chCfg={
+    hearts:!!G.cfg.hearts,
+    winScore:clampRounds(G.cfg.winScore||DEFAULT_ROUNDS)
+  };
 
   const f=getFriendData(uid);
   document.getElementById('ch-friend-av').textContent=f.avatar||'😊';
@@ -44053,9 +44071,18 @@ function challengeFriend(uid){
 
   // Reset chip selections
   document.querySelectorAll('#ch-diff-chips .chip').forEach(c=>c.classList.remove('sel'));
-  document.getElementById('ch-diff-easy').classList.add('sel');
+  const diffChip=document.getElementById('ch-diff-'+_chDiff)||document.getElementById('ch-diff-easy');
+  if(diffChip) diffChip.classList.add('sel');
   document.querySelectorAll('#ch-qtype-chips .chip').forEach(c=>c.classList.remove('sel'));
-  document.getElementById('ch-qtype-classic').classList.add('sel');
+  const modeChip=document.getElementById('ch-qtype-'+_chQType)||document.getElementById('ch-qtype-classic');
+  if(modeChip) modeChip.classList.add('sel');
+  const hBtn=document.getElementById('ch-tog-hearts');
+  if(hBtn){
+    hBtn.textContent=_chCfg.hearts?'ON':'OFF';
+    hBtn.className='toggle-btn '+(_chCfg.hearts?'on':'off');
+  }
+  const roundsEl=document.getElementById('ch-win-disp');
+  if(roundsEl) roundsEl.textContent=clampRounds(_chCfg.winScore);
 
   openOv('ov-challenge');
 }
@@ -44072,6 +44099,21 @@ function pickChQType(el,qtype){
   _chQType=qtype;
   document.querySelectorAll('#ch-qtype-chips .chip').forEach(c=>c.classList.remove('sel'));
   el.classList.add('sel');
+}
+function togChHearts(){
+  sfx.tap();
+  _chCfg.hearts=!_chCfg.hearts;
+  const b=document.getElementById('ch-tog-hearts');
+  if(b){
+    b.textContent=_chCfg.hearts?'ON':'OFF';
+    b.className='toggle-btn '+(_chCfg.hearts?'on':'off');
+  }
+}
+function adjChRounds(n){
+  sfx.tap();
+  _chCfg.winScore=clampRounds((_chCfg.winScore||DEFAULT_ROUNDS)+n);
+  const el=document.getElementById('ch-win-disp');
+  if(el) el.textContent=_chCfg.winScore;
 }
 
 function sendChallenge(){
@@ -44094,7 +44136,7 @@ function sendChallenge(){
     mode:'online',
     difficulty:_chDiff,
     qtype:challengeSub,
-    cfg:{hearts:!!G.cfg.hearts,sudden:!!G.cfg.sudden,winScore:clampRounds(G.cfg.winScore)},
+    cfg:{hearts:!!_chCfg.hearts,sudden:false,winScore:clampRounds(_chCfg.winScore)},
     timestamp:Date.now(),
     status:'pending'
   };
@@ -44106,7 +44148,7 @@ function sendChallenge(){
   ref.set({
     code, host:G.uid, status:'waiting', sub:challengeSub, qtype:challengeSub, createdAt:Date.now(),
     challenge:true, difficulty:_chDiff,
-    cfg:{hearts:!!G.cfg.hearts,sudden:!!G.cfg.sudden,winScore:clampRounds(G.cfg.winScore)},
+    cfg:{hearts:!!_chCfg.hearts,sudden:false,winScore:clampRounds(_chCfg.winScore)},
     challengeTarget:_chTargetUid,
     players:{
       [G.uid]:{name:G.profile.name,avatar:G.profile.avatar,ready:false,score:0,hearts:3,diff:_chDiff},
@@ -44134,7 +44176,7 @@ function sendChallenge(){
       // Navigate to lobby and show the room
       document.getElementById('rc-disp').textContent=challengeData.roomCode;
       document.getElementById('lobby-panel').style.display='block';
-      updateLobbyModeNote({qtype:challengeSub,difficulty:_chDiff,cfg:{hearts:!!G.cfg.hearts,sudden:!!G.cfg.sudden,winScore:clampRounds(G.cfg.winScore)}});
+      updateLobbyModeNote({qtype:challengeSub,difficulty:_chDiff,cfg:{hearts:!!_chCfg.hearts,sudden:false,winScore:clampRounds(_chCfg.winScore)}});
       document.getElementById('start-btn').disabled=false;
       renderQRCode(challengeData.roomCode);
       go('lobby');
