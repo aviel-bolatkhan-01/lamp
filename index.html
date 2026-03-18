@@ -2676,6 +2676,7 @@ html[data-theme="warmth"] .setup-av-btn { background: #FDF9F4; border-color: #D8
 .chat-send:focus-visible { outline: 2px solid var(--green1); outline-offset: 2px; }
 .social-tab:focus-visible { outline: 2px solid var(--green1); outline-offset: 2px; }
 .friend-btn:focus-visible { outline: 2px solid var(--green1); outline-offset: 2px; }
+.screen#s-tf #tf-txt { margin-top: 12px; }
 .trans-btn:focus-visible { outline: 2px solid var(--green1); outline-offset: 2px; }
 .theme-swatch:focus-visible { outline: 2px solid var(--green1); outline-offset: 2px; }
 .g-quit:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
@@ -40738,6 +40739,33 @@ function addXP(n){
     setTimeout(()=>{ sfx.levelUp(); toast('🎉 Level Up! '+l.name+' · Lv '+l.lv); },1500);
   }
 }
+function canAwardAnswerXP(playerName){
+  if(!G.profile || !playerName) return false;
+  if(G.onlineGame) return playerName===G.profile.name;
+  return true;
+}
+function xpMultForStreak(streak){
+  if(streak>=5) return 2;
+  if(streak>=3) return 1.5;
+  return 1;
+}
+function awardAnswerXPForPlayer(playerName,anchorEl){
+  if(!canAwardAnswerXP(playerName)) return;
+  const streak=G.streaks[playerName]||0;
+  const base=G.mode==='practice'?2:10;
+  const xp=Math.round(base*xpMultForStreak(streak));
+  if(anchorEl) floatScore(anchorEl,'+'+xp);
+  addXP(xp);
+  if(G.profile){
+    G.profile.correct=(G.profile.correct||0)+1;
+    if(streak>=(G.profile.bestStreak||0)) G.profile.bestStreak=streak;
+    saveProfile();
+  }
+  updateComboUI(streak);
+}
+function resetComboUIForPlayer(playerName){
+  if(canAwardAnswerXP(playerName)) updateComboUI(0);
+}
 function createProfile(){
   const name=(document.getElementById('auth-name').value||'').trim();
   if(!name){ toast('Please enter your name'); return; }
@@ -41351,19 +41379,11 @@ function answerQ(btn,isOk,q,order){
       G.teamScores[p.team]++;
       document.getElementById(p.team === "Team 1" ? 'g-t1-score' : 'g-t2-score').textContent = G.teamScores[p.team];
     }
-    if(G.profile){ G.profile.correct=(G.profile.correct||0)+1; if(G.streaks[p.name]>=(G.profile.bestStreak||0)) G.profile.bestStreak=G.streaks[p.name]; saveProfile(); }
     const scoreEl=document.getElementById('g-score'); scoreEl.textContent=G.scores[p.name];
     document.getElementById('g-round').textContent=G.scores[p.name]+' / '+(G.sub==='classic'||G.sub==='team'?G.cfg.winScore:'—');
     fb.className='fb ok'; fb.innerHTML=`<strong>✓ Correct!</strong> ${q.e}${typeof getTranslationBadge==='function'?getTranslationBadge():''}`;
     sfx.correct(); haptic('correct');
-    // Combo multiplier: streak 3+ = 1.5x, 5+ = 2x
-    const _streak = G.streaks[p.name]||0;
-    const _mult = _streak>=5 ? 2 : _streak>=3 ? 1.5 : 1;
-    const _baseXP = G.mode==='practice' ? 2 : 10;
-    const _xp = Math.round(_baseXP * _mult);
-    floatScore(btn, '+'+_xp);
-    addXP(_xp);
-    updateComboUI(_streak);
+    awardAnswerXPForPlayer(p.name,btn);
     
     if(G.streaks[p.name]>=3) showStreak(G.streaks[p.name]);
     
@@ -41384,6 +41404,7 @@ function answerQ(btn,isOk,q,order){
     const opts=document.querySelectorAll('#g-opts .opt');
     opts.forEach((b,i)=>{ if(order[i]===q.a) b.classList.add('reveal'); });
     G.streaks[p.name]=0;
+    resetComboUIForPlayer(p.name);
     fb.className='fb no'; fb.innerHTML=`<strong>Not quite.</strong> ${q.e}`;
     sfx.wrong(); haptic('wrong');
     if(G.cfg.hearts){
@@ -41423,6 +41444,7 @@ function timeOut(q,pfx){
   document.querySelectorAll(`#${pfx}-opts .opt`).forEach(b=>b.disabled=true);
   const p=G.players[G.pi];
   G.streaks[p.name]=0;
+  resetComboUIForPlayer(p.name);
   const fb=document.getElementById(`${pfx}-fb`); fb.style.display='block';
   fb.className='fb to'; fb.innerHTML=`<strong>⏰ Time's up!</strong> ${q.e||''}`;
   sfx.wrong(); haptic('wrong');
@@ -41506,6 +41528,10 @@ function startLightning(pIdx){
   renderHearts('l-hearts',G.hearts[p.name]||3);
   document.getElementById('l-streak').textContent='0 correct';
   document.getElementById('l-clock').style.color='var(--gold1)';
+  document.getElementById('l-cat').textContent='';
+  document.getElementById('l-txt').textContent='';
+  document.getElementById('l-opts').innerHTML='';
+  document.getElementById('l-fb').style.display='none';
   go('lightning'); queueLightningQuestion();
   clearInterval(G.lTimId);
   let t=45;
@@ -41518,9 +41544,6 @@ function startLightning(pIdx){
 }
 function queueLightningQuestion(delayMs=1500){
   clearTimeout(G.lQDelayId);
-  document.getElementById('l-cat').textContent='';
-  document.getElementById('l-txt').textContent='Get ready...';
-  document.getElementById('l-opts').innerHTML='';
   G.lQDelayId=setTimeout(()=>renderLQ(),delayMs);
 }
 function renderLQ(){
@@ -41534,8 +41557,11 @@ function renderLQ(){
     const fb=document.getElementById('l-fb'); fb.style.display='block';
     if(isOk){
       btn.classList.add('correct'); G.lScore++;
-      G.scores[G.players[G.pi].name]++;
-      document.getElementById('l-score').textContent=G.scores[G.players[G.pi].name]||0;
+      const cur=G.players[G.pi];
+      G.scores[cur.name]++;
+      G.streaks[cur.name]=(G.streaks[cur.name]||0)+1;
+      awardAnswerXPForPlayer(cur.name,btn);
+      document.getElementById('l-score').textContent=G.scores[cur.name]||0;
       document.getElementById('l-streak').textContent=G.lScore+' correct';
       fb.className='fb ok'; fb.innerHTML=`<strong>✓</strong> ${q2.e}`;
       sfx.correct();
@@ -41544,8 +41570,10 @@ function renderLQ(){
       document.querySelectorAll('#l-opts .opt').forEach((b,i)=>{ if(order[i]===q2.a)b.classList.add('reveal'); });
       fb.className='fb no'; fb.innerHTML=`<strong>✗</strong> ${q2.e}`;
       sfx.wrong();
+      const cur=G.players[G.pi];
+      G.streaks[cur.name]=0;
+      resetComboUIForPlayer(cur.name);
       if(G.cfg.hearts){
-        const cur=G.players[G.pi];
         G.hearts[cur.name]=Math.max(0,(G.hearts[cur.name]||0)-1);
         renderHearts('l-hearts',G.hearts[cur.name]||0);
         if(G.hearts[cur.name]===0){
@@ -41686,12 +41714,21 @@ function revealTF(q){
   const isPracticeSolo=G.mode==='practice'&&G.players.length===1;
   let elimMsg='';
   const activePlayers=G._tfActivePlayers||G.players;
+  let myStreak=null;
   activePlayers.forEach(p=>{
     const ans=G.tfVotes[p.name];
     const ok=(ans===q.a);
-    if(ok){ G.scores[p.name]++; sfx.correct(); }
+    if(ok){
+      G.scores[p.name]++;
+      G.streaks[p.name]=(G.streaks[p.name]||0)+1;
+      awardAnswerXPForPlayer(p.name);
+      if(canAwardAnswerXP(p.name)) myStreak=G.streaks[p.name];
+      sfx.correct();
+    }
     else {
       if(ans!==undefined) sfx.wrong();
+      G.streaks[p.name]=0;
+      if(canAwardAnswerXP(p.name)) myStreak=0;
       // Decrease hearts on wrong answer or timeout (no vote)
       if(G.cfg.hearts){
         G.hearts[p.name]=Math.max(0,(G.hearts[p.name]||0)-1);
@@ -41703,6 +41740,8 @@ function revealTF(q){
     const el=document.getElementById('voter-'+slug(p.name));
     if(el) el.innerHTML=`<span>${p.avatar}</span><span>${p.name}</span><span style="color:${ok?'#6dda9a':ans===undefined?'var(--ink3)':'#e08080'}">${ok?'✓':ans===undefined?'—':'✗'}</span>`;
   });
+  if(myStreak===0) resetComboUIForPlayer(G.profile&&G.profile.name);
+  else if(myStreak!=null) updateComboUI(myStreak);
   // Update header stats
   renderTFHeader();
   document.getElementById('tf-scores').textContent=G.players.map(p=>p.avatar+' '+G.scores[p.name]).join('  ');
@@ -42487,10 +42526,18 @@ function showOnlineResult(gs){
   // Reveal correctness feedback only now (after both players voted / result phase)
   try{
     const myVote=me?votes[me.uid]:undefined;
-    if(myVote!==undefined&&myVote!==-1){
-      const correctIdx=isTF?((gs.correctA===true||gs.correctA===1)?1:0):gs.correctA;
-      if(myVote===correctIdx){sfx.correct();haptic('correct');}
-      else{sfx.wrong();haptic('wrong');}
+    const correctIdx=isTF?((gs.correctA===true||gs.correctA===1)?1:0):gs.correctA;
+    if(me){
+      const meName=me.name;
+      if(myVote!==undefined&&myVote!==-1&&myVote===correctIdx){
+        G.streaks[meName]=(G.streaks[meName]||0)+1;
+        awardAnswerXPForPlayer(meName);
+        sfx.correct();haptic('correct');
+      } else {
+        G.streaks[meName]=0;
+        resetComboUIForPlayer(meName);
+        if(myVote!==undefined&&myVote!==-1){ sfx.wrong();haptic('wrong'); }
+      }
     }
   }catch(e){}
   // Build result summary
@@ -44404,12 +44451,15 @@ function updateComboUI(streak){
   const lbl=document.getElementById('combo-label');
   const icon=document.getElementById('combo-icon');
   if(!wrap) return;
+  clearTimeout(G._comboHideId);
   if(streak>=5){
     wrap.className='combo-wrap show x3';
     icon.textContent='⚡'; lbl.textContent='2× XP!';
+    G._comboHideId=setTimeout(()=>{ wrap.className='combo-wrap'; },1400);
   } else if(streak>=3){
     wrap.className='combo-wrap show x2';
     icon.textContent='🔥'; lbl.textContent='1.5× XP!';
+    G._comboHideId=setTimeout(()=>{ wrap.className='combo-wrap'; },1400);
   } else {
     wrap.className='combo-wrap';
   }
