@@ -3290,7 +3290,7 @@ html[data-theme="warmth"] .divider::before, html[data-theme="warmth"] .divider::
   <div class="scroller">
     <div style="text-align:center;padding:14px 0 10px;">
       <div style="font-family:'Playfair Display',serif;font-size:58px;font-weight:900;color:var(--gold1);line-height:.95;" id="l-clock">45</div>
-      <div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:.28em;color:var(--ink3);text-transform:uppercase;margin-top:8px;">seconds</div>
+      <div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:.28em;color:var(--ink3);text-transform:uppercase;margin-top:14px;">seconds</div>
       <div style="font-family:'Cinzel',serif;font-size:12px;letter-spacing:.12em;color:var(--gold);margin-top:5px;" id="l-streak">0 correct</div>
     </div>
     <div class="q-cat" id="l-cat"></div>
@@ -41452,7 +41452,7 @@ function startLightning(pIdx){
   renderHearts('l-hearts',G.hearts[p.name]||3);
   document.getElementById('l-streak').textContent='0 correct';
   document.getElementById('l-clock').style.color='var(--gold1)';
-  go('lightning'); renderLQ();
+  go('lightning'); queueLightningQuestion();
   clearInterval(G.lTimId);
   let t=45;
   document.getElementById('l-clock').textContent=t;
@@ -41461,6 +41461,13 @@ function startLightning(pIdx){
     if(t<=10) document.getElementById('l-clock').style.color='var(--red1)';
     if(t<=0){ clearInterval(G.lTimId); endLightning(); }
   },1000);
+}
+function queueLightningQuestion(delayMs=1500){
+  clearTimeout(G.lQDelayId);
+  document.getElementById('l-cat').textContent='';
+  document.getElementById('l-txt').textContent='Get ready...';
+  document.getElementById('l-opts').innerHTML='';
+  G.lQDelayId=setTimeout(()=>renderLQ(),delayMs);
 }
 function renderLQ(){
   if(G.qi>=G.pool.length){ endLightning(); return; }
@@ -41494,10 +41501,11 @@ function renderLQ(){
         }
       }
     }
-    setTimeout(()=>{ G.qi++; renderLQ(); },650);
+    setTimeout(()=>{ G.qi++; queueLightningQuestion(); },650);
   });
 }
 function endLightning(){
+  clearTimeout(G.lQDelayId);
   let next=G.pi+1;
   while(next<G.players.length && G.cfg.hearts && (G.hearts[G.players[next].name]||0)<=0){
     next++;
