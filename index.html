@@ -3144,9 +3144,9 @@ html[data-theme="warmth"] .divider::before, html[data-theme="warmth"] .divider::
 <div class="screen" id="s-setup">
   <div style="padding:16px 0 12px;flex-shrink:0;">
     <button class="back-btn" onclick="go('home')">← Back</button>
-    <div class="eyebrow">Get Ready</div>
-    <div class="h1">Add <em>Players</em></div>
-    <p style="font-size:13px;color:var(--ink3);margin-top:5px;">2–6 players · Tap avatar to cycle</p>
+    <div class="eyebrow" id="setup-eyebrow">Get Ready</div>
+    <div class="h1" id="setup-title">Add <em>Players</em></div>
+    <p style="font-size:13px;color:var(--ink3);margin-top:5px;" id="setup-subtitle">2–6 players · Tap avatar to cycle</p>
   </div>
   <div class="scroller">
     <div id="setup-list" class="gap-8" style="margin-bottom:10px;"></div>
@@ -3157,8 +3157,8 @@ html[data-theme="warmth"] .divider::before, html[data-theme="warmth"] .divider::
 
     <div class="eyebrow" style="margin-bottom:9px;">Options</div>
     <div id="opt-list" class="gap-8" style="margin-bottom:16px;"></div>
-    <button class="btn btn-gold" onclick="beginGame()">
-      <span class="btn-icon">🕯️</span> Let's Play!
+    <button class="btn btn-gold" id="setup-go-btn" onclick="beginFromSetup()">
+      <span class="btn-icon">🕯️</span> Continue
     </button>
     <div class="pb"></div>
   </div>
@@ -3176,7 +3176,7 @@ html[data-theme="warmth"] .divider::before, html[data-theme="warmth"] .divider::
   </div>
   <div class="scroller">
     <div class="grid2" style="margin-bottom:12px;">
-      <button class="btn btn-blue btn-sm" onclick="createRoom()"><span class="btn-icon">➕</span>Host Room</button>
+      <button class="btn btn-blue btn-sm" onclick="go('setup');buildModeSetup('online')"><span class="btn-icon">➕</span>Host Room</button>
       <button class="btn btn-ghost btn-sm" onclick="openOv('ov-join')"><span class="btn-icon">🔑</span>Join Room</button>
     </div>
     <div id="lobby-panel" style="display:none;">
@@ -3202,7 +3202,7 @@ html[data-theme="warmth"] .divider::before, html[data-theme="warmth"] .divider::
       <div class="nearby-ring">📡</div>
       <div class="eyebrow" style="margin-bottom:6px;">Same WiFi Play</div>
       <p style="font-size:13px;color:var(--ink3);line-height:1.6;margin-bottom:14px;">Best for players on the same WiFi or hotspot. Share code or QR to join instantly.</p>
-      <button class="btn btn-green btn-sm" style="max-width:200px;margin:0 auto;" onclick="startNearby()"><span class="btn-icon">📡</span>Start Nearby</button>
+      <button class="btn btn-green btn-sm" style="max-width:200px;margin:0 auto;" onclick="go('setup');buildModeSetup('nearby')"><span class="btn-icon">📡</span>Start Nearby</button>
     </div>
     <div class="pb"></div>
   </div>
@@ -40783,6 +40783,7 @@ function communityTab(tab){
    AUTO-ADVANCE
 ══════════════════════════════════════════════════ */
 let _autoAdvId=null;
+let _setupAction='local';
 function clearAutoAdvance(){ clearTimeout(_autoAdvId); }
 function showAutoAdvance(wrapId,fillId,ms,cb){
   const wrap=document.getElementById(wrapId);
@@ -40875,15 +40876,9 @@ function pickSub(el,s){
 function onPlay(){
   sfx.tap();
   if(!G.profile){ go('auth'); buildAvGrid(); return; }
-  if(G.mode==='online'){
-    go('lobby');
-    const nbJoin=document.getElementById('nb-join');
-    if(nbJoin) setNb(nbJoin);
-    setTimeout(()=>createRoom(),0);
-    return;
-  }
-  if(G.mode==='nearby'){ go('lobby'); return; }
-  if(G.mode==='practice'){ startPracticeGame(); return; }
+  if(G.mode==='online'){ go('setup'); buildModeSetup('online'); return; }
+  if(G.mode==='nearby'){ go('setup'); buildModeSetup('nearby'); return; }
+  if(G.mode==='practice'){ go('setup'); buildModeSetup('practice'); return; }
   go('setup'); buildSetup();
 }
 
@@ -40892,11 +40887,41 @@ function onPlay(){
 ══════════════════════════════════════════════════ */
 let setupPs=[];
 function buildSetup(){
+  _setupAction='local';
+  document.getElementById('setup-eyebrow').textContent='Get Ready';
+  document.getElementById('setup-title').innerHTML='Add <em>Players</em>';
+  document.getElementById('setup-subtitle').textContent='2–6 players · Tap avatar to cycle';
+  document.getElementById('setup-list').style.display='block';
+  document.getElementById('add-p-btn').style.display='flex';
+  document.getElementById('setup-go-btn').innerHTML='<span class="btn-icon">🕯️</span> Let\'s Play!';
   setupPs=[
     {name:G.profile.name,avatar:G.profile.avatar},
     {name:'Player 2',avatar:AVATARS[1]||'🙂'}
   ];
   renderSetup(); renderOpts();
+}
+function buildModeSetup(kind){
+  _setupAction=kind;
+  document.getElementById('setup-list').innerHTML='';
+  document.getElementById('setup-list').style.display='none';
+  document.getElementById('add-p-btn').style.display='none';
+  if(kind==='online'){
+    document.getElementById('setup-eyebrow').textContent='Online Room';
+    document.getElementById('setup-title').innerHTML='Game <em>Settings</em>';
+    document.getElementById('setup-subtitle').textContent='Host picks rules; joiners receive them automatically.';
+    document.getElementById('setup-go-btn').innerHTML='<span class="btn-icon">🌐</span> Host Room';
+  } else if(kind==='nearby'){
+    document.getElementById('setup-eyebrow').textContent='Same WiFi';
+    document.getElementById('setup-title').innerHTML='Game <em>Settings</em>';
+    document.getElementById('setup-subtitle').textContent='Apply rules before creating your nearby room.';
+    document.getElementById('setup-go-btn').innerHTML='<span class="btn-icon">📡</span> Start Nearby';
+  } else {
+    document.getElementById('setup-eyebrow').textContent='Practice';
+    document.getElementById('setup-title').innerHTML='Solo <em>Settings</em>';
+    document.getElementById('setup-subtitle').textContent='Single-player with selected game mode and rules.';
+    document.getElementById('setup-go-btn').innerHTML='<span class="btn-icon">🎓</span> Start Practice';
+  }
+  renderOpts();
 }
 function renderSetup(){
   const el=document.getElementById('setup-list'); el.innerHTML='';
@@ -40931,12 +40956,14 @@ function removeP(i){
 }
 function renderOpts(){
   const el=document.getElementById('opt-list'); el.innerHTML='';
+  const setupKind=_setupAction||'local';
+  const isRoom=setupKind==='online'||setupKind==='nearby';
   const opts=[
     {k:'sound',l:'🔔 Sound Effects'},
     {k:'timer',l:'⏳ Question Timer (20s)'},
     {k:'hearts',l:'❤️ Lives / Hearts'},
-    {k:'sudden',l:'💀 Sudden Death'},
   ];
+  if(!isRoom) opts.push({k:'sudden',l:'💀 Sudden Death'});
   opts.forEach(o=>{
     G.cfg[o.k]=G.cfg[o.k]!==undefined?G.cfg[o.k]:true;
     const row=document.createElement('div'); row.className='toggle-row';
@@ -40944,15 +40971,32 @@ function renderOpts(){
       <button class="toggle-btn ${G.cfg[o.k]?'on':'off'}" id="tog-${o.k}" onclick="togCfg('${o.k}')">${G.cfg[o.k]?'ON':'OFF'}</button>`;
     el.appendChild(row);
   });
-  // Win score
+  // Fixed rounds for consistency across modes
   const wr=document.createElement('div'); wr.className='toggle-row';
-  wr.innerHTML=`<span class="toggle-lbl">🏆 Win Score</span>
-    <div class="stepper">
-      <button class="step-btn" onclick="adjWin(-5)">−</button>
-      <span class="step-val" id="win-disp">${G.cfg.winScore}</span>
-      <button class="step-btn" onclick="adjWin(5)">+</button>
-    </div>`;
+  wr.innerHTML=`<span class="toggle-lbl">🏁 Rounds</span>
+    <div class="stepper"><span class="step-val" id="win-disp">${ROUND_LIMIT}</span></div>`;
   el.appendChild(wr);
+}
+function beginFromSetup(){
+  if(_setupAction==='online'){
+    go('lobby');
+    const nbJoin=document.getElementById('nb-join');
+    if(nbJoin) setNb(nbJoin);
+    setTimeout(()=>createRoom(),0);
+    return;
+  }
+  if(_setupAction==='nearby'){
+    go('lobby');
+    const nbJoin=document.getElementById('nb-join');
+    if(nbJoin) setNb(nbJoin);
+    setTimeout(()=>startNearby(),0);
+    return;
+  }
+  if(_setupAction==='practice'){
+    startPracticeGame();
+    return;
+  }
+  beginGame();
 }
 function togCfg(k){
   G.cfg[k]=!G.cfg[k];
@@ -41680,7 +41724,7 @@ function playAgain(){
         const roomDiff=d.difficulty||G.diff||'easy';
         G.diff=roomDiff;
         G.TIM=G.diff==='easy'?25:G.diff==='hard'?12:20;
-        const upd={status:'waiting',difficulty:roomDiff,sub:roomSub,qtype:roomSub};
+        const upd={status:'waiting',difficulty:roomDiff,sub:roomSub,qtype:roomSub,cfg:{sound:!!G.cfg.sound,timer:!!G.cfg.timer,hearts:!!G.cfg.hearts,sudden:!!G.cfg.sudden,winScore:ROUND_LIMIT}};
         Object.keys(d.players||{}).forEach(uid=>{
           upd['players/'+uid+'/ready']=false;
           upd['players/'+uid+'/diff']=roomDiff;
@@ -41755,6 +41799,7 @@ function createRoom(){
   const ref=G.db.ref('rooms/'+code); G.roomRef=ref;
   ref.set({
     code, host:G.uid, status:'waiting', sub:roomSub, qtype:roomSub, difficulty:G.diff, createdAt:Date.now(),
+    cfg:{sound:!!G.cfg.sound,timer:!!G.cfg.timer,hearts:!!G.cfg.hearts,sudden:!!G.cfg.sudden,winScore:ROUND_LIMIT},
     players:{[G.uid]:{name:G.profile.name,avatar:G.profile.avatar,ready:false,score:0,hearts:3,diff:G.diff}}
   }).then(()=>{
     document.getElementById('rc-disp').textContent=code;
@@ -41825,6 +41870,7 @@ function joinRoomByCode(code){
       G.diff=d.difficulty;
       G.TIM=G.diff==='easy'?25:G.diff==='hard'?12:20;
     }
+    if(d.cfg) G.cfg={...G.cfg,...d.cfg,winScore:ROUND_LIMIT};
     ref.child('players/'+G.uid).set({name:G.profile.name,avatar:G.profile.avatar,ready:false,score:0,hearts:3,diff:d.difficulty||G.diff});
     document.getElementById('rc-disp').textContent=code;
     document.getElementById('lobby-panel').style.display='block';
@@ -41958,7 +42004,7 @@ function startOnline(){
     const roomDiff=d.difficulty||G.diff||'easy';
     G.diff=roomDiff;
     G.TIM=G.diff==='easy'?25:G.diff==='hard'?12:20;
-    const upd={status:'playing',difficulty:roomDiff,sub:roomSub,qtype:roomSub};
+    const upd={status:'playing',difficulty:roomDiff,sub:roomSub,qtype:roomSub,cfg:{sound:!!G.cfg.sound,timer:!!G.cfg.timer,hearts:!!G.cfg.hearts,sudden:!!G.cfg.sudden,winScore:ROUND_LIMIT}};
     Object.keys(d.players||{}).forEach(uid=>{ upd['players/'+uid+'/diff']=roomDiff; });
     G.roomRef.update(upd);
   }).catch(()=>toast('Unable to start room right now.'));
@@ -41967,6 +42013,7 @@ function joinFromRoom(d){
   // Keep roomRef alive for game sync
   // Set difficulty from room data so buildPool filters correctly
   if(d.difficulty) G.diff=d.difficulty;
+  if(d.cfg) G.cfg={...G.cfg,...d.cfg,winScore:ROUND_LIMIT};
   G.cfg.winScore=ROUND_LIMIT;
   G.TIM=G.diff==='easy'?25:G.diff==='hard'?12:20;
   const playerEntries=Object.entries(d.players||{});
@@ -42291,6 +42338,7 @@ function startNearby(){
   const ref=G.db.ref('rooms/'+code); G.roomRef=ref;
   ref.set({
     code, host:G.uid, status:'waiting', sub:G.sub, difficulty:G.diff, createdAt:Date.now(),
+    cfg:{sound:!!G.cfg.sound,timer:!!G.cfg.timer,hearts:!!G.cfg.hearts,sudden:!!G.cfg.sudden,winScore:ROUND_LIMIT},
     nearby:true,
     players:{[G.uid]:{name:G.profile.name,avatar:G.profile.avatar,ready:false,score:0,hearts:3,diff:G.diff}}
   }).then(()=>{
@@ -43696,6 +43744,7 @@ function sendChallenge(){
   ref.set({
     code, host:G.uid, status:'waiting', sub:challengeSub, qtype:challengeSub, createdAt:Date.now(),
     challenge:true, difficulty:_chDiff,
+    cfg:{sound:!!G.cfg.sound,timer:!!G.cfg.timer,hearts:!!G.cfg.hearts,sudden:!!G.cfg.sudden,winScore:ROUND_LIMIT},
     challengeTarget:_chTargetUid,
     players:{
       [G.uid]:{name:G.profile.name,avatar:G.profile.avatar,ready:false,score:0,hearts:3,diff:_chDiff},
