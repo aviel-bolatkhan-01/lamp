@@ -678,9 +678,9 @@ body::after {
 .lb-info { flex: 1; min-width: 0; }
 .lb-nm   { font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .lb-sub  { font-family: 'Nunito', sans-serif; font-size: 10px; color: var(--ink3); display: flex; align-items: center; gap: 4px; }
-.lb-sub.lb-clan-sub { display: inline-flex; flex-direction: column; align-items: center; gap: 1px; line-height: 1.05; }
-.lb-sub.lb-clan-sub .clan-emoji { width: 12px; text-align: center; flex-shrink: 0; opacity: .85; }
-.lb-sub.lb-clan-sub .clan-name { white-space: nowrap; }
+.lb-sub.lb-clan-sub { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 2px; line-height: 1.1; }
+.lb-sub.lb-clan-sub .clan-emoji { display: block; width: 12px; text-align: center; flex-shrink: 0; opacity: .9; line-height: 1; }
+.lb-sub.lb-clan-sub .clan-name { display: block; white-space: nowrap; }
 .lb-xpv  { font-family: 'Cormorant Garamond', serif; font-size: 15px; font-weight: 700; color: var(--gold1); }
 .lb-lvl  { font-family: 'Nunito', sans-serif; font-size: 9px; color: var(--ink3); display: block; text-align: right; }
 
@@ -1121,14 +1121,26 @@ html[data-theme="warmth"] .challenge-notif-inner {
   font-size: 13px;
   font-weight: 700;
   color: var(--gold1);
-  white-space: nowrap;
+  white-space: normal;
+  line-height: 1.35;
   z-index: 500;
   animation: popIn .25s ease;
   pointer-events: none;
-  max-width: 90vw;
+  width: min(92vw, 560px);
+  max-width: 92vw;
   text-align: center;
   backdrop-filter: blur(14px);
   box-shadow: 0 4px 24px rgba(0,0,0,.4);
+}
+@media (max-width: 480px) {
+  .toast {
+    top: calc(var(--safe-t) + 8px);
+    border-radius: 16px;
+    padding: 9px 12px;
+    font-size: 12px;
+    width: min(94vw, 420px);
+    max-width: 94vw;
+  }
 }
 
 /* ─── NEARBY RING ────────────────────────────────── */
@@ -42766,7 +42778,7 @@ function displayLBRows(list, rows, tab) {
       row.innerHTML=`<div class="lb-rank">${medal}</div><div class="lb-av">${p.icon||'⛪'}</div><div class="lb-info"><div class="lb-nm">${p.name}</div><div class="lb-sub">${Object.keys(p.members||{}).length} members</div></div><div class="lb-xpv">${p.totalXp||0} XP</div>`;
     }else{
       const clanName=(p.clan&&String(p.clan).trim())?String(p.clan):'No clan';
-      const clanEmoji=clanName==='No clan'?'•':'⛪';
+      const clanEmoji=(p.clanIcon&&String(p.clanIcon).trim())?String(p.clanIcon):'⛪';
       row.innerHTML=`<div class="lb-rank">${medal}</div><div class="lb-av">${p.avatar||'😊'}</div><div class="lb-info"><div class="lb-nm">${escHtml(p.name||'Player')}${isMe?' ✦':''}</div><div class="lb-sub lb-clan-sub"><span class="clan-emoji">${clanEmoji}</span><span class="clan-name">${escHtml(clanName)}</span></div></div><div style="text-align:right;"><div class="lb-xpv">${p.xp||0} XP</div><span class="lb-lvl">${l.name}</span></div>`;
     }
     list.appendChild(row);
