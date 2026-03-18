@@ -3135,7 +3135,10 @@ html[data-theme="warmth"] .divider::before, html[data-theme="warmth"] .divider::
     <button class="back-btn" onclick="go('friends');switchSocialTab('messages')">← Back</button>
     <span class="chat-av" id="chat-partner-av">😊</span>
     <span class="chat-partner-name" id="chat-partner-name">Friend</span>
-    <button class="friend-btn friend-btn-challenge" style="margin-left:auto;" onclick="challengeFriend(_chatUid)">⚔️ Challenge</button>
+    <div style="margin-left:auto;display:flex;gap:6px;">
+      <button class="friend-btn friend-btn-challenge" onclick="challengeFriend(_chatUid)">⚔️ Challenge</button>
+      <button class="friend-btn" style="background:#7a2e2e;color:#fff;" onclick="removeFriendFromFriends(_chatUid)">Remove</button>
+    </div>
   </div>
   <div class="chat-msgs" id="chat-msgs"></div>
   <div class="chat-input-row">
@@ -42025,8 +42028,6 @@ function joinRoomByCode(code){
     const d=sn.val();
     if(!d){ toast('Room not found'); return; }
     if(d.status==='playing'){ toast('Game already in progress'); return; }
-    const joinPreview=`Mode: ${chQTypeLabel((d&& (d.qtype||d.sub))||'classic')}\nDifficulty: ${chDiffLabel((d&&d.difficulty)||'easy')}\nRules: ${roomSettingsLine(d)}`;
-    if(!confirm(`Join room ${code}?\n\n${joinPreview}`)) return;
     G.sub=normalizeOnlineSub((d&& (d.qtype||d.sub)) || G.sub);
     if(d.difficulty){
       G.diff=d.difficulty;
@@ -43944,7 +43945,6 @@ function renderFriends(){
         <div class="friend-actions">
           <button class="friend-btn friend-btn-chat" onclick="openChatById('${uid}')">💬 Chat</button>
           <button class="friend-btn friend-btn-challenge" onclick="challengeFriend('${uid}')">⚔️</button>
-          <button class="friend-btn" style="background:#7a2e2e;color:#fff;" onclick="removeFriendFromFriends('${uid}')">Remove</button>
         </div>
       </div>`;
     }).join('');
