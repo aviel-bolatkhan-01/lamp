@@ -546,7 +546,7 @@ body::after {
   border-color: rgba(34,176,90,.32) !important;
 }
 .opt.reveal .opt-key { color: var(--green1); border-color: rgba(34,176,90,.4); }
-.opt:disabled { cursor: default; pointer-events: none; }
+.opt:disabled { cursor: default; pointer-events: none; opacity: 1; -webkit-text-fill-color: currentColor; }
 
 /* ─── TRUE / FALSE ───────────────────────────────── */
 .tf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -41842,8 +41842,18 @@ function renderOnlineQ(){
 function answerOnline(btn,isOk,q,timedOut){
   if(G._myVoteSubmitted)return;
   G._myVoteSubmitted=true;
-  getOptionButtons().forEach(b=>b.disabled=true);
-  if(btn)btn.classList.add('selected-vote');
+  getOptionButtons().forEach(b=>{
+    b.disabled=true;
+    b.style.opacity='1';
+    b.style.filter='none';
+  });
+  if(btn){
+    btn.classList.add('selected-vote');
+    btn.style.opacity='1';
+    btn.style.filter='none';
+    btn.style.transform='translateY(1px)';
+    btn.style.borderWidth='2px';
+  }
   const origIdx=btn?parseInt(btn.dataset.origIdx):-1;
   const voteVal=origIdx!==-1?origIdx:-1;
   // Write vote to Firebase FIRST, before sound effects
