@@ -42203,7 +42203,7 @@ function renderMatchHistory(expanded){
           ${m.scores.length} players
         </div>
       </div>
-    `).join('') + (hasMore ? `<button class="btn btn-ghost btn-sm" style="width:100%;margin-top:2px;" onclick="renderMatchHistory(${!expanded})">${expanded?'▲ Show less':'▼ Show all '+history.length+' matches'}</button>` : '');
+    `).join('') + (hasMore ? `<button class="btn btn-ghost btn-sm" style="width:100%;margin-top:2px;" onclick="renderMatchHistory(${!expanded})">${expanded?'Show less':'Show all'}</button>` : '');
   } catch(e) { el.innerHTML = ''; }
 }
 
@@ -43823,7 +43823,7 @@ function renderAchs(expanded){
     const btn=document.createElement('button');
     btn.className='btn btn-ghost btn-sm';
     btn.style.cssText='width:100%;margin-top:2px;';
-    btn.textContent=expanded?'▲ Show less':'▼ Show all '+ACHS.length+' achievements';
+    btn.textContent=expanded?'Show less':'Show all';
     btn.onclick=()=>renderAchs(!expanded);
     ae.appendChild(btn);
   }
