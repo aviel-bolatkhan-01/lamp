@@ -808,7 +808,56 @@ body::after {
 .clan-inline.sm { width: 20px; height: 20px; border-radius: 6px; }
 .clan-inline.md { width: 26px; height: 26px; border-radius: 7px; }
 .clan-inline.lg { width: 54px; height: 54px; border-radius: 12px; }
-.clan-inline .avatar-photo { width: 100%; height: 100%; }
+.clan-inline .avatar-photo { width: 100%; height: 100%; border-radius: 0; }
+.clan-pic-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 6px;
+  z-index: 300;
+  min-width: 175px;
+  box-shadow: 0 4px 20px rgba(0,0,0,.35);
+}
+.clan-menu-btn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  color: var(--ink1);
+  font-size: 13px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.clan-menu-btn:hover { background: rgba(255,255,255,.07); }
+.clan-menu-label {
+  font-size: 10px;
+  color: var(--ink3);
+  padding: 5px 8px 2px;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+.clan-emoji-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 2px 4px 4px;
+}
+.clan-emoji-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 3px;
+  border-radius: 6px;
+  line-height: 1;
+}
+.clan-emoji-btn:hover { background: rgba(255,255,255,.1); }
 .profile-bar .av.has-photo {
   width: 34px;
   height: 34px;
@@ -43373,6 +43422,28 @@ function autoCreateClan(name,icon){
 }
 let _pendingClanPhoto='';
 let _clanPhotoCtx='create';
+const CLAN_ICON_EMOJIS=['⛪','🕍','🏛️','🙏','✝️','🕊️','📖','🌟','🫶','🎺','🎹','🌿','🕯️','👑','⚡','🎵','🌈','🦁','🐑','🌊'];
+function toggleClanPicMenu(e){
+  e.stopPropagation();
+  const m=document.getElementById('clan-pic-menu');
+  if(!m) return;
+  const open=m.style.display==='block';
+  m.style.display=open?'none':'block';
+  if(!open){
+    const close=ev=>{if(!m.contains(ev.target)){m.style.display='none';document.removeEventListener('click',close);}};
+    setTimeout(()=>document.addEventListener('click',close),0);
+  }
+}
+function setClanIcon(emoji){
+  if(!G.profile||!G.profile.clanCode){toast('No congregation');return;}
+  G.profile.clanIcon=emoji;
+  saveProfile();
+  if(G.fbOk) G.db.ref('clans/'+G.profile.clanCode+'/icon').set(emoji);
+  const m=document.getElementById('clan-pic-menu');
+  if(m) m.style.display='none';
+  renderClans();
+  toast('Congregation icon updated');
+}
 function renderClanPhotoPreview(){
   const el=document.getElementById('clan-photo-preview');
   if(!el) return;
@@ -43518,14 +43589,21 @@ function renderClans(){
   if(G.profile?.clanName){
     mc.innerHTML=`<div class="clan-card" style="border-color:rgba(201,145,13,.32);">
       <div style="display:flex;align-items:center;gap:12px;">
-        <span style="font-size:32px;">${clanBadgeMarkup(G.profile.clanIcon||'⛪',G.profile.clanPhoto||'','lg')}</span>
+        <div style="position:relative;display:inline-block;cursor:pointer;flex-shrink:0;" onclick="toggleClanPicMenu(event)">
+          <span style="font-size:32px;display:block;">${clanBadgeMarkup(G.profile.clanIcon||'⛪',G.profile.clanPhoto||'','lg')}</span>
+          <span style="position:absolute;bottom:-2px;right:-2px;background:var(--gold1);border-radius:50%;width:17px;height:17px;display:flex;align-items:center;justify-content:center;font-size:9px;line-height:1;">✏️</span>
+          <div id="clan-pic-menu" class="clan-pic-menu" style="display:none;" onclick="event.stopPropagation()">
+            <button class="clan-menu-btn" onclick="uploadClanPhoto('existing')">📷 Upload</button>
+            ${G.profile.clanPhoto?`<button class="clan-menu-btn" onclick="clearClanPhoto('existing')">🗑 Remove photo</button>`:''}
+            <div class="clan-menu-label">Pick an emoji</div>
+            <div class="clan-emoji-grid">${CLAN_ICON_EMOJIS.map(em=>`<button class="clan-emoji-btn" onclick="setClanIcon('${em}')" title="${em}">${em}</button>`).join('')}</div>
+          </div>
+        </div>
         <div style="flex:1;min-width:0;">
           <div class="h2">${G.profile.clanName}</div>
           <div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;margin-top:2px;">Your Congregation</div>
           ${G.profile.clanCode?`<div style="display:inline-flex;align-items:center;gap:5px;background:rgba(201,145,13,.1);border:1px solid rgba(201,145,13,.22);border-radius:20px;padding:2px 9px;font-family:'Cinzel',serif;font-size:9px;letter-spacing:.1em;color:var(--gold1);margin-top:6px;">Code: ${G.profile.clanCode}</div>`:''}
           <div class="profile-avatar-tools" style="justify-content:flex-start;margin-top:8px;">
-            <button class="btn btn-ghost btn-sm" onclick="uploadClanPhoto('existing')">📷 Upload Congregation Pic</button>
-            <button class="btn btn-ghost btn-sm" onclick="clearClanPhoto('existing')">🗑 Remove</button>
             <button class="btn btn-ruby btn-sm" onclick="requestRemoveCongregation()">🧹 Remove Congregation</button>
           </div>
         </div>
