@@ -43454,11 +43454,16 @@ function loadClanMembers(){
     const others=[];
     sn.forEach(c=>{ if(c.key!==G.uid) others.push({uid:c.key,...c.val()}); });
     if(!others.length){el.innerHTML='';return;}
-    el.innerHTML='<div style="font-family:\'Cinzel\',serif;font-size:9px;letter-spacing:.07em;color:var(--ink3);text-transform:uppercase;margin:10px 0 6px;">Members</div>'+
-      others.map(m=>`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(200,158,72,.08);">
-        <span style="flex:1;font-size:13px;color:var(--ink);">${escHtml(m.name||'Player')}</span>
-        <button class="btn btn-ghost btn-sm" onclick="kickMember('${m.uid}','${escHtml(m.name||'Player')}')" style="color:var(--ink3);font-size:11px;">Kick</button>
-      </div>`).join('');
+    Promise.all(others.map(m=>G.db.ref('leaderboard/'+m.uid).once('value'))).then(snaps=>{
+      snaps.forEach((s,i)=>{ const d=s.val()||{}; others[i].avatar=d.avatar||'😊'; others[i].photo=d.photo||''; others[i].xp=d.xp||others[i].xp||0; });
+      el.innerHTML='<div style="font-family:\'Cinzel\',serif;font-size:9px;letter-spacing:.07em;color:var(--ink3);text-transform:uppercase;margin:10px 0 6px;">Members</div>'+
+        others.map(m=>`<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid rgba(200,158,72,.07);">
+          ${avatarMarkup(m.avatar||'😊',m.photo||'','sm')}
+          <span style="flex:1;font-size:13px;color:var(--ink);">${escHtml(m.name||'Player')}</span>
+          <span style="font-size:11px;color:var(--gold1);margin-right:4px;">${m.xp||0} XP</span>
+          <button class="btn btn-ghost btn-sm" onclick="kickMember('${m.uid}','${escHtml(m.name||'Player')}')" style="color:var(--ink3);font-size:10px;padding:3px 8px;">Remove</button>
+        </div>`).join('');
+    });
   });
 }
 function inviteToClan(){
