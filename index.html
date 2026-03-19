@@ -3466,11 +3466,16 @@ html[data-theme="warmth"] .divider::before, html[data-theme="warmth"] .divider::
     </div>
 
     <div class="divider"><span>✦</span></div>
+    <div class="eyebrow" style="margin-bottom:7px;">Progress Snapshot</div>
     <div class="stat-grid" style="margin-bottom:12px;">
       <div class="stat-box"><span class="stat-val" id="ps-played">0</span><span class="stat-key">Games</span></div>
       <div class="stat-box"><span class="stat-val gold" id="ps-wins">0</span><span class="stat-key">Wins</span></div>
-      <div class="stat-box"><span class="stat-val" id="ps-streak">0</span><span class="stat-key">🔥 Best</span></div>
+      <div class="stat-box"><span class="stat-val" id="ps-winrate">0%</span><span class="stat-key">Win Rate</span></div>
+      <div class="stat-box"><span class="stat-val" id="ps-streak-now">0</span><span class="stat-key">🔥 Current Streak</span></div>
+      <div class="stat-box"><span class="stat-val" id="ps-streak">0</span><span class="stat-key">🔥 Best Streak</span></div>
+      <div class="stat-box"><span class="stat-val" id="ps-correct">0</span><span class="stat-key">✅ Correct Answers</span></div>
     </div>
+    <div id="ps-summary" style="font-size:11px;color:var(--ink3);text-align:center;margin:-3px 0 12px;">Play games to build your profile stats.</div>
     <div id="prof-clan" style="margin-bottom:12px;"></div>
     
     <!-- Church Dashboard Link -->
@@ -43273,9 +43278,22 @@ function renderProfile(){
   fill.style.setProperty('--pct',l.pct+'%'); fill.style.width=l.pct+'%';
   document.getElementById('prof-xp-cur').textContent=(p.xp||0)+' XP';
   document.getElementById('prof-xp-nxt').textContent='next: '+(l.lv*XP_PER_LEVEL)+' XP';
-  document.getElementById('ps-played').textContent=p.played||0;
-  document.getElementById('ps-wins').textContent=p.wins||0;
-  document.getElementById('ps-streak').textContent=p.bestStreak||0;
+  const played=p.played||0;
+  const wins=p.wins||0;
+  const winRate=played>0?Math.round((wins/played)*100):0;
+  const currentStreak=p.winStreak||0;
+  const bestStreak=p.bestStreak||0;
+  const correct=p.correct||0;
+  document.getElementById('ps-played').textContent=played;
+  document.getElementById('ps-wins').textContent=wins;
+  document.getElementById('ps-winrate').textContent=winRate+'%';
+  document.getElementById('ps-streak-now').textContent=currentStreak;
+  document.getElementById('ps-streak').textContent=bestStreak;
+  document.getElementById('ps-correct').textContent=correct;
+  const summary=document.getElementById('ps-summary');
+  if(summary){
+    summary.textContent=`${wins} wins in ${played} games · ${correct} correct answers total`;
+  }
   renderMatchHistory();
   const ci=document.getElementById('prof-clan');
   ci.innerHTML=p.clanName?`<div class="card-sm" style="display:flex;align-items:center;gap:10px;">
