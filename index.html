@@ -3754,6 +3754,12 @@ html[data-theme="warmth"] .divider::before, html[data-theme="warmth"] .divider::
     <label class="label" style="margin-bottom:6px;">Clan Name</label>
     <input class="inp" id="clan-nm-inp" placeholder="e.g. Grace Baptist Warriors" style="margin-bottom:12px;">
     <label class="label" style="margin-bottom:7px;">Clan Icon</label>
+    <div id="clan-photo-preview" style="display:flex;align-items:center;justify-content:center;margin-bottom:10px;"></div>
+    <div class="profile-avatar-tools" style="margin:0 0 10px;">
+      <button class="btn btn-ghost btn-sm" onclick="uploadClanPhoto('create')">📷 Upload Clan Pic</button>
+      <button class="btn btn-ghost btn-sm" onclick="clearClanPhoto('create')">🗑 Remove</button>
+    </div>
+    <input id="clan-photo-input" type="file" accept="image/*" style="display:none;" onchange="onClanPhotoPicked(event)">
     <div id="clan-icon-grid" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;"></div>
     <button class="btn btn-gold" onclick="createClan()"><span class="btn-icon">⛪</span>Create Clan</button>
   </div>
@@ -40825,6 +40831,9 @@ function avatarMarkup(emoji,photo,sizeCls){
   }
   return `<span>${emoji||'😊'}</span>`;
 }
+function clanBadgeMarkup(icon,photo,sizeCls){
+  return avatarMarkup(icon||'⛪',photo||'',sizeCls||'md');
+}
 function uploadProfilePhoto(){
   if(!G.profile) return;
   const inp=document.getElementById('profile-photo-input');
@@ -40879,7 +40888,7 @@ function pushProfile(){
   if(!G.fbOk||!G.uid||!G.profile)return;
   try{
     const p=G.profile;
-    const d={name:p.name,avatar:p.avatar,xp:p.xp||0,weeklyXP:p.weeklyXP||0,weeklyReset:p.weeklyReset||wk(),xpResetVersion:p.xpResetVersion||XP_RESET_VERSION,wins:p.wins||0,clan:p.clanName||'',ts:Date.now(),friendCode:p.friendCode||''};
+    const d={name:p.name,avatar:p.avatar,xp:p.xp||0,weeklyXP:p.weeklyXP||0,weeklyReset:p.weeklyReset||wk(),xpResetVersion:p.xpResetVersion||XP_RESET_VERSION,wins:p.wins||0,clan:p.clanName||'',clanIcon:p.clanIcon||'⛪',clanPhoto:p.clanPhoto||'',ts:Date.now(),friendCode:p.friendCode||''};
     G.db.ref('players/'+G.uid).set(d);
     G.db.ref('leaderboard/'+G.uid).set(d);
     G.db.ref('weekly/'+wk()+'/'+G.uid).set(d);
@@ -43258,7 +43267,7 @@ function renderLB(tab){
       const rows = snapshots.filter(s => s.exists()).map(s => ({...s.val(), id: s.key}));
       if(G.profile&&G.uid){
         const meIdx=rows.findIndex(r=>r.id===G.uid);
-        const meData={id:G.uid,name:G.profile.name,avatar:G.profile.avatar,photo:G.profile.photo||'',xp:G.profile.xp||0,weeklyXP:G.profile.weeklyXP||0,clan:G.profile.clanName||''};
+        const meData={id:G.uid,name:G.profile.name,avatar:G.profile.avatar,photo:G.profile.photo||'',xp:G.profile.xp||0,weeklyXP:G.profile.weeklyXP||0,clan:G.profile.clanName||'',clanIcon:G.profile.clanIcon||'⛪',clanPhoto:G.profile.clanPhoto||''};
         if(meIdx>=0) rows[meIdx]={...rows[meIdx],...meData};
         else rows.push(meData);
       }
@@ -43286,7 +43295,7 @@ function renderLB(tab){
     });
     if(G.profile&&G.uid){
       const meIdx=rows.findIndex(r=>r.id===G.uid);
-      const meData={id:G.uid,name:G.profile.name,avatar:G.profile.avatar,photo:G.profile.photo||'',xp:G.profile.xp||0,weeklyXP:(G.profile.weeklyReset===thisWeek?(G.profile.weeklyXP||0):0),clan:G.profile.clanName||''};
+      const meData={id:G.uid,name:G.profile.name,avatar:G.profile.avatar,photo:G.profile.photo||'',xp:G.profile.xp||0,weeklyXP:(G.profile.weeklyReset===thisWeek?(G.profile.weeklyXP||0):0),clan:G.profile.clanName||'',clanIcon:G.profile.clanIcon||'⛪',clanPhoto:G.profile.clanPhoto||''};
       if(meIdx>=0) rows[meIdx]={...rows[meIdx],...meData};
       else rows.push(meData);
     }
@@ -43310,8 +43319,9 @@ function displayLBRows(list, rows, tab) {
     }else{
       const clanName=(p.clan&&String(p.clan).trim())?String(p.clan):'No clan';
       const clanEmoji=(p.clanIcon&&String(p.clanIcon).trim())?String(p.clanIcon):'⛪';
+      const clanMark=clanBadgeMarkup(clanEmoji,p.clanPhoto||'','sm');
       const shownXp=tab==='weekly'?(p.weeklyXP||0):(p.xp||0);
-      row.innerHTML=`<div class="lb-rank">${medal}</div><div class="lb-av">${avatarMarkup(p.avatar||'😊',p.photo||'','sm')}</div><div class="lb-info"><div class="lb-nm">${escHtml(p.name||'Player')}${isMe?' ✦':''}</div><div class="lb-sub lb-clan-sub"><span class="clan-emoji">${clanEmoji}</span><span class="clan-name">${escHtml(clanName)}</span></div></div><div style="text-align:right;"><div class="lb-xpv">${shownXp} XP</div><span class="lb-lvl">${l.name}</span></div>`;
+      row.innerHTML=`<div class="lb-rank">${medal}</div><div class="lb-av">${avatarMarkup(p.avatar||'😊',p.photo||'','sm')}</div><div class="lb-info"><div class="lb-nm">${escHtml(p.name||'Player')}${isMe?' ✦':''}</div><div class="lb-sub lb-clan-sub"><span class="clan-emoji">${clanMark}</span><span class="clan-name">${escHtml(clanName)}</span></div></div><div style="text-align:right;"><div class="lb-xpv">${shownXp} XP</div><span class="lb-lvl">${l.name}</span></div>`;
     }
     list.appendChild(row);
   });
@@ -43324,9 +43334,88 @@ function autoCreateClan(name,icon){
   if(!G.fbOk||!G.uid)return;
   const code=mkCode();
   try{
-    G.db.ref('clans/'+code).set({name,icon,code,members:{[G.uid]:{name:G.profile.name,xp:0}},totalXp:0,weeklyXp:0,createdAt:Date.now()});
+    G.db.ref('clans/'+code).set({name,icon,photo:'',code,members:{[G.uid]:{name:G.profile.name,xp:0}},totalXp:0,weeklyXp:0,createdAt:Date.now()});
     G.profile.clanCode=code; saveProfile();
   }catch(e){}
+}
+let _pendingClanPhoto='';
+let _clanPhotoCtx='create';
+function renderClanPhotoPreview(){
+  const el=document.getElementById('clan-photo-preview');
+  if(!el) return;
+  el.innerHTML=clanBadgeMarkup('⛪',_pendingClanPhoto,'lg');
+}
+function uploadClanPhoto(ctx){
+  _clanPhotoCtx=ctx||'create';
+  const inp=document.getElementById('clan-photo-input');
+  if(!inp) return;
+  inp.value='';
+  inp.click();
+}
+function onClanPhotoPicked(e){
+  const file=e&&e.target&&e.target.files&&e.target.files[0];
+  if(!file) return;
+  if(!file.type||!file.type.startsWith('image/')){
+    toast('Please choose an image file');
+    return;
+  }
+  const rd=new FileReader();
+  rd.onload=()=>{
+    const img=new Image();
+    img.onload=()=>{
+      const side=320;
+      const cnv=document.createElement('canvas');
+      cnv.width=side; cnv.height=side;
+      const ctx=cnv.getContext('2d');
+      if(!ctx){ toast('Could not process image'); return; }
+      const srcW=img.width, srcH=img.height;
+      const srcSide=Math.min(srcW,srcH);
+      const sx=(srcW-srcSide)/2;
+      const sy=(srcH-srcSide)/2;
+      ctx.drawImage(img,sx,sy,srcSide,srcSide,0,0,side,side);
+      const data=cnv.toDataURL('image/jpeg',0.84);
+      if(_clanPhotoCtx==='existing') updateCurrentClanPhoto(data);
+      else{
+        _pendingClanPhoto=data;
+        renderClanPhotoPreview();
+        toast('Clan photo selected');
+      }
+    };
+    img.onerror=()=>toast('Could not read this image');
+    img.src=String(rd.result||'');
+  };
+  rd.onerror=()=>toast('Unable to load image');
+  rd.readAsDataURL(file);
+}
+function clearClanPhoto(ctx){
+  const mode=ctx||_clanPhotoCtx||'create';
+  if(mode==='existing'){
+    updateCurrentClanPhoto('');
+    return;
+  }
+  _pendingClanPhoto='';
+  renderClanPhotoPreview();
+  toast('Clan photo removed');
+}
+function updateCurrentClanPhoto(photoData){
+  if(!G.profile||!G.profile.clanCode){
+    toast('Join a clan first');
+    return;
+  }
+  const code=G.profile.clanCode;
+  const nextPhoto=photoData||'';
+  const applyLocal=()=>{
+    G.profile.clanPhoto=nextPhoto;
+    saveProfile();
+    renderClans();
+    if(document.getElementById('s-profile')?.classList.contains('active')) renderProfile();
+    toast(nextPhoto?'Clan photo updated':'Clan photo removed');
+  };
+  if(G.fbOk&&G.db){
+    G.db.ref('clans/'+code+'/photo').set(nextPhoto).then(applyLocal).catch(()=>toast('Could not update clan photo'));
+  }else{
+    applyLocal();
+  }
 }
 function createClan(){
   const name=(document.getElementById('clan-nm-inp').value||'').trim();
@@ -43334,10 +43423,11 @@ function createClan(){
   if(!G.profile){ toast('Create a profile first'); return; }
   sfx.tap();
   const icon=document.querySelector('#clan-icon-grid .sel-icon')?.textContent||'⛪';
+  const photo=_pendingClanPhoto||'';
   const code=mkCode();
-  const save=()=>{ G.profile.clanName=name; G.profile.clanCode=code; G.profile.clanIcon=icon; saveProfile(); closeOv('ov-clan-create'); renderClans(); toast(`Clan "${name}" created! Code: ${code}`); };
+  const save=()=>{ G.profile.clanName=name; G.profile.clanCode=code; G.profile.clanIcon=icon; G.profile.clanPhoto=photo; saveProfile(); _pendingClanPhoto=''; closeOv('ov-clan-create'); renderClans(); toast(`Clan "${name}" created! Code: ${code}`); };
   if(G.fbOk&&G.uid){
-    G.db.ref('clans/'+code).set({name,icon,code,members:{[G.uid]:{name:G.profile.name,xp:G.profile.xp||0}},totalXp:G.profile.xp||0,weeklyXp:0,createdAt:Date.now()}).then(save).catch(e=>toast('Error: '+e.message));
+    G.db.ref('clans/'+code).set({name,icon,photo,code,members:{[G.uid]:{name:G.profile.name,xp:G.profile.xp||0}},totalXp:G.profile.xp||0,weeklyXp:0,createdAt:Date.now()}).then(save).catch(e=>toast('Error: '+e.message));
   }else save();
 }
 function joinClan(){
@@ -43348,7 +43438,7 @@ function joinClan(){
   G.db.ref('clans/'+code).once('value').then(sn=>{
     const d=sn.val(); if(!d){ toast('Clan not found'); return; }
     G.db.ref('clans/'+code+'/members/'+G.uid).set({name:G.profile.name,xp:G.profile.xp||0});
-    G.profile.clanName=d.name; G.profile.clanCode=code; G.profile.clanIcon=d.icon||'⛪'; saveProfile();
+    G.profile.clanName=d.name; G.profile.clanCode=code; G.profile.clanIcon=d.icon||'⛪'; G.profile.clanPhoto=d.photo||''; saveProfile();
     closeOv('ov-clan-join'); renderClans(); toast('Joined '+d.name+'! ✦');
   }).catch(()=>toast('Clan not found'));
 }
@@ -43357,11 +43447,15 @@ function renderClans(){
   if(G.profile?.clanName){
     mc.innerHTML=`<div class="clan-card" style="border-color:rgba(201,145,13,.32);">
       <div style="display:flex;align-items:center;gap:12px;">
-        <span style="font-size:32px;">${G.profile.clanIcon||'⛪'}</span>
+        <span style="font-size:32px;">${clanBadgeMarkup(G.profile.clanIcon||'⛪',G.profile.clanPhoto||'','lg')}</span>
         <div style="flex:1;min-width:0;">
           <div class="h2">${G.profile.clanName}</div>
           <div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;margin-top:2px;">Your Clan</div>
           ${G.profile.clanCode?`<div style="display:inline-flex;align-items:center;gap:5px;background:rgba(201,145,13,.1);border:1px solid rgba(201,145,13,.22);border-radius:20px;padding:2px 9px;font-family:'Cinzel',serif;font-size:9px;letter-spacing:.1em;color:var(--gold1);margin-top:6px;">Code: ${G.profile.clanCode}</div>`:''}
+          <div class="profile-avatar-tools" style="justify-content:flex-start;margin-top:8px;">
+            <button class="btn btn-ghost btn-sm" onclick="uploadClanPhoto('existing')">📷 Upload Clan Pic</button>
+            <button class="btn btn-ghost btn-sm" onclick="clearClanPhoto('existing')">🗑 Remove</button>
+          </div>
         </div>
       </div>
     </div>`;
@@ -43379,7 +43473,7 @@ function renderClans(){
       const isMe=c.code===G.profile?.clanCode;
       const row=document.createElement('div'); row.className='lb-row'+(isMe?' me':'');
       const medal=i===0?'👑':i===1?'🥈':i===2?'🥉':'#'+(i+1);
-      row.innerHTML=`<div class="lb-rank">${medal}</div><div class="lb-av">${c.icon||'⛪'}</div><div class="lb-info"><div class="lb-nm">${c.name}</div><div class="lb-sub">${Object.keys(c.members||{}).length} members</div></div><div class="lb-xpv">${c.totalXp||0} XP</div>`;
+      row.innerHTML=`<div class="lb-rank">${medal}</div><div class="lb-av">${clanBadgeMarkup(c.icon||'⛪',c.photo||'','sm')}</div><div class="lb-info"><div class="lb-nm">${c.name}</div><div class="lb-sub">${Object.keys(c.members||{}).length} members</div></div><div class="lb-xpv">${c.totalXp||0} XP</div>`;
       clb.appendChild(row);
     });
   }).catch(()=>{ clb.innerHTML='<div class="empty">Error loading clans.</div>'; });
@@ -43436,7 +43530,7 @@ function renderProfile(){
   renderMatchHistory();
   const ci=document.getElementById('prof-clan');
   ci.innerHTML=p.clanName?`<div class="card-sm" style="display:flex;align-items:center;gap:10px;">
-    <span style="font-size:22px;">${p.clanIcon||'⛪'}</span>
+    <span style="font-size:22px;">${clanBadgeMarkup(p.clanIcon||'⛪',p.clanPhoto||'','md')}</span>
     <div><div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;">${p.clanName}</div>
     <div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;">Your Clan · ${p.clanCode||''}</div></div></div>`:
     `<div class="empty" style="padding:8px 0;">Not in a clan. <button onclick="go('community');communityTab('clans')" style="background:none;border:none;color:var(--gold);font-family:'Cinzel',serif;font-size:10px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;">Join one →</button></div>`;
@@ -43570,7 +43664,7 @@ function confetti(){
 function openOv(id,ctx){
   const el=document.getElementById(id); if(el) el.classList.add('open');
   if(id==='ov-avatars') buildAvGrid(ctx);
-  if(id==='ov-clan-create') buildClanIcons();
+  if(id==='ov-clan-create'){ _pendingClanPhoto=''; buildClanIcons(); renderClanPhotoPreview(); }
 }
 function closeOv(id){ const el=document.getElementById(id); if(el) el.classList.remove('open'); }
 function bgClose(e,id){ if(e.target.id===id) closeOv(id); }
