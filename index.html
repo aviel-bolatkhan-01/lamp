@@ -42501,12 +42501,21 @@ function getActiveLobbyEntries(d){
   }
   return entries;
 }
+function lobbyStartState(d){
+  const activeEntries=getActiveLobbyEntries(d);
+  const hostUid=d&&d.host?d.host:(activeEntries[0]?activeEntries[0][0]:null);
+  const amHost=!!(hostUid&&G.uid&&hostUid===G.uid);
+  const nonHost=activeEntries.filter(([uid])=>uid!==hostUid).map(([,p])=>p);
+  const allReady=activeEntries.length>=2 && nonHost.length>=1 && nonHost.every(p=>!!p.ready);
+  return {activeEntries,hostUid,amHost,allReady,canStart:amHost&&allReady};
+}
 function updateLobbyUI(d){
   const list=document.getElementById('lobby-list'); list.innerHTML='';
   updateLobbyModeNote(d);
-  const activeEntries=getActiveLobbyEntries(d);
-  const hostUid=d&&d.host?d.host:(activeEntries[0]?activeEntries[0][0]:null);
-  if(hostUid&&G.uid) G.isHost=(hostUid===G.uid);
+  const st=lobbyStartState(d);
+  const activeEntries=st.activeEntries;
+  const hostUid=st.hostUid;
+  G.isHost=st.amHost;
   activeEntries.forEach(([uid,p])=>{
     const row=document.createElement('div'); row.className='lobby-row';
     const isHost=uid===hostUid, isMe=uid===G.uid;
@@ -42515,9 +42524,7 @@ function updateLobbyUI(d){
   });
   const startBtn=document.getElementById('start-btn');
   if(startBtn){
-    const nonHost=activeEntries.filter(([uid])=>uid!==hostUid).map(([,p])=>p);
-    const allReady=activeEntries.length>=2 && nonHost.length>=1 && nonHost.every(p=>!!p.ready);
-    startBtn.disabled=!(G.isHost && allReady);
+    startBtn.disabled=!st.canStart;
   }
 }
 function toggleReady(){
@@ -42532,12 +42539,9 @@ function startOnline(){
   G.cfg.winScore=clampRounds(G.cfg.winScore);
   G.roomRef.once('value').then(sn=>{
     const d=sn.val()||{};
-    const activeEntries=getActiveLobbyEntries(d);
-    const hostUid=d&&d.host?d.host:(activeEntries[0]?activeEntries[0][0]:null);
-    if(hostUid&&G.uid) G.isHost=(hostUid===G.uid);
-    const nonHost=activeEntries.filter(([uid])=>uid!==hostUid).map(([,p])=>p);
-    const allReady=activeEntries.length>=2 && nonHost.length>=1 && nonHost.every(p=>!!p.ready);
-    if(!allReady){ toast('All joined players must press Ready first.'); return; }
+    const st=lobbyStartState(d);
+    G.isHost=st.amHost;
+    if(!st.canStart){ toast('All joined players must press Ready first.'); return; }
     const roomSub=normalizeOnlineSub((d&& (d.qtype||d.sub)) || G.sub);
     G.sub=roomSub;
     const roomDiff=d.difficulty||G.diff||'easy';
