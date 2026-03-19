@@ -3819,6 +3819,7 @@ const AVATARS=['😊','🧑','👦','👧','👨','👩','🧔','👴','👵','�
 const CLAN_ICONS=['⛪','🕍','🔔','✝️','🌿','🕊️','🏛️','📖','🙏','🌟','🔥','👑','🦁','🌈','⚔️','🎺'];
 const LEVELS=['Seeker','Believer','Disciple','Apostle','Elder','Deacon','Prophet','Bishop','Patriarch','Sage of Faith'];
 const XP_PER_LEVEL=120;
+const XP_RESET_VERSION=1;
 const WIN_VERSES=[
   {t:'Well done, good and faithful servant! You have been faithful with a few things; I will put you in charge of many things.',r:'Matthew 25:21'},
   {t:'The LORD your God is with you, the Mighty Warrior who saves.',r:'Zephaniah 3:17'},
@@ -40646,6 +40647,7 @@ function initFB(){
             church:'', xp:0, correct:0, bestStreak:0,
             theme:'light',
             weeklyXP:0, weeklyReset: wk(),
+            xpResetVersion: XP_RESET_VERSION,
             friendCode: Math.random().toString(36).slice(2,8).toUpperCase(),
             friends:[], notifications:false
           };
@@ -40675,13 +40677,29 @@ function fbDot(ok){
   if(t) t.textContent=ok?'Connected — ready to play':'Not connected (local only)';
 }
 function wk(){ const d=new Date(),dt=d.getDate()-d.getDay()+(d.getDay()===0?-6:1); return new Date(d.setDate(dt)).toISOString().split('T')[0]; }
+function applyXpReset(profile){
+  if(!profile) return;
+  const v=parseInt(profile.xpResetVersion||0,10)||0;
+  if(v>=XP_RESET_VERSION) return;
+  profile.xp=0;
+  profile.weeklyXP=0;
+  profile.weeklyReset=wk();
+  profile.wins=0;
+  profile.played=0;
+  profile.correct=0;
+  profile.bestStreak=0;
+  profile.winStreak=0;
+  profile.xpResetVersion=XP_RESET_VERSION;
+}
 
 /* ══════════════════════════════════════════════════
    PROFILE
 ══════════════════════════════════════════════════ */
 function loadProfile(){
   try{ G.profile=JSON.parse(localStorage.getItem('bgn3')||'null'); }catch(e){}
+  applyXpReset(G.profile);
   normalizeSocialProfile();
+  if(G.profile) saveProfile();
   G.cfg.timer=true;
   G.cfg.winScore=clampRounds(G.cfg.winScore);
   if(G.profile){
@@ -40708,7 +40726,7 @@ function pushProfile(){
   if(!G.fbOk||!G.uid||!G.profile)return;
   try{
     const p=G.profile;
-    const d={name:p.name,avatar:p.avatar,xp:p.xp||0,weeklyXP:p.weeklyXP||0,weeklyReset:p.weeklyReset||wk(),wins:p.wins||0,clan:p.clanName||'',ts:Date.now(),friendCode:p.friendCode||''};
+    const d={name:p.name,avatar:p.avatar,xp:p.xp||0,weeklyXP:p.weeklyXP||0,weeklyReset:p.weeklyReset||wk(),xpResetVersion:p.xpResetVersion||XP_RESET_VERSION,wins:p.wins||0,clan:p.clanName||'',ts:Date.now(),friendCode:p.friendCode||''};
     G.db.ref('players/'+G.uid).set(d);
     G.db.ref('leaderboard/'+G.uid).set(d);
     G.db.ref('weekly/'+wk()+'/'+G.uid).set(d);
@@ -40770,7 +40788,7 @@ function createProfile(){
     tier: 'free', gamesToday: 0, lastGameDate: new Date().toISOString().split('T')[0],
     friends: [], friendCode: mkCode(),
     theme: 'light',
-    weeklyXP: 0, weeklyReset: wk()
+    weeklyXP: 0, weeklyReset: wk(), xpResetVersion: XP_RESET_VERSION
   };
   normalizeSocialProfile();
   if(church){ G.profile.clanName=church; autoCreateClan(church,av); }
