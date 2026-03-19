@@ -40988,6 +40988,10 @@ function syncSubChipSelection(){
   });
 }
 function applyModeSubAvailability(){
+  const localMode=G.mode==='local';
+  const lightChip=document.querySelector('#sub-chips .chip[data-sub="lightning"]');
+  if(lightChip) lightChip.style.display=localMode?'none':'';
+  if(localMode&&G.sub==='lightning') G.sub='classic';
   if(G.sub==='team') G.sub='classic';
   syncSubChipSelection();
 }
@@ -41000,6 +41004,10 @@ function pickMode(el,m){
 }
 function pickSub(el,s){
   sfx.tap(); haptic('tap');
+  if(G.mode==='local'&&s==='lightning'){
+    toast('Lightning is not available in Pass & Play.');
+    return;
+  }
   if(s==='team') s='classic';
   G.sub=s; G.seen.clear(); // Clear seen on sub change
   document.querySelectorAll('#sub-chips .chip').forEach(c=>c.classList.remove('sel'));
@@ -41273,6 +41281,10 @@ function buildPool(){
 
 function beginGame(){
   if(G.mode==='local'&&setupPs.length<2){ toast('Pass & Play requires at least 2 players.'); return; }
+  if(G.mode==='local'&&G.sub==='lightning'){
+    G.sub='classic';
+    syncSubChipSelection();
+  }
   G.cfg.winScore=clampRounds(G.cfg.winScore);
 
   // Sync names and ensure uniqueness
@@ -41595,13 +41607,9 @@ function nextTurn(){
   }
 
   if (isMulti && nextPi <= G.pi) {
-    // We've looped back to the start of the rotation, show scores
+    // We've looped back to the start of the rotation, continue without scoreboard.
     G.pi = nextPi;
-    showScores(false);
-    document.getElementById('scores-cta').onclick = () => {
-      sfx.tap();
-      showSplash(G.pi, () => { go('game'); renderQ(); });
-    };
+    showSplash(G.pi, () => { go('game'); renderQ(); });
     return;
   }
 
@@ -41691,9 +41699,8 @@ function endLightning(){
     next++;
   }
   if(next<G.players.length){
-    showScores(false);
-    document.getElementById('scores-cta').onclick=()=>{ sfx.tap(); showSplash(next,()=>startLightning(next)); };
-  }else{ showScores(true); }
+    showSplash(next,()=>startLightning(next));
+  }else{ endGame(); }
 }
 
 /* ── True/False ── */
@@ -41716,21 +41723,18 @@ function renderTF(){
   const isSolo=G.players.length===1;
   const isPracticeSolo=G.mode==='practice'&&isSolo;
   if(G.tfRound>=G.pool.length){
-    if(isPracticeSolo){ endGame(); }
-    else{ showScores(true); }
+    endGame();
     return;
   }
   const totalRounds=Math.min(currentRounds(),G.pool.length);
   if(G.tfRound>=totalRounds){
-    if(isPracticeSolo){ endGame(); }
-    else{ showScores(true); }
+    endGame();
     return;
   }
 
   // Check if all players are eliminated (hearts)
   if(shouldEndByHearts()){
-    if(isPracticeSolo){ endGame(); }
-    else{ showScores(true); }
+    endGame();
     return;
   }
 
@@ -41853,7 +41857,7 @@ function revealTF(q){
     }
     const nxt=document.getElementById('tf-next'); nxt.style.display='flex';
     nxt.textContent='See Results →';
-    nxt.onclick=()=>{ sfx.tap(); haptic('tap'); showScores(true); };
+    nxt.onclick=()=>{ sfx.tap(); haptic('tap'); endGame(); };
     return;
   }
 
@@ -43814,6 +43818,7 @@ buildAvGrid('auth');
 buildClanIcons();
 buildSettingsList();
 loadProfile();
+applyModeSubAvailability();
 initFB();
 initDailyVerse();
 initGreeting();
