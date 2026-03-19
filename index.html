@@ -2135,7 +2135,7 @@ body { background: var(--bg); color: var(--ink); }
   /* Blue */
   .btn-blue:hover:not(:disabled) { background: #254888; filter: none; }
   /* Green explicit */
-  .btn-green:hover:not(:disabled) { background: #6AD80A; filter: none; }
+  .btn-green:hover:not(:disabled) { filter: brightness(0.88); }
   /* Chip selected */
   .chip.sel:hover { filter: brightness(1.08); }
 }
@@ -2433,7 +2433,7 @@ html[data-theme="dark"] .mode-card:active { box-shadow: none; }
   /* Blue button */
   html[data-theme="dark"] .btn-blue:hover:not(:disabled) { background: #254888; }
   /* Green button */
-  html[data-theme="dark"] .btn-green:hover:not(:disabled) { background: #70A070; }
+  html[data-theme="dark"] .btn-green:hover:not(:disabled) { filter: brightness(0.88); background: unset; }
 }
 /* Dark placeholder */
 html[data-theme="dark"] .inp::placeholder { color: var(--ink3); }
