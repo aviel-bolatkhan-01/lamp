@@ -41402,13 +41402,17 @@ function renderVerseQ(q){
   wrap.appendChild(vb);
   const od=document.createElement('div'); od.className='opts';
   od.style.marginTop='0';
-  const order=shuf([0,1,2,3]);
+  const opts=Array.isArray(q.o)?q.o.slice(0,4):[];
+  const correctWord=String(q.blank||'').trim().toLowerCase();
+  let correctOrig=opts.findIndex(opt=>String(opt||'').trim().toLowerCase()===correctWord);
+  if(correctOrig<0) correctOrig=0;
+  const order=shuf(opts.map((_,i)=>i));
   const keys=['A','B','C','D'];
   order.forEach((orig,di)=>{
     const btn=document.createElement('button'); btn.className='opt';
     btn.style.cssText=`animation:scrIn .3s ${di*.06}s both`;
-    btn.innerHTML=`<span class="opt-key">${keys[di]}</span><span>${q.o[orig]}</span>`;
-    btn.onclick=()=>answerQ(btn,orig===0,{e:`${q.r} — "${q.b} ${q.blank} ${q.a}"`,a:0},order);
+    btn.innerHTML=`<span class="opt-key">${keys[di]||'•'}</span><span>${opts[orig]}</span>`;
+    btn.onclick=()=>answerQ(btn,orig===correctOrig,{e:`${q.r} — "${q.b} ${q.blank} ${q.a}"`,a:correctOrig},order);
     od.appendChild(btn);
   });
   wrap.appendChild(od);
