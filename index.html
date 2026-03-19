@@ -40727,6 +40727,7 @@ function addXP(n){
   if(G.profile.weeklyReset!==thisWeek){ G.profile.weeklyXP=0; G.profile.weeklyReset=thisWeek; }
   G.profile.weeklyXP=(G.profile.weeklyXP||0)+n;
   saveProfile();
+  if(G.fbOk) pushProfile();
   if(lvl(G.profile.xp).lv>before){
     const l=lvl(G.profile.xp);
     setTimeout(()=>{ sfx.levelUp(); toast('🎉 Level Up! '+l.name+' · Lv '+l.lv); },1500);
@@ -42849,6 +42850,7 @@ function lbTab(tab){
 function renderLB(tab){
   const list=document.getElementById('lb-list');
   normalizeSocialProfile();
+  if(G.fbOk&&G.profile) pushProfile();
   if(!G.fbOk){
     list.innerHTML=`<div class="card" style="text-align:center;padding:22px 16px;">
       <div style="font-size:34px;margin-bottom:9px;">🌐</div>
@@ -42871,6 +42873,12 @@ function renderLB(tab){
     
     Promise.all(promises).then(snapshots => {
       const rows = snapshots.filter(s => s.exists()).map(s => ({...s.val(), id: s.key}));
+      if(G.profile&&G.uid){
+        const meIdx=rows.findIndex(r=>r.id===G.uid);
+        const meData={id:G.uid,name:G.profile.name,avatar:G.profile.avatar,xp:G.profile.xp||0,weeklyXP:G.profile.weeklyXP||0,clan:G.profile.clanName||''};
+        if(meIdx>=0) rows[meIdx]={...rows[meIdx],...meData};
+        else rows.push(meData);
+      }
       rows.sort((a,b) => (b.xp||0) - (a.xp||0));
       displayLBRows(list, rows, tab);
     });
@@ -42882,6 +42890,14 @@ function renderLB(tab){
                           G.db.ref('leaderboard').orderByChild('xp').limitToLast(30);
   ref.once('value').then(sn=>{
     const rows=[]; sn.forEach(s=>rows.unshift({...s.val(),id:s.key}));
+    if(tab!=='clan'&&G.profile&&G.uid){
+      const meIdx=rows.findIndex(r=>r.id===G.uid);
+      const meData={id:G.uid,name:G.profile.name,avatar:G.profile.avatar,xp:G.profile.xp||0,weeklyXP:G.profile.weeklyXP||0,clan:G.profile.clanName||''};
+      if(meIdx>=0) rows[meIdx]={...rows[meIdx],...meData};
+      else rows.push(meData);
+      if(tab==='weekly') rows.sort((a,b)=>(b.weeklyXP||0)-(a.weeklyXP||0));
+      else rows.sort((a,b)=>(b.xp||0)-(a.xp||0));
+    }
     displayLBRows(list, rows, tab);
   }).catch(()=>{ list.innerHTML='<div class="empty">Error loading ranks.</div>'; });
 }
