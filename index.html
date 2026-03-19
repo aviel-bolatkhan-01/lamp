@@ -43348,9 +43348,18 @@ function renderLB(tab){
   }
 
   if(tab==='clan'){
-    G.db.ref('clans').once('value').then(sn=>{
-      const rows=[]; sn.forEach(s=>rows.push({...s.val(),id:s.key}));
-      rows.sort((a,b)=>(b.totalXp||0)-(a.totalXp||0));
+    Promise.all([G.db.ref('clans').once('value'), G.db.ref('leaderboard').once('value')]).then(([clanSn,lbSn])=>{
+      const lbMap={};
+      lbSn.forEach(c=>{ lbMap[c.key]=(c.val()?.xp)||0; });
+      const rows=[];
+      clanSn.forEach(s=>{
+        const c=s.val()||{};
+        const members=c.members||{};
+        const totalXp=Object.keys(members).reduce((sum,uid)=>sum+(lbMap[uid]||0),0);
+        const isMe=c.code===G.profile?.clanCode;
+        rows.push({...c,id:s.key,totalXp,memberCount:Object.keys(members).length,isMe});
+      });
+      rows.sort((a,b)=>b.totalXp-a.totalXp);
       displayLBRows(list, rows, tab);
     }).catch(()=>{ list.innerHTML='<div class="empty">Error loading ranks.</div>'; });
     return;
@@ -43386,7 +43395,9 @@ function displayLBRows(list, rows, tab) {
     row.className='lb-row'+(i<3?' top':'')+(isMe?' me':'');
     const medal=i===0?'👑':i===1?'🥈':i===2?'🥉':'#'+(i+1);
     if(tab==='clan'){
-      row.innerHTML=`<div class="lb-rank">${medal}</div><div class="lb-av">${clanBadgeMarkup(p.icon||'⛪',p.photo||'','sm')}</div><div class="lb-info"><div class="lb-nm">${p.name}</div><div class="lb-sub">${Object.keys(p.members||{}).length} members</div></div><div class="lb-xpv">${p.totalXp||0} XP</div>`;
+      const isMeClan=p.isMe||p.code===G.profile?.clanCode;
+      if(isMeClan) row.classList.add('me');
+      row.innerHTML=`<div class="lb-rank">${medal}</div><div class="lb-av">${clanBadgeMarkup(p.icon||'⛪',p.photo||'','sm')}</div><div class="lb-info"><div class="lb-nm">${escHtml(p.name||'')}${isMeClan?' ✦':''}</div><div class="lb-sub">${p.memberCount||Object.keys(p.members||{}).length} member${(p.memberCount||1)!==1?'s':''}</div></div><div class="lb-xpv">${p.totalXp||0} XP</div>`;
     }else{
       const clanName=(p.clan&&String(p.clan).trim())?String(p.clan):'No congregation';
       const clanEmoji=(p.clanIcon&&String(p.clanIcon).trim())?String(p.clanIcon):'⛪';
