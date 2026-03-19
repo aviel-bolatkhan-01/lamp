@@ -44098,12 +44098,23 @@ function listenFriendLinks(){
   G._friendsRef=ref;
   ref.on('value',sn=>{
     const data=sn.val()||{};
-    const linked=Object.keys(data).filter(uid=>!!data[uid]);
+    const linked=[...new Set(Object.keys(data).filter(uid=>!!data[uid]))].sort();
     normalizeSocialProfile();
-    const merged=[...new Set([...(G.profile.friends||[]),...linked])];
-    if(JSON.stringify(merged)!==JSON.stringify(G.profile.friends||[])){
-      G.profile.friends=merged;
+    const prev=[...(G.profile.friends||[])].sort();
+    const changed=linked.length!==prev.length||linked.some((uid,i)=>uid!==prev[i]);
+    if(changed){
+      G.profile.friends=linked;
       saveProfile();
+      if(G._friendCache){
+        Object.keys(G._friendCache).forEach(uid=>{
+          if(!linked.includes(uid)) delete G._friendCache[uid];
+        });
+      }
+      if(G._convPreviews){
+        Object.keys(G._convPreviews).forEach(uid=>{
+          if(!linked.includes(uid)) delete G._convPreviews[uid];
+        });
+      }
     }
     if(document.getElementById('s-friends')?.classList.contains('active')){
       renderFriends();
