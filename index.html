@@ -3161,36 +3161,107 @@ html[data-theme="warmth"] .divider::before, html[data-theme="warmth"] .divider::
     <div style="text-align:center;margin-bottom:22px;">
       <span id="auth-av" style="display:none;">😊</span>
       <div style="display:inline-block;animation:float 2.5s ease-in-out infinite;">
-        <svg width="104" height="112" viewBox="0 0 52 56" xmlns="http://www.w3.org/2000/svg">
+        <svg width="120" height="130" viewBox="0 0 100 108" xmlns="http://www.w3.org/2000/svg">
           <defs>
-            <radialGradient id="auth-fl" cx="50%" cy="20%" r="70%">
-              <stop offset="0%" stop-color="#fff8e0"/>
-              <stop offset="40%" stop-color="#f0c040"/>
-              <stop offset="100%" stop-color="#c4880a" stop-opacity="0"/>
+            <radialGradient id="al-glow" cx="50%" cy="60%" r="55%">
+              <stop offset="0%" stop-color="#ffe066" stop-opacity="0.45"/>
+              <stop offset="100%" stop-color="#ff9900" stop-opacity="0"/>
             </radialGradient>
-            <radialGradient id="auth-fg" cx="50%" cy="20%" r="60%">
-              <stop offset="0%" stop-color="#f0c040" stop-opacity="0.4"/>
-              <stop offset="100%" stop-color="#c4880a" stop-opacity="0"/>
+            <radialGradient id="al-fo" cx="50%" cy="82%" r="62%">
+              <stop offset="0%" stop-color="#fff8c0"/>
+              <stop offset="30%" stop-color="#ffcc22"/>
+              <stop offset="68%" stop-color="#ff7700"/>
+              <stop offset="100%" stop-color="#cc4400" stop-opacity="0"/>
             </radialGradient>
-            <linearGradient id="auth-lb" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#d4a050"/>
-              <stop offset="50%" stop-color="#c4880a"/>
-              <stop offset="100%" stop-color="#8a5c1a"/>
+            <radialGradient id="al-fi" cx="50%" cy="90%" r="52%">
+              <stop offset="0%" stop-color="#ffffff"/>
+              <stop offset="55%" stop-color="#fff8d0"/>
+              <stop offset="100%" stop-color="#ffcc44" stop-opacity="0"/>
+            </radialGradient>
+            <linearGradient id="al-body" x1="10%" y1="0%" x2="90%" y2="100%">
+              <stop offset="0%" stop-color="#eec050"/>
+              <stop offset="28%" stop-color="#cc8c14"/>
+              <stop offset="62%" stop-color="#a06810"/>
+              <stop offset="100%" stop-color="#5e3208"/>
             </linearGradient>
+            <radialGradient id="al-sheen" cx="28%" cy="22%" r="52%">
+              <stop offset="0%" stop-color="#fff8d8" stop-opacity="0.42"/>
+              <stop offset="55%" stop-color="#e8a820" stop-opacity="0.08"/>
+              <stop offset="100%" stop-color="#a06010" stop-opacity="0"/>
+            </radialGradient>
+            <linearGradient id="al-spout" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#d4a030"/>
+              <stop offset="100%" stop-color="#8a5010"/>
+            </linearGradient>
+            <linearGradient id="al-handle" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#dca030"/>
+              <stop offset="100%" stop-color="#6a3c08"/>
+            </linearGradient>
+            <filter id="al-drop" x="-25%" y="-25%" width="150%" height="150%">
+              <feDropShadow dx="0" dy="3" stdDeviation="3.5" flood-color="#3a1800" flood-opacity="0.32"/>
+            </filter>
           </defs>
-          <ellipse cx="22" cy="10" rx="9" ry="11" fill="url(#auth-fg)"/>
-          <path d="M22 1 C22 1 15 8 15 14 C15 18 18 21 20 22 C19 18 19.5 14 22 11 C24.5 14 25 18 24 22 C26 21 29 18 29 14 C29 8 22 1 22 1Z" fill="url(#auth-fl)"/>
-          <line x1="22" y1="22" x2="22" y2="26" stroke="#3a1a04" stroke-width="1.2" stroke-linecap="round"/>
-          <path d="M17 26 L14 30 Q12 32 16 33 L28 33 Q32 32 30 30 L27 26Z" fill="url(#auth-lb)"/>
-          <ellipse cx="26" cy="40" rx="18" ry="9" fill="url(#auth-lb)" stroke="#8a5c1a" stroke-width="0.8"/>
-          <ellipse cx="26" cy="35" rx="16" ry="4" fill="url(#auth-lb)" stroke="#8a5c1a" stroke-width="0.5"/>
-          <ellipse cx="26" cy="35" rx="12" ry="2.5" fill="#1a0e04" opacity="0.6"/>
-          <path d="M44 38 Q50 36 49 42 Q48 48 43 46 Q46 44 45 42 Q44 39 44 38Z" fill="url(#auth-lb)" stroke="#8a5c1a" stroke-width="0.6"/>
-          <ellipse cx="22" cy="39" rx="5" ry="4" fill="white" opacity="0.06"/>
-          <ellipse cx="26" cy="49" rx="12" ry="3" fill="#5a3810" opacity="0.7"/>
-          <rect x="20" y="48" width="12" height="4" rx="1" fill="#5a3810" opacity="0.5"/>
-          <line x1="26" y1="37" x2="26" y2="43" stroke="#e8c060" stroke-width="0.5" opacity="0.2"/>
-          <line x1="23" y1="40" x2="29" y2="40" stroke="#e8c060" stroke-width="0.5" opacity="0.2"/>
+
+          <!-- Warm ambient glow around flame -->
+          <ellipse cx="24" cy="42" rx="20" ry="24" fill="url(#al-glow)"/>
+
+          <!-- Flame — outer halo -->
+          <path d="M24 46 C24 46 13 38 13 26 C13 16 18 8 21 4 C19 13 21 21 24 23 C27 21 29 13 27 4 C30 8 35 16 35 26 C35 38 24 46 24 46Z" fill="#ff8c00" opacity="0.28"/>
+          <!-- Flame — mid layer -->
+          <path d="M24 45 C24 45 15 38 15 28 C15 19 19 12 22 8 C21 16 22 23 24 25 C26 23 27 16 26 8 C29 12 33 19 33 28 C33 38 24 45 24 45Z" fill="url(#al-fo)"/>
+          <!-- Flame — bright core -->
+          <path d="M24 42 C24 42 18 36 18 29 C18 23 21 18 24 15 C27 18 30 23 30 29 C30 36 24 42 24 42Z" fill="url(#al-fi)"/>
+          <!-- Flame tip highlight -->
+          <ellipse cx="24" cy="18" rx="3" ry="4.5" fill="white" opacity="0.65"/>
+
+          <!-- Wick -->
+          <line x1="24" y1="45" x2="24" y2="49" stroke="#2e1402" stroke-width="1.4" stroke-linecap="round"/>
+
+          <!-- Spout — tapered elegant tube -->
+          <path d="M36 60 Q30 56 26 52 Q22 48 22 47" stroke="url(#al-spout)" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+          <path d="M36 60 Q30 56 26 52 Q22 48 22 47" stroke="#f0c84a" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.38"/>
+          <!-- Spout tip opening -->
+          <ellipse cx="21.5" cy="47.5" rx="2.8" ry="1.8" fill="#1a0800" opacity="0.85" transform="rotate(-35,21.5,47.5)"/>
+
+          <!-- Lamp body — smooth rounded shape -->
+          <path d="M36 60 Q24 58 18 66 Q12 74 14 85 Q16 96 28 102 Q40 108 55 107 Q70 107 79 100 Q88 93 87 82 Q86 71 78 65 Q70 59 58 59 Q48 59 40 60 Q38 60 36 60Z" fill="url(#al-body)" filter="url(#al-drop)"/>
+          <!-- Body sheen overlay -->
+          <path d="M36 60 Q24 58 18 66 Q12 74 14 85 Q16 96 28 102 Q40 108 55 107 Q70 107 79 100 Q88 93 87 82 Q86 71 78 65 Q70 59 58 59 Q48 59 40 60 Q38 60 36 60Z" fill="url(#al-sheen)"/>
+
+          <!-- Decorative engraved bands -->
+          <path d="M20 72 Q36 68 55 69 Q68 70 80 68" stroke="#5e3208" stroke-width="1" fill="none" opacity="0.55"/>
+          <path d="M16 83 Q34 79 55 80 Q70 81 84 79" stroke="#5e3208" stroke-width="1" fill="none" opacity="0.45"/>
+          <path d="M18 94 Q36 91 55 92 Q70 93 81 91" stroke="#5e3208" stroke-width="1" fill="none" opacity="0.35"/>
+
+          <!-- Decorative diamond dots -->
+          <circle cx="37" cy="84" r="1.8" fill="#e8b030" opacity="0.28"/>
+          <circle cx="55" cy="82" r="1.8" fill="#e8b030" opacity="0.28"/>
+          <circle cx="72" cy="84" r="1.8" fill="#e8b030" opacity="0.28"/>
+
+          <!-- Subtle cross motif -->
+          <line x1="55" y1="74" x2="55" y2="98" stroke="#c8901c" stroke-width="0.8" opacity="0.2"/>
+          <line x1="43" y1="86" x2="67" y2="86" stroke="#c8901c" stroke-width="0.8" opacity="0.2"/>
+
+          <!-- Fill opening / rim -->
+          <ellipse cx="52" cy="60" rx="15" ry="4" fill="#b87818" stroke="#7a4808" stroke-width="0.7"/>
+          <ellipse cx="52" cy="59" rx="11" ry="2.6" fill="#c8941c"/>
+          <ellipse cx="52" cy="58.5" rx="8" ry="1.6" fill="#1a0e04" opacity="0.72"/>
+
+          <!-- Handle — graceful ear -->
+          <path d="M85 70 Q98 66 99 79 Q100 93 88 100" stroke="url(#al-handle)" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+          <path d="M85 70 Q98 66 99 79 Q100 93 88 100" stroke="#eec050" stroke-width="1.8" fill="none" stroke-linecap="round" opacity="0.4"/>
+
+          <!-- Base foot ring -->
+          <ellipse cx="51" cy="104" rx="21" ry="5.5" fill="#8a5010" opacity="0.88"/>
+          <path d="M36 100 Q51 108 66 100 Q63 113 51 114 Q39 113 36 100Z" fill="#6a3c08"/>
+          <ellipse cx="51" cy="114" rx="14" ry="3.5" fill="#4a2a06" opacity="0.9"/>
+
+          <!-- Ground shadow -->
+          <ellipse cx="51" cy="121" rx="22" ry="4.5" fill="#1a0800" opacity="0.1"/>
+
+          <!-- Shine on body left -->
+          <ellipse cx="32" cy="73" rx="7" ry="5" fill="white" opacity="0.09" transform="rotate(-22,32,73)"/>
+          <ellipse cx="44" cy="65" rx="5" ry="3" fill="white" opacity="0.07"/>
         </svg>
       </div>
     </div>
