@@ -2697,64 +2697,6 @@ html[data-theme="warmth"] .setup-av-btn { background: #FDF9F4; border-color: #D8
 #add-p-btn:focus-visible { outline: 2px solid var(--green1); outline-offset: 2px; }
 
 /* ── Smooth transitions on interactive elements ── */
-/* Avatar support for both Emoji and Images */
-.av, .splash-av, .prof-avatar, .g-av, .chat-av, .lb-av, .l-av, .tf-av, .cn-av {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  position: relative;
-}
-.av img, .splash-av img, .prof-avatar img, .g-av img, .chat-av img, .lb-av img, .l-av img, .tf-av img, .cn-av img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* Matchmaking Button */
-.btn-matchmaking {
-  background: linear-gradient(135deg, #C89E48 0%, #A67C37 100%);
-  color: #1a0f00;
-  border: none;
-  box-shadow: 0 4px 15px rgba(200, 158, 72, 0.3);
-  position: relative;
-  overflow: hidden;
-}
-.btn-matchmaking::after {
-  content: '';
-  position: absolute;
-  top: -50%; left: -50%; width: 200%; height: 200%;
-  background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
-  transform: rotate(45deg);
-  animation: shine 3s infinite;
-}
-@keyframes shine {
-  0% { transform: translateX(-100%) rotate(45deg); }
-  100% { transform: translateX(100%) rotate(45deg); }
-}
-
-.matchmaking-loader {
-  display: inline-block;
-  width: 20px;
-  height: 20px;
-  border: 2px solid rgba(255,255,255,0.3);
-  border-radius: 50%;
-  border-top-color: #fff;
-  animation: spin 1s ease-in-out infinite;
-  margin-right: 8px;
-}
-
-/* Profile View Styles */
-.pv-stat-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-}
-.pv-stat-lbl { color: var(--ink3); font-size: 13px; }
-.pv-stat-val { color: var(--gold1); font-weight: 700; font-size: 14px; }
-
-/* Refined Nav Transition */
 .back-btn { transition: color .15s, transform .1s; }
 .g-quit { transition: all .15s; }
 .setup-del { transition: all .15s; }
@@ -3267,16 +3209,6 @@ html[data-theme="warmth"] .divider::before, html[data-theme="warmth"] .divider::
     </div>
   </div>
   <div class="scroller">
-    <!-- Matchmaking -->
-    <div id="matchmaking-panel" style="margin-bottom:16px;">
-      <button class="btn btn-matchmaking" id="mm-btn" onclick="toggleMatchmaking()">
-        <span class="btn-icon">⚡</span> <span id="mm-btn-txt">Find Random Opponent</span>
-      </button>
-      <div id="mm-status" style="display:none;text-align:center;margin-top:10px;font-size:12px;color:var(--ink3);">
-        <span class="matchmaking-loader"></span> Looking for players with similar XP...
-      </div>
-    </div>
-
     <div class="grid2" style="margin-bottom:12px;">
       <button class="btn btn-blue btn-sm" onclick="go('setup');buildModeSetup('online')"><span class="btn-icon">➕</span>Host Room</button>
       <button class="btn btn-ghost btn-sm" onclick="openOv('ov-join')"><span class="btn-icon">🔑</span>Join Room</button>
@@ -3747,9 +3679,6 @@ html[data-theme="warmth"] .divider::before, html[data-theme="warmth"] .divider::
   <div class="mbox">
     <div class="mhandle"></div>
     <div class="mtitle">Choose Avatar</div>
-    <button class="btn btn-blue btn-sm" style="margin-bottom:12px;width:100%;" onclick="document.getElementById('av-upload').click()">
-      <span class="btn-icon">📸</span> Upload Custom Image
-    </button>
     <div class="av-grid" id="av-grid"></div>
     <button class="btn btn-ghost btn-sm" onclick="closeOv('ov-avatars')">Cancel</button>
   </div>
@@ -3850,34 +3779,6 @@ html[data-theme="warmth"] .divider::before, html[data-theme="warmth"] .divider::
     <button class="btn btn-ghost btn-sm" style="margin-top:8px;" onclick="closeOv('ov-challenge')">Cancel</button>
   </div>
 </div>
-
-<!-- ── MODAL: Profile View ── -->
-<div class="ov" id="ov-profile-view" onclick="bgClose(event,'ov-profile-view')">
-  <div class="mbox">
-    <div class="mhandle"></div>
-    <div style="text-align:center;padding:10px 0 16px;">
-      <div class="prof-avatar" id="pv-av" style="width:80px;height:80px;font-size:40px;margin:0 auto 12px;cursor:default;">😊</div>
-      <div class="h2" id="pv-name">Player Name</div>
-      <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.12em;color:var(--gold1);text-transform:uppercase;margin-top:4px;" id="pv-level">Disciple · Lv 1</div>
-    </div>
-    
-    <div class="divider"><span>Stats</span></div>
-    <div id="pv-stats" style="margin-bottom:16px;">
-      <div class="pv-stat-row"><span class="pv-stat-lbl">XP Earned</span><span class="pv-stat-val" id="pv-xp">0</span></div>
-      <div class="pv-stat-row"><span class="pv-stat-lbl">Games Played</span><span class="pv-stat-val" id="pv-played">0</span></div>
-      <div class="pv-stat-row"><span class="pv-stat-lbl">Total Wins</span><span class="pv-stat-val" id="pv-wins">0</span></div>
-      <div class="pv-stat-row"><span class="pv-stat-lbl">Correct Answers</span><span class="pv-stat-val" id="pv-correct">0</span></div>
-      <div class="pv-stat-row"><span class="pv-stat-lbl">Best Streak</span><span class="pv-stat-val" id="pv-streak">0</span></div>
-    </div>
-
-    <div id="pv-actions" style="display:flex;gap:8px;">
-      <button class="btn btn-blue btn-sm" id="pv-add-friend" style="flex:1;">Add Friend</button>
-      <button class="btn btn-ghost btn-sm" onclick="closeOv('ov-profile-view')" style="flex:1;">Close</button>
-    </div>
-  </div>
-</div>
-
-<input type="file" id="av-upload" accept="image/*" style="display:none;" onchange="handleAvUpload(this)">
 
 <!-- ── Challenge Notification (incoming) ── -->
 <div id="challenge-notif" class="challenge-notif" style="display:none;">
@@ -4264,8 +4165,6 @@ function awardAnswerXPForPlayer(playerName,anchorEl){
     if(streak>=(G.profile.bestStreak||0)) G.profile.bestStreak=streak;
     saveProfile();
   }
-  // Milestone sounds
-  if(streak > 0 && streak % 5 === 0) sfx.streak(streak / 5);
   updateComboUI(streak);
 }
 function resetComboUIForPlayer(playerName){
@@ -4324,7 +4223,7 @@ function renderHomeBar(){
   const p=G.profile, l=lvl(p.xp||0);
   const el=document.getElementById('home-profile-bar');
   el.innerHTML=`<div class="profile-bar" onclick="go('profile');setNb(document.getElementById('nb-profile'))">
-    <div class="av">${renderAvHtml(p.avatar)}</div>
+    <div class="av">${p.avatar}</div>
     <div class="info">
       <div class="pname">${p.name}</div>
       <div class="plvl">${l.name} · Lv ${l.lv}</div>
@@ -4940,7 +4839,6 @@ function answerQ(btn,isOk,q,order){
     sfx.wrong(); haptic('wrong');
     if(G.cfg.hearts){
       G.hearts[p.name]=Math.max(0,(G.hearts[p.name]||0)-1);
-      sfx.heartLost();
       renderHearts('g-hearts',G.hearts[p.name]);
       if(G.hearts[p.name]===0){
         fb.innerHTML += `<br><span style="color:#e08080;">${p.name} has been eliminated!</span>`;
@@ -4977,7 +4875,6 @@ function timeOut(q,pfx){
   sfx.wrong(); haptic('wrong');
   if(G.cfg.hearts){
     G.hearts[p.name]=Math.max(0,(G.hearts[p.name]||0)-1);
-    sfx.heartLost();
     renderHearts(`${pfx}-hearts`,G.hearts[p.name]);
     if(G.hearts[p.name]===0){
       fb.innerHTML += `<br><span style="color:#e08080;">${p.name} has been eliminated!</span>`;
@@ -6293,7 +6190,7 @@ function displayLBRows(list, rows, tab) {
     }else{
       const clanName=(p.clan&&String(p.clan).trim())?String(p.clan):'No clan';
       const clanEmoji=(p.clanIcon&&String(p.clanIcon).trim())?String(p.clanIcon):'⛪';
-      row.innerHTML=`<div class="lb-rank">${medal}</div><div class="lb-av" onclick="viewPlayerProfile('${p.id}')" style="cursor:pointer;">${renderAvHtml(p.avatar)}</div><div class="lb-info"><div class="lb-nm">${escHtml(p.name||'Player')}${isMe?' ✦':''}</div><div class="lb-sub lb-clan-sub"><span class="clan-emoji">${clanEmoji}</span><span class="clan-name">${escHtml(clanName)}</span></div></div><div style="text-align:right;"><div class="lb-xpv">${p.xp||0} XP</div><span class="lb-lvl">${l.name}</span></div>`;
+      row.innerHTML=`<div class="lb-rank">${medal}</div><div class="lb-av">${p.avatar||'😊'}</div><div class="lb-info"><div class="lb-nm">${escHtml(p.name||'Player')}${isMe?' ✦':''}</div><div class="lb-sub lb-clan-sub"><span class="clan-emoji">${clanEmoji}</span><span class="clan-name">${escHtml(clanName)}</span></div></div><div style="text-align:right;"><div class="lb-xpv">${p.xp||0} XP</div><span class="lb-lvl">${l.name}</span></div>`;
     }
     list.appendChild(row);
   });
@@ -6392,7 +6289,7 @@ function checkAchs(){
 function renderProfile(){
   if(!G.profile){ go('auth'); buildAvGrid(); return; }
   const p=G.profile, l=lvl(p.xp||0);
-  document.getElementById('prof-av').innerHTML=renderAvHtml(p.avatar);
+  document.getElementById('prof-av').textContent=p.avatar;
   document.getElementById('prof-name').textContent=p.name;
   document.getElementById('prof-level').textContent=l.name+' · Level '+l.lv;
   const fill=document.getElementById('prof-xp-fill');
@@ -6722,14 +6619,12 @@ const sfx = {
 
   /* ── Wooden button tap ── */
   tap: ()=>{
-    if(!G.cfg.sound) return;
     noiseBurst(0.022, {freq:2400, q:10, vol:0.07, type:'bandpass'});
     noiseBurst(0.010, {freq:600,  q:2,  vol:0.03, type:'lowpass', start:0.004});
   },
 
   /* ── Church bells — C major arpeggio with real reverb ── */
   correct: ()=>{
-    if(!G.cfg.sound) return;
     [523, 659, 784, 1047].forEach((f, i) => bell(f, 1.6 + i * 0.2, 0.14, i * 0.095));
     // Soft sustained choir "aah" underneath (sine formant)
     setTimeout(()=>{
@@ -6739,7 +6634,6 @@ const sfx = {
 
   /* ── Trombone wa-wa descending glissando ── */
   wrong: ()=>{
-    if(!G.cfg.sound) return;
     try {
       const ac = getAC(), now = ac.currentTime;
       // Waveshaper distortion for brass grit
@@ -6772,200 +6666,6 @@ const sfx = {
       noiseBurst(0.06, {freq:180, q:1, vol:0.1, type:'lowpass'});
     } catch(e){}
   },
-
-  /* ── Level Up Fanfare ── */
-  levelUp: ()=>{
-    if(!G.cfg.sound) return;
-    const freqs = [523, 659, 784, 1047, 1318];
-    freqs.forEach((f, i) => {
-      bell(f, 2.5, 0.15, i * 0.12);
-      osc(f, 1.2, {type:'square', vol:0.015, atk:0.1, rel:0.5, start: i * 0.12});
-    });
-  },
-
-  /* ── Match Found ── */
-  matchFound: ()=>{
-    if(!G.cfg.sound) return;
-    [784, 1047, 1568].forEach((f, i) => bell(f, 2.0, 0.2, i * 0.08));
-    haptic('medium');
-  },
-
-  /* ── Streak Milestone (Rich sound) ── */
-  streak: (n)=>{
-    if(!G.cfg.sound) return;
-    const base = 440 * Math.pow(1.05946, n); // ascending pitch
-    [base, base*1.25, base*1.5].forEach((f, i) => bell(f, 1.5, 0.1, i * 0.05));
-  },
-
-  /* ── Heart Lost (Thump) ── */
-  heartLost: ()=>{
-    if(!G.cfg.sound) return;
-    noiseBurst(0.15, {freq:80, q:1, vol:0.2, type:'lowpass'});
-    osc(60, 0.2, {type:'sine', vol:0.3, atk:0.01, rel:0.1});
-  },
-
-  /* ── Clock Tick (Mechanical) ── */
-  tick: ()=>{
-    if(!G.cfg.sound) return;
-    noiseBurst(0.008, {freq:3000, q:5, vol:0.02, type:'highpass'});
-  }
-};
-
-/* ── Avatar Helper ── */
-function renderAvHtml(avatar, size='inherit') {
-  if (!avatar) return '😊';
-  if (avatar.startsWith('data:image') || avatar.startsWith('http')) {
-    return `<img src="${avatar}" style="width:${size};height:${size};border-radius:50%;object-fit:cover;" onerror="this.src='https://api.dicebear.com/7.x/bottts/svg?seed=fallback'">`;
-  }
-  return avatar;
-}
-
-function handleAvUpload(input) {
-  if (input.files && input.files[0]) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      const base64 = e.target.result;
-      if (base64.length > 150000) {
-        toast('Image too large. Please use a smaller one.');
-        return;
-      }
-      sfx.tap();
-      if (_avCtx === 'prof' && G.profile) {
-        G.profile.avatar = base64;
-        saveProfile();
-        renderHomeBar();
-        renderProfile();
-      } else {
-        const authAv = document.getElementById('auth-av');
-        if (authAv) authAv.innerHTML = renderAvHtml(base64);
-      }
-      closeOv('ov-avatars');
-      toast('Profile picture updated! 📸');
-      if (G.fbOk) pushProfile();
-    };
-    reader.readAsDataURL(input.files[0]);
-  }
-}
-
-/* ── Profile View Logic ── */
-function viewPlayerProfile(uid) {
-  if (!G.fbOk) { toast('Firebase required to view profiles.'); return; }
-  sfx.tap();
-  const modal = document.getElementById('ov-profile-view');
-  modal.classList.add('open');
-  
-  // Reset UI
-  document.getElementById('pv-name').textContent = 'Loading...';
-  document.getElementById('pv-av').innerHTML = '⟳';
-  document.getElementById('pv-level').textContent = '---';
-  
-  G.db.ref('players/' + uid).once('value').then(sn => {
-    const p = sn.val();
-    if (!p) { toast('Player not found'); closeOv('ov-profile-view'); return; }
-    
-    const l = lvl(p.xp || 0);
-    document.getElementById('pv-name').textContent = p.name || 'Player';
-    document.getElementById('pv-av').innerHTML = renderAvHtml(p.avatar);
-    document.getElementById('pv-level').textContent = `${l.name} · Lv ${l.lv}`;
-    document.getElementById('pv-xp').textContent = (p.xp || 0).toLocaleString();
-    document.getElementById('pv-played').textContent = (p.played || 0).toLocaleString();
-    document.getElementById('pv-wins').textContent = (p.wins || 0).toLocaleString();
-    document.getElementById('pv-correct').textContent = (p.correct || 0).toLocaleString();
-    document.getElementById('pv-streak').textContent = (p.bestStreak || 0).toLocaleString();
-    
-    const addBtn = document.getElementById('pv-add-friend');
-    if (uid === G.uid || hasFriend(uid)) {
-      addBtn.style.display = 'none';
-    } else {
-      addBtn.style.display = 'block';
-      addBtn.onclick = () => { sfx.tap(); sendFriendRequest(uid); closeOv('ov-profile-view'); };
-    }
-  });
-}
-
-/* ── Matchmaking Logic ── */
-let _mmInterval = null;
-function toggleMatchmaking() {
-  if (!G.fbOk || !G.profile) { toast('Sign in to play online!'); return; }
-  sfx.tap();
-  const btn = document.getElementById('mm-btn');
-  const status = document.getElementById('mm-status');
-  
-  if (_mmInterval) {
-    clearInterval(_mmInterval);
-    _mmInterval = null;
-    G.db.ref('matchmaking/' + G.uid).remove();
-    btn.classList.remove('btn-ruby');
-    btn.classList.add('btn-matchmaking');
-    document.getElementById('mm-btn-txt').textContent = 'Find Random Opponent';
-    status.style.display = 'none';
-    toast('Matchmaking cancelled.');
-  } else {
-    btn.classList.remove('btn-matchmaking');
-    btn.classList.add('btn-ruby');
-    document.getElementById('mm-btn-txt').textContent = 'Cancel Matchmaking';
-    status.style.display = 'block';
-    
-    const myXp = G.profile.xp || 0;
-    G.db.ref('matchmaking/' + G.uid).set({
-      uid: G.uid,
-      name: G.profile.name,
-      avatar: G.profile.avatar,
-      xp: myXp,
-      ts: Date.now()
-    });
-    
-    _mmInterval = setInterval(checkMatchmaking, 3000);
-    checkMatchmaking();
-  }
-}
-
-function checkMatchmaking() {
-  if (!G.uid) return;
-  const myXp = G.profile.xp || 0;
-  
-  G.db.ref('matchmaking').once('value').then(sn => {
-    const queue = sn.val();
-    if (!queue) return;
-    
-    // Find closest player by XP
-    const players = Object.values(queue).filter(p => p.uid !== G.uid && !p.matchFound);
-    if (!players.length) return;
-    
-    players.sort((a, b) => Math.abs(a.xp - myXp) - Math.abs(b.xp - myXp));
-    const opponent = players[0];
-    
-    if (Math.abs(opponent.xp - myXp) <= 2500) {
-      clearInterval(_mmInterval);
-      _mmInterval = null;
-      
-      if (G.uid < opponent.uid) {
-        const code = mkCode();
-        const roomSub = normalizeOnlineSub(G.sub);
-        G.db.ref('rooms/' + code).set({
-          code, host: G.uid, status: 'waiting', sub: roomSub, difficulty: G.diff, createdAt: Date.now(), matchmaking: true,
-          players: { [G.uid]: { name: G.profile.name, avatar: G.profile.avatar, ready: true } }
-        });
-        G.db.ref('matchmaking/' + opponent.uid).update({ matchFound: code });
-        G.db.ref('matchmaking/' + G.uid).remove();
-        joinRoomByCode(code);
-        sfx.matchFound();
-        toast('Match Found! ⚡');
-      } else {
-        G.db.ref('matchmaking/' + G.uid).on('value', sn2 => {
-          const d = sn2.val();
-          if (d && d.matchFound) {
-            G.db.ref('matchmaking/' + G.uid).off();
-            G.db.ref('matchmaking/' + G.uid).remove();
-            joinRoomByCode(d.matchFound);
-            sfx.matchFound();
-            toast('Match Found! ⚡');
-          }
-        });
-      }
-    }
-  });
-}
 
   /* ── Ascending harp-bell run ── */
   streak: ()=>{
@@ -7637,7 +7337,7 @@ function renderFriends(){
     list.innerHTML=uids.map(uid=>{
       const f=cache[uid]||{name:'Friend',avatar:'😊',xp:0};
       return `<div class="friend-row">
-        <div class="friend-av" onclick="viewPlayerProfile('${uid}')" style="cursor:pointer;">${renderAvHtml(f.avatar)}</div>
+        <div class="friend-av">${f.avatar||'😊'}</div>
         <div class="friend-info">
           <div class="friend-name">${escHtml(f.name||'Friend')}</div>
           <div class="friend-xp">⚡ ${f.xp||0} XP</div>
@@ -7674,7 +7374,7 @@ function renderConversations(){
     const f=getFriendData(uid);
     const preview=G._convPreviews&&G._convPreviews[uid];
     return `<div class="conv-row" onclick="openChatById('${uid}')">
-      <div class="conv-av">${renderAvHtml(f.avatar)}</div>
+      <div class="conv-av">${f.avatar||'😊'}</div>
       <div class="conv-info">
         <div class="conv-name">${escHtml(f.name||'Friend')}</div>
         <div class="conv-preview">${preview?escHtml(preview.text):'Tap to start chatting'}</div>
