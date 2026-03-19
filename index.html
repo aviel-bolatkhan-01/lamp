@@ -42119,7 +42119,7 @@ function playAgain(){
         const existingRequests=(d&&d.rematchRequestedBy&&typeof d.rematchRequestedBy==='object')?d.rematchRequestedBy:{};
         const startedAt=(d&&d.status==='waiting'&&d.rematchStartedAt)?d.rematchStartedAt:Date.now();
         const upd={status:'waiting',difficulty:roomDiff,sub:roomSub,qtype:roomSub,cfg:{hearts:!!G.cfg.hearts,winScore:clampRounds(G.cfg.winScore)},rematchStartedAt:startedAt,rematchRequestedBy:{...existingRequests,[G.uid]:true}};
-        upd['players/'+G.uid]={name:G.profile.name,avatar:G.profile.avatar,ready:false,score:0,hearts:3,diff:roomDiff};
+        upd['players/'+G.uid]={name:G.profile.name,avatar:G.profile.avatar,ready:false,score:0,hearts:3,diff:roomDiff,connected:true};
         Object.keys(d.players||{}).forEach(uid=>{
           upd['players/'+uid+'/ready']=false;
           upd['players/'+uid+'/diff']=roomDiff;
@@ -42130,7 +42130,7 @@ function playAgain(){
           status:'waiting',
           rematchStartedAt:Date.now(),
           rematchRequestedBy:{[G.uid]:true},
-          ['players/'+G.uid]:{name:G.profile.name,avatar:G.profile.avatar,ready:false,score:0,hearts:3,diff:G.diff}
+          ['players/'+G.uid]:{name:G.profile.name,avatar:G.profile.avatar,ready:false,score:0,hearts:3,diff:G.diff,connected:true}
         });
       });
     } else {
@@ -42143,14 +42143,14 @@ function playAgain(){
         G.roomRef.update({
           status:'waiting',
           rematchStartedAt:startedAt,
-          ['players/'+G.uid]:{name:G.profile.name,avatar:G.profile.avatar,ready:false,score:0,hearts:3,diff:roomDiff},
+          ['players/'+G.uid]:{name:G.profile.name,avatar:G.profile.avatar,ready:false,score:0,hearts:3,diff:roomDiff,connected:true},
           ['rematchRequestedBy/'+G.uid]:true
         });
       }).catch(()=>{
         G.roomRef.update({
           status:'waiting',
           rematchStartedAt:Date.now(),
-          ['players/'+G.uid]:{name:G.profile.name,avatar:G.profile.avatar,ready:false,score:0,hearts:3,diff:G.diff},
+          ['players/'+G.uid]:{name:G.profile.name,avatar:G.profile.avatar,ready:false,score:0,hearts:3,diff:G.diff,connected:true},
           ['rematchRequestedBy/'+G.uid]:true
         });
       });
@@ -42323,7 +42323,7 @@ function createRoom(){
   ref.set({
     code, host:G.uid, status:'waiting', sub:roomSub, qtype:roomSub, difficulty:G.diff, createdAt:Date.now(),
     cfg:{hearts:!!G.cfg.hearts,winScore:clampRounds(G.cfg.winScore)},
-    players:{[G.uid]:{name:G.profile.name,avatar:G.profile.avatar,ready:false,score:0,hearts:3,diff:G.diff}}
+    players:{[G.uid]:{name:G.profile.name,avatar:G.profile.avatar,ready:false,score:0,hearts:3,diff:G.diff,connected:true}}
   }).then(()=>{
     document.getElementById('rc-disp').textContent=code;
     document.getElementById('lobby-panel').style.display='block';
@@ -42397,7 +42397,7 @@ function joinRoomByCode(code){
       const rcfg={...d.cfg}; delete rcfg.sound;
       G.cfg={...G.cfg,...rcfg,winScore:clampRounds(d.cfg.winScore),timer:true};
     }
-    ref.child('players/'+G.uid).set({name:G.profile.name,avatar:G.profile.avatar,ready:false,score:0,hearts:3,diff:d.difficulty||G.diff});
+    ref.child('players/'+G.uid).set({name:G.profile.name,avatar:G.profile.avatar,ready:false,score:0,hearts:3,diff:d.difficulty||G.diff,connected:true});
     document.getElementById('rc-disp').textContent=code;
     document.getElementById('lobby-panel').style.display='block';
     updateLobbyModeNote(d);
@@ -42504,7 +42504,10 @@ function updateLobbyModeNote(d){
 }
 function getActiveLobbyEntries(d){
   const ps=(d&&d.players)||{};
-  let entries=Object.entries(ps).filter(([,p])=>p&&p.connected!==false);
+  let entries=Object.entries(ps).filter(([,p])=>!!p);
+  if(d&&d.status==='playing'){
+    entries=entries.filter(([,p])=>p.connected!==false);
+  }
   const requested=(d&&d.rematchRequestedBy)||null;
   if(requested && Object.keys(requested).length){
     entries=entries.filter(([uid])=>!!requested[uid]);
@@ -42904,7 +42907,7 @@ function startNearby(){
     code, host:G.uid, status:'waiting', sub:G.sub, difficulty:G.diff, createdAt:Date.now(),
     cfg:{hearts:!!G.cfg.hearts,winScore:clampRounds(G.cfg.winScore)},
     nearby:true,
-    players:{[G.uid]:{name:G.profile.name,avatar:G.profile.avatar,ready:false,score:0,hearts:3,diff:G.diff}}
+    players:{[G.uid]:{name:G.profile.name,avatar:G.profile.avatar,ready:false,score:0,hearts:3,diff:G.diff,connected:true}}
   }).then(()=>{
     document.getElementById('rc-disp').textContent=code;
     document.getElementById('lobby-panel').style.display='block';
