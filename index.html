@@ -42505,15 +42505,17 @@ function updateLobbyUI(d){
   const list=document.getElementById('lobby-list'); list.innerHTML='';
   updateLobbyModeNote(d);
   const activeEntries=getActiveLobbyEntries(d);
+  const hostUid=d&&d.host?d.host:(activeEntries[0]?activeEntries[0][0]:null);
+  if(hostUid&&G.uid) G.isHost=(hostUid===G.uid);
   activeEntries.forEach(([uid,p])=>{
     const row=document.createElement('div'); row.className='lobby-row';
-    const isHost=uid===d.host, isMe=uid===G.uid;
+    const isHost=uid===hostUid, isMe=uid===G.uid;
     row.innerHTML=`<span style="font-size:20px;">${p.avatar}</span><span style="font-family:'Playfair Display',serif;font-size:14px;flex:1;">${p.name}${isMe?' (You)':''}</span><span class="l-badge ${isHost?'host':p.ready?'ready':'wait'}">${isHost?'Host':p.ready?'Ready':'Waiting'}</span>`;
     list.appendChild(row);
   });
   const startBtn=document.getElementById('start-btn');
   if(startBtn){
-    const nonHost=activeEntries.filter(([uid])=>uid!==d.host).map(([,p])=>p);
+    const nonHost=activeEntries.filter(([uid])=>uid!==hostUid).map(([,p])=>p);
     const allReady=activeEntries.length>=2 && nonHost.length>=1 && nonHost.every(p=>!!p.ready);
     startBtn.disabled=!(G.isHost && allReady);
   }
@@ -42531,7 +42533,9 @@ function startOnline(){
   G.roomRef.once('value').then(sn=>{
     const d=sn.val()||{};
     const activeEntries=getActiveLobbyEntries(d);
-    const nonHost=activeEntries.filter(([uid])=>uid!==d.host).map(([,p])=>p);
+    const hostUid=d&&d.host?d.host:(activeEntries[0]?activeEntries[0][0]:null);
+    if(hostUid&&G.uid) G.isHost=(hostUid===G.uid);
+    const nonHost=activeEntries.filter(([uid])=>uid!==hostUid).map(([,p])=>p);
     const allReady=activeEntries.length>=2 && nonHost.length>=1 && nonHost.every(p=>!!p.ready);
     if(!allReady){ toast('All joined players must press Ready first.'); return; }
     const roomSub=normalizeOnlineSub((d&& (d.qtype||d.sub)) || G.sub);
