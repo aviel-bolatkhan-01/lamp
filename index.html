@@ -3264,10 +3264,6 @@ html[data-theme="warmth"] .divider::before, html[data-theme="warmth"] .divider::
     <div class="timer-track"><div class="timer-bar" id="g-tbar"></div></div>
     <div class="timer-secs" id="g-tsecs"></div>
   </div>
-  <div class="q-progress">
-    <div class="q-progress-track"><div class="q-progress-fill" id="g-progress" style="width:0%"></div></div>
-    <div class="q-progress-label" id="g-progress-lbl">Q1</div>
-  </div>
   <div class="scroller">
     <div class="q-cat" id="g-cat"></div>
     <div class="q-text" id="g-txt"></div>
@@ -41270,12 +41266,7 @@ function startPracticeGame(){
 }
 
 function updateProgress(){
-  const total=(G.roomPool||G.pool||[]).length||1;
-  const pct=Math.min(100,((G.qi+1)/total*100)).toFixed(0);
-  const fill=document.getElementById('g-progress');
-  const lbl=document.getElementById('g-progress-lbl');
-  if(fill)fill.style.width=pct+'%';
-  if(lbl)lbl.textContent='Q'+(G.qi+1)+'/'+total;
+  return;
 }
 
 /* ── Render a multiple-choice question ── */
