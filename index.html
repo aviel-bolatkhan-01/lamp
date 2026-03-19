@@ -680,7 +680,7 @@ body::after {
 .lb-nm   { font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .lb-sub  { font-family: 'Nunito', sans-serif; font-size: 10px; color: var(--ink3); display: flex; align-items: center; gap: 4px; }
 .lb-sub.lb-clan-sub { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 2px; line-height: 1.1; }
-.lb-sub.lb-clan-sub .clan-emoji { display: block; width: 12px; text-align: center; flex-shrink: 0; opacity: .9; line-height: 1; }
+.lb-sub.lb-clan-sub .clan-emoji { display: block; width: 22px; text-align: center; flex-shrink: 0; opacity: .9; line-height: 1; }
 .lb-sub.lb-clan-sub .clan-name { display: block; white-space: nowrap; }
 .lb-xpv  { font-family: 'Cormorant Garamond', serif; font-size: 15px; font-weight: 700; color: var(--gold1); }
 .lb-lvl  { font-family: 'Nunito', sans-serif; font-size: 9px; color: var(--ink3); display: block; text-align: right; }
@@ -794,6 +794,21 @@ body::after {
 .avatar-inline.md { width: 28px; height: 28px; }
 .avatar-inline.lg { width: 72px; height: 72px; }
 .avatar-inline .avatar-photo { width: 100%; height: 100%; }
+.clan-inline {
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  line-height: 1;
+}
+.clan-inline.sm { width: 20px; height: 20px; border-radius: 6px; }
+.clan-inline.md { width: 26px; height: 26px; border-radius: 7px; }
+.clan-inline.lg { width: 54px; height: 54px; border-radius: 12px; }
+.clan-inline .avatar-photo { width: 100%; height: 100%; }
 .profile-bar .av.has-photo {
   width: 34px;
   height: 34px;
@@ -3445,7 +3460,7 @@ html[data-theme="warmth"] .divider::before, html[data-theme="warmth"] .divider::
         <div style="display:flex;gap:7px;margin-bottom:16px;">
           <button class="btn btn-ghost btn-sm" style="flex:1;padding:8px;" id="lb-friends" onclick="lbTab('friends')">👥 Friends</button>
           <button class="btn btn-ghost btn-sm" style="flex:1;padding:8px;" id="lb-global" onclick="lbTab('global')">🌍 Global</button>
-          <button class="btn btn-ghost btn-sm" style="flex:1;padding:8px;" id="lb-clan"   onclick="lbTab('clan')">⛪ Congregation</button>
+          <button class="btn btn-ghost btn-sm" style="flex:1;padding:8px;" id="lb-clan"   onclick="lbTab('clan')">⛪ Congreg.</button>
           <button class="btn btn-ghost btn-sm" style="flex:1;padding:8px;" id="lb-weekly" onclick="lbTab('weekly')">📅 Weekly</button>
         </div>
       </div>
@@ -3724,7 +3739,7 @@ html[data-theme="warmth"] .divider::before, html[data-theme="warmth"] .divider::
     <div class="mhandle"></div>
     <div class="mtitle">Choose Avatar</div>
     <div id="av-photo-tools" class="profile-avatar-tools" style="display:none;margin-bottom:10px;">
-      <button class="btn btn-ghost btn-sm" onclick="uploadProfilePhoto()">📷 Upload Photo</button>
+      <button class="btn btn-ghost btn-sm" onclick="uploadProfilePhoto()">📷 Upload</button>
       <button class="btn btn-ghost btn-sm" onclick="clearProfilePhoto()">🗑 Remove</button>
     </div>
     <input id="profile-photo-input" type="file" accept="image/*" style="display:none;" onchange="onProfilePhotoPicked(event)">
@@ -3775,6 +3790,19 @@ html[data-theme="warmth"] .divider::before, html[data-theme="warmth"] .divider::
       style="text-transform:uppercase;letter-spacing:.18em;text-align:center;margin-bottom:14px;"
       oninput="this.value=this.value.toUpperCase()" autocomplete="off">
     <button class="btn btn-green" onclick="joinClan()"><span class="btn-icon">✦</span>Join Congregation</button>
+  </div>
+</div>
+
+<!-- ── MODAL: Remove Congregation ── -->
+<div class="ov" id="ov-cong-remove" onclick="bgClose(event,'ov-cong-remove')">
+  <div class="mbox">
+    <div class="mhandle"></div>
+    <div class="mtitle">Remove Congregation?</div>
+    <div style="font-size:13px;color:var(--ink2);line-height:1.6;margin-bottom:14px;">Are you sure you want to leave this congregation?</div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-ghost btn-sm" style="flex:1;" onclick="closeOv('ov-cong-remove')">Cancel</button>
+      <button class="btn btn-ruby btn-sm" style="flex:1;" onclick="removeCongregationConfirmed()">Remove</button>
+    </div>
   </div>
 </div>
 
@@ -40832,7 +40860,11 @@ function avatarMarkup(emoji,photo,sizeCls){
   return `<span>${emoji||'😊'}</span>`;
 }
 function clanBadgeMarkup(icon,photo,sizeCls){
-  return avatarMarkup(icon||'⛪',photo||'',sizeCls||'md');
+  const hasPhoto=typeof photo==='string' && photo.trim().length>0;
+  if(hasPhoto){
+    return `<span class="clan-inline ${sizeCls||'md'}"><img class="avatar-photo" src="${escAttr(photo)}" alt="congregation"></span>`;
+  }
+  return `<span>${icon||'⛪'}</span>`;
 }
 function uploadProfilePhoto(){
   if(!G.profile) return;
@@ -40888,7 +40920,7 @@ function pushProfile(){
   if(!G.fbOk||!G.uid||!G.profile)return;
   try{
     const p=G.profile;
-    const d={name:p.name,avatar:p.avatar,xp:p.xp||0,weeklyXP:p.weeklyXP||0,weeklyReset:p.weeklyReset||wk(),xpResetVersion:p.xpResetVersion||XP_RESET_VERSION,wins:p.wins||0,clan:p.clanName||'',clanIcon:p.clanIcon||'⛪',clanPhoto:p.clanPhoto||'',ts:Date.now(),friendCode:p.friendCode||''};
+    const d={name:p.name,avatar:p.avatar,photo:p.photo||'',xp:p.xp||0,weeklyXP:p.weeklyXP||0,weeklyReset:p.weeklyReset||wk(),xpResetVersion:p.xpResetVersion||XP_RESET_VERSION,wins:p.wins||0,clan:p.clanName||'',clanIcon:p.clanIcon||'⛪',clanPhoto:p.clanPhoto||'',ts:Date.now(),friendCode:p.friendCode||''};
     G.db.ref('players/'+G.uid).set(d);
     G.db.ref('leaderboard/'+G.uid).set(d);
     G.db.ref('weekly/'+wk()+'/'+G.uid).set(d);
@@ -41918,7 +41950,7 @@ function renderTF(){
   document.getElementById('tf-next').style.display='none';
   const tfScores=document.getElementById('tf-scores');
   const tfVoters=document.getElementById('tf-voters');
-  tfScores.textContent=G.players.map(p=>p.avatar+' '+G.scores[p.name]).join('  ');
+  tfScores.innerHTML=G.players.map(p=>`<span style="display:inline-flex;align-items:center;gap:6px;margin-right:10px;">${avatarMarkup(p.avatar,resolvePlayerPhoto(p),'sm')} <strong>${G.scores[p.name]||0}</strong></span>`).join('');
   tfScores.style.display=isSolo?'none':'block';
   tfVoters.style.display=isSolo?'none':'flex';
   // voter chips — skip eliminated players
@@ -42004,7 +42036,7 @@ function revealTF(q){
       if(G.cfg.hearts){
         G.hearts[p.name]=Math.max(0,(G.hearts[p.name]||0)-1);
         if(G.hearts[p.name]===0){
-          elimMsg+=`<br><span style="color:#e08080;">${p.avatar} ${p.name} has been eliminated!</span>`;
+          elimMsg+=`<br><span style="color:#e08080;display:inline-flex;align-items:center;gap:6px;">${avatarMarkup(p.avatar,resolvePlayerPhoto(p),'sm')} ${p.name} has been eliminated!</span>`;
         }
       }
     }
@@ -42015,7 +42047,7 @@ function revealTF(q){
   else if(myStreak!=null) updateComboUI(myStreak);
   // Update header stats
   renderTFHeader();
-  document.getElementById('tf-scores').textContent=G.players.map(p=>p.avatar+' '+G.scores[p.name]).join('  ');
+  document.getElementById('tf-scores').innerHTML=G.players.map(p=>`<span style="display:inline-flex;align-items:center;gap:6px;margin-right:10px;">${avatarMarkup(p.avatar,resolvePlayerPhoto(p),'sm')} <strong>${G.scores[p.name]||0}</strong></span>`).join('');
   const fb=document.getElementById('tf-fb'); fb.style.display='block';
   fb.className='fb ok';
   fb.innerHTML=`<strong>Answer: ${q.a?'TRUE ✅':'FALSE ❌'}</strong> — ${q.e}${elimMsg}`;
@@ -43278,8 +43310,9 @@ function renderLB(tab){
   }
 
   if(tab==='clan'){
-    G.db.ref('clans').orderByChild('totalXp').limitToLast(30).once('value').then(sn=>{
-      const rows=[]; sn.forEach(s=>rows.unshift({...s.val(),id:s.key}));
+    G.db.ref('clans').once('value').then(sn=>{
+      const rows=[]; sn.forEach(s=>rows.push({...s.val(),id:s.key}));
+      rows.sort((a,b)=>(b.totalXp||0)-(a.totalXp||0));
       displayLBRows(list, rows, tab);
     }).catch(()=>{ list.innerHTML='<div class="empty">Error loading ranks.</div>'; });
     return;
@@ -43315,7 +43348,7 @@ function displayLBRows(list, rows, tab) {
     row.className='lb-row'+(i<3?' top':'')+(isMe?' me':'');
     const medal=i===0?'👑':i===1?'🥈':i===2?'🥉':'#'+(i+1);
     if(tab==='clan'){
-      row.innerHTML=`<div class="lb-rank">${medal}</div><div class="lb-av">${p.icon||'⛪'}</div><div class="lb-info"><div class="lb-nm">${p.name}</div><div class="lb-sub">${Object.keys(p.members||{}).length} members</div></div><div class="lb-xpv">${p.totalXp||0} XP</div>`;
+      row.innerHTML=`<div class="lb-rank">${medal}</div><div class="lb-av">${clanBadgeMarkup(p.icon||'⛪',p.photo||'','sm')}</div><div class="lb-info"><div class="lb-nm">${p.name}</div><div class="lb-sub">${Object.keys(p.members||{}).length} members</div></div><div class="lb-xpv">${p.totalXp||0} XP</div>`;
     }else{
       const clanName=(p.clan&&String(p.clan).trim())?String(p.clan):'No congregation';
       const clanEmoji=(p.clanIcon&&String(p.clanIcon).trim())?String(p.clanIcon):'⛪';
@@ -43399,7 +43432,7 @@ function clearClanPhoto(ctx){
 }
 function updateCurrentClanPhoto(photoData){
   if(!G.profile||!G.profile.clanCode){
-    toast('Join a clan first');
+    toast('Join a congregation first');
     return;
   }
   const code=G.profile.clanCode;
@@ -43416,6 +43449,44 @@ function updateCurrentClanPhoto(photoData){
   }else{
     applyLocal();
   }
+}
+function requestRemoveCongregation(){
+  if(!G.profile||!G.profile.clanCode){
+    toast('You are not in a congregation');
+    return;
+  }
+  openOv('ov-cong-remove');
+}
+function removeCongregationConfirmed(){
+  closeOv('ov-cong-remove');
+  if(!G.profile||!G.profile.clanCode){
+    toast('You are not in a congregation');
+    return;
+  }
+  const code=G.profile.clanCode;
+  const clearLocal=()=>{
+    delete G.profile.clanName;
+    delete G.profile.clanCode;
+    delete G.profile.clanIcon;
+    delete G.profile.clanPhoto;
+    saveProfile();
+    if(G.fbOk) pushProfile();
+    renderClans();
+    if(document.getElementById('s-profile')?.classList.contains('active')) renderProfile();
+    toast('Congregation removed');
+  };
+  if(!G.fbOk||!G.db||!G.uid){ clearLocal(); return; }
+  const membersRef=G.db.ref('clans/'+code+'/members');
+  membersRef.child(G.uid).remove()
+    .then(()=>membersRef.once('value'))
+    .then(sn=>{
+      if(!sn.exists()){
+        return G.db.ref('clans/'+code).remove();
+      }
+      return null;
+    })
+    .then(clearLocal)
+    .catch(()=>toast('Could not remove congregation right now'));
 }
 function createClan(){
   const name=(document.getElementById('clan-nm-inp').value||'').trim();
@@ -43455,6 +43526,7 @@ function renderClans(){
           <div class="profile-avatar-tools" style="justify-content:flex-start;margin-top:8px;">
             <button class="btn btn-ghost btn-sm" onclick="uploadClanPhoto('existing')">📷 Upload Congregation Pic</button>
             <button class="btn btn-ghost btn-sm" onclick="clearClanPhoto('existing')">🗑 Remove</button>
+            <button class="btn btn-ruby btn-sm" onclick="requestRemoveCongregation()">🧹 Remove Congregation</button>
           </div>
         </div>
       </div>
@@ -43465,8 +43537,9 @@ function renderClans(){
   const clb=document.getElementById('clan-lb');
   if(!G.fbOk){ clb.innerHTML='<div class="empty">Firebase required for congregation rankings.</div>'; return; }
   clb.innerHTML='<div class="loading"><span class="spin">⟳</span> Loading…</div>';
-  G.db.ref('clans').orderByChild('totalXp').limitToLast(8).once('value').then(sn=>{
-    const rows=[]; sn.forEach(s=>rows.unshift({...s.val()}));
+  G.db.ref('clans').once('value').then(sn=>{
+    const rows=[]; sn.forEach(s=>rows.push({...s.val()}));
+    rows.sort((a,b)=>(b.totalXp||0)-(a.totalXp||0));
     clb.innerHTML='';
     if(!rows.length){ clb.innerHTML='<div class="empty">No congregations yet. Be the first!</div>'; return; }
     rows.forEach((c,i)=>{
@@ -44621,7 +44694,7 @@ function getFriendList(){
 function getFriendData(uid){
   // Get cached display data for a friend UID
   if(G._friendCache&&G._friendCache[uid]) return G._friendCache[uid];
-  return {name:'Friend',avatar:'😊',xp:0};
+  return {name:'Friend',avatar:'😊',photo:'',xp:0};
 }
 function hasFriend(uid){
   return getFriendList().includes(uid);
@@ -44720,7 +44793,7 @@ function renderFriendRequests(){
   }
   box.innerHTML=reqs.map(([uid,r])=>{
     const nm=escHtml(r.fromName||'Player');
-    const av=escHtml(r.fromAvatar||'😊');
+    const av=avatarMarkup(r.fromAvatar||'😊',r.fromPhoto||'','md');
     const code=escHtml(r.fromCode||'');
     return `<div class="friend-row" style="margin-bottom:8px;">
       <div class="friend-av">${av}</div>
@@ -44752,6 +44825,7 @@ function sendFriendRequestToUid(uid,targetData){
       fromUid:G.uid,
       fromName:G.profile.name||'Player',
       fromAvatar:G.profile.avatar||'😊',
+      fromPhoto:G.profile.photo||'',
       fromCode:G.profile.friendCode||'',
       toUid:uid,
       status:'pending',
@@ -44772,6 +44846,7 @@ function acceptFriendRequest(fromUid,silent){
     G._friendCache[fromUid]={
       name:req.fromName||'Friend',
       avatar:req.fromAvatar||'😊',
+      photo:req.fromPhoto||'',
       xp:(G._friendCache[fromUid]&&G._friendCache[fromUid].xp)||0
     };
   }
@@ -44825,9 +44900,9 @@ function renderFriends(){
   // If Firebase is available, fetch fresh data; else use cache
   const renderRows=(cache)=>{
     list.innerHTML=uids.map(uid=>{
-      const f=cache[uid]||{name:'Friend',avatar:'😊',xp:0};
+      const f=cache[uid]||{name:'Friend',avatar:'😊',photo:'',xp:0};
       return `<div class="friend-row">
-        <div class="friend-av">${f.avatar||'😊'}</div>
+        <div class="friend-av">${avatarMarkup(f.avatar||'😊',f.photo||'','md')}</div>
         <div class="friend-info">
           <div class="friend-name">${escHtml(f.name||'Friend')}</div>
           <div class="friend-xp">⚡ ${f.xp||0} XP</div>
@@ -44844,7 +44919,7 @@ function renderFriends(){
     const promises=uids.map(uid=>G.db.ref('leaderboard/'+uid).once('value'));
     Promise.all(promises).then(snaps=>{
       if(!G._friendCache) G._friendCache={};
-      snaps.forEach(s=>{ if(s.exists()){ const v=s.val(); G._friendCache[s.key]={name:v.name||'Friend',avatar:v.avatar||'😊',xp:v.xp||0}; } });
+      snaps.forEach(s=>{ if(s.exists()){ const v=s.val(); G._friendCache[s.key]={name:v.name||'Friend',avatar:v.avatar||'😊',photo:v.photo||'',xp:v.xp||0}; } });
       renderRows(G._friendCache);
     });
   } else {
@@ -44864,7 +44939,7 @@ function renderConversations(){
     const f=getFriendData(uid);
     const preview=G._convPreviews&&G._convPreviews[uid];
     return `<div class="conv-row" onclick="openChatById('${uid}')">
-      <div class="conv-av">${f.avatar||'😊'}</div>
+      <div class="conv-av">${avatarMarkup(f.avatar||'😊',f.photo||'','md')}</div>
       <div class="conv-info">
         <div class="conv-name">${escHtml(f.name||'Friend')}</div>
         <div class="conv-preview">${preview?escHtml(preview.text):'Tap to start chatting'}</div>
@@ -44875,7 +44950,7 @@ function renderConversations(){
 }
 function openChatById(uid){
   const f=getFriendData(uid);
-  openChat(uid, f.name||'Friend', f.avatar||'😊');
+  openChat(uid, f.name||'Friend', f.avatar||'😊', f.photo||'');
 }
 function escHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
@@ -44907,7 +44982,7 @@ function addFriendFromFriends(){
     if(uid===G.uid){ toast("That's your own code!"); return; }
     // Cache friend data for display
     if(!G._friendCache) G._friendCache={};
-    G._friendCache[uid]={name:targetData.name||'Friend',avatar:targetData.avatar||'😊',xp:targetData.xp||0};
+    G._friendCache[uid]={name:targetData.name||'Friend',avatar:targetData.avatar||'😊',photo:targetData.photo||'',xp:targetData.xp||0};
     sendFriendRequestToUid(uid,{name:targetData.name,avatar:targetData.avatar}).then(()=>{
       document.getElementById('friends-screen-code-inp').value='';
       toast('Friend request sent ✦');
@@ -44942,7 +45017,7 @@ function challengeFriend(uid){
   };
 
   const f=getFriendData(uid);
-  document.getElementById('ch-friend-av').textContent=f.avatar||'😊';
+  document.getElementById('ch-friend-av').innerHTML=avatarMarkup(f.avatar||'😊',f.photo||'','lg');
   document.getElementById('ch-friend-name').textContent=f.name||'Friend';
 
   // Reset chip selections
@@ -45010,6 +45085,7 @@ function sendChallenge(){
     senderUid:G.uid,
     senderName:G.profile.name,
     senderAvatar:G.profile.avatar,
+    senderPhoto:G.profile.photo||'',
     mode:'online',
     difficulty:_chDiff,
     qtype:challengeSub,
@@ -45029,7 +45105,7 @@ function sendChallenge(){
     challengeTarget:_chTargetUid,
     players:{
       [G.uid]:{name:G.profile.name,avatar:G.profile.avatar,photo:G.profile.photo||'',ready:false,score:0,hearts:3,diff:_chDiff},
-      [_chTargetUid]:{name:targetF.name||'Friend',avatar:targetF.avatar||'😊',ready:false,score:0,hearts:3,diff:_chDiff}
+      [_chTargetUid]:{name:targetF.name||'Friend',avatar:targetF.avatar||'😊',photo:targetF.photo||'',ready:false,score:0,hearts:3,diff:_chDiff}
     }
   }).then(()=>{
     // Store room ref so host can listen
@@ -45092,7 +45168,7 @@ function showChallengeNotif(ch){
   const el=document.getElementById('challenge-notif');
   if(!el) return;
 
-  document.getElementById('cn-av').textContent=ch.senderAvatar||'😊';
+  document.getElementById('cn-av').innerHTML=avatarMarkup(ch.senderAvatar||'😊',ch.senderPhoto||'','md');
   document.getElementById('cn-name').textContent=(ch.senderName||'Someone')+' challenged you!';
 
   document.getElementById('cn-detail').textContent='Mode: '+chQTypeLabel(ch.qtype||'classic')+' · Difficulty: '+chDiffLabel(ch.difficulty||'easy')+' · '+roomSettingsLine(ch);
@@ -45204,10 +45280,10 @@ function cleanupChat(){
   _chatQuery=null;
   _chatListener=null;
 }
-function openChat(uid,name,avatar){
+function openChat(uid,name,avatar,photo){
   _chatUid=uid;
   document.getElementById('chat-partner-name').textContent=name;
-  document.getElementById('chat-partner-av').textContent=avatar;
+  document.getElementById('chat-partner-av').innerHTML=avatarMarkup(avatar||'😊',photo||'','md');
   document.getElementById('chat-msgs').innerHTML='';
   document.getElementById('chat-inp').value='';
   go('chat');
