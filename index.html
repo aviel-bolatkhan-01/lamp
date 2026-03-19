@@ -40573,6 +40573,7 @@ const G={
   // cfg
   cfg:{sound:true,timer:true,hearts:true,winScore:ROUND_LIMIT},
   donAmt:'$10',
+  _xpAtGameStart:0,
 };
 function setAuthRedirectPending(v){
   try{
@@ -40707,7 +40708,7 @@ function pushProfile(){
   if(!G.fbOk||!G.uid||!G.profile)return;
   try{
     const p=G.profile;
-    const d={name:p.name,avatar:p.avatar,xp:p.xp||0,wins:p.wins||0,clan:p.clanName||'',ts:Date.now(),friendCode:p.friendCode||''};
+    const d={name:p.name,avatar:p.avatar,xp:p.xp||0,weeklyXP:p.weeklyXP||0,weeklyReset:p.weeklyReset||wk(),wins:p.wins||0,clan:p.clanName||'',ts:Date.now(),friendCode:p.friendCode||''};
     G.db.ref('players/'+G.uid).set(d);
     G.db.ref('leaderboard/'+G.uid).set(d);
     G.db.ref('weekly/'+wk()+'/'+G.uid).set(d);
@@ -41245,6 +41246,7 @@ function beginGame(){
     names.add(finalName);
     return { ...p, name: finalName };
   });
+  G._xpAtGameStart=G.profile?(G.profile.xp||0):0;
 
   G.pool=buildPool().slice(0,currentRounds()); G.qi=0; G.pi=0; G.done=false; G.onlineGame=false;
   G.scores={}; G.hearts={}; G.streaks={};
@@ -41268,6 +41270,7 @@ function startPracticeGame(){
   G.cfg.winScore=clampRounds(G.cfg.winScore);
   syncSubChipSelection();
   G.players=[{name:G.profile.name,avatar:G.profile.avatar}];
+  G._xpAtGameStart=G.profile?(G.profile.xp||0):0;
   G.pool=buildPool().slice(0,currentRounds());
   G.qi=0; G.pi=0; G.done=false; G.onlineGame=false;
   G.scores={[G.profile.name]:0};
@@ -41403,8 +41406,9 @@ function renderVerseQ(q){
   const od=document.createElement('div'); od.className='opts';
   od.style.marginTop='0';
   const opts=Array.isArray(q.o)?q.o.slice(0,4):[];
-  const correctWord=String(q.blank||'').trim().toLowerCase();
-  let correctOrig=opts.findIndex(opt=>String(opt||'').trim().toLowerCase()===correctWord);
+  const normVerse=(s)=>String(s||'').toLowerCase().replace(/[^a-z0-9']/g,'').trim();
+  const correctWord=normVerse(q.blank||'');
+  let correctOrig=opts.findIndex(opt=>normVerse(opt)===correctWord);
   if(correctOrig<0) correctOrig=0;
   const order=shuf(opts.map((_,i)=>i));
   const keys=['A','B','C','D'];
@@ -41911,15 +41915,13 @@ function endGame(){
   }
 
   if(G.profile){
-    let xpEarned=0;
     G.profile.played=(G.profile.played||0)+1;
     const xpAllowed=G.mode!=='practice';
     if(iWon){
       G.profile.wins=(G.profile.wins||0)+1;
-      if(xpAllowed){ addXP(50); xpEarned+=50; }
+      if(xpAllowed){ addXP(50); }
     }else if(xpAllowed){
       addXP(20);
-      xpEarned+=20;
     }
 
     if (G.mode === 'daily') {
@@ -41932,7 +41934,6 @@ function endGame(){
       }
       G.profile.lastDaily = today;
       addXP(100); // Daily bonus
-      xpEarned+=100;
       toast(`☀️ Daily Challenge Complete! +100 XP`);
     }
 
@@ -41943,8 +41944,13 @@ function endGame(){
     }
 
     saveProfile(); if(G.fbOk)pushProfile();
-    if(G.mode==='practice') document.getElementById('w-xp-txt').textContent='✦ Practice mode · XP disabled';
-    else document.getElementById('w-xp-txt').textContent=`✦ +${xpEarned} XP earned`;
+    if(G.mode==='practice'){
+      document.getElementById('w-xp-txt').textContent='✦ Practice mode · XP disabled';
+    }else{
+      const startXp=G._xpAtGameStart||0;
+      const gained=Math.max(0,(G.profile.xp||0)-startXp);
+      document.getElementById('w-xp-txt').textContent=`✦ +${gained} XP earned`;
+    }
   }
   saveMatchResult(win, G.players);
   const v=nextWinVerse();
@@ -42204,8 +42210,9 @@ function toOnlineQuestion(q,sub){
   }
   if(mode==='verse'){
     const opts=Array.isArray(q.o)?q.o.slice(0,4):[];
+    const normVerse=(s)=>String(s||'').toLowerCase().replace(/[^a-z0-9']/g,'').trim();
     const correctWord=(q.blank||'').trim();
-    let correctIdx=opts.findIndex(opt=>String(opt||'').trim().toLowerCase()===correctWord.toLowerCase());
+    let correctIdx=opts.findIndex(opt=>normVerse(opt)===normVerse(correctWord));
     if(correctIdx===-1&&correctWord){
       opts.unshift(correctWord);
       while(opts.length>4) opts.pop();
@@ -42325,6 +42332,7 @@ function joinFromRoom(d){
   const usedNames=new Set();
   players=players.map(p=>{let n=p.name,c=2;while(usedNames.has(n)){n=p.name+' '+c;c++;}usedNames.add(n);return{...p,name:n};});
   G.players=players;
+  G._xpAtGameStart=G.profile?(G.profile.xp||0):0;
   G.sub=normalizeOnlineSub((d&& (d.qtype||d.sub)) || 'classic');
   G.qi=0;G.pi=0;G.done=false;G.onlineGame=true;G.isAnswerer=false;G._lastOnlineState=null;G._onlineQKey=null;G.roomPool=null;G.roomOrders=null;
   G.scores={};G.hearts={};G.streaks={};
@@ -42424,10 +42432,12 @@ function renderOnlineQ(){
     wrap.appendChild(vb);
     const od=document.createElement('div'); od.className='opts'; od.style.marginTop='0';
     const keys=['A','B','C','D'];
-    (q.o||[]).forEach((opt,orig)=>{
+    const verseOrder=shuf((q.o||[]).map((_,i)=>i));
+    verseOrder.forEach((orig,di)=>{
+      const opt=(q.o||[])[orig];
       const btn=document.createElement('button');btn.className='opt';
-      btn.style.cssText=`animation:scrIn .3s ${orig*.06}s both`;
-      btn.innerHTML=`<span class="opt-key">${keys[orig]||'•'}</span><span>${opt}</span>`;
+      btn.style.cssText=`animation:scrIn .3s ${di*.06}s both`;
+      btn.innerHTML=`<span class="opt-key">${keys[di]||'•'}</span><span>${opt}</span>`;
       btn.dataset.origIdx=orig;
       btn.onclick=()=>answerOnline(btn,orig===q.a,q);
       od.appendChild(btn);
@@ -42775,6 +42785,7 @@ function startDailyChallenge(){
 
   G.mode = 'daily';
   G.sub = 'classic';
+  G._xpAtGameStart=G.profile?(G.profile.xp||0):0;
   G.players = [{name: G.profile.name, avatar: G.profile.avatar}];
   G.pool = dailyPool;
   G.qi = 0; G.pi = 0;
@@ -42812,6 +42823,7 @@ function startSeasonalEvent(){
   sfx.tap();
   G.mode = 'seasonal';
   G.sub = 'classic';
+  G._xpAtGameStart=G.profile?(G.profile.xp||0):0;
   G.players = [{name: G.profile?.name || 'Player', avatar: G.profile?.avatar || '😊'}];
   G.pool = shuf([...currentActiveEvent.questions]).slice(0,ROUND_LIMIT);
   G.qi = 0; G.pi = 0;
@@ -42865,7 +42877,7 @@ function renderLB(tab){
     return;
   }
 
-  const ref=tab==='weekly'?G.db.ref('weekly/'+wk()).orderByChild('xp').limitToLast(30):
+  const ref=tab==='weekly'?G.db.ref('weekly/'+wk()).orderByChild('weeklyXP').limitToLast(30):
             tab==='clan' ?G.db.ref('clans').orderByChild('totalXp').limitToLast(30):
                           G.db.ref('leaderboard').orderByChild('xp').limitToLast(30);
   ref.once('value').then(sn=>{
@@ -42888,7 +42900,8 @@ function displayLBRows(list, rows, tab) {
     }else{
       const clanName=(p.clan&&String(p.clan).trim())?String(p.clan):'No clan';
       const clanEmoji=(p.clanIcon&&String(p.clanIcon).trim())?String(p.clanIcon):'⛪';
-      row.innerHTML=`<div class="lb-rank">${medal}</div><div class="lb-av">${p.avatar||'😊'}</div><div class="lb-info"><div class="lb-nm">${escHtml(p.name||'Player')}${isMe?' ✦':''}</div><div class="lb-sub lb-clan-sub"><span class="clan-emoji">${clanEmoji}</span><span class="clan-name">${escHtml(clanName)}</span></div></div><div style="text-align:right;"><div class="lb-xpv">${p.xp||0} XP</div><span class="lb-lvl">${l.name}</span></div>`;
+      const shownXp=tab==='weekly'?(p.weeklyXP||0):(p.xp||0);
+      row.innerHTML=`<div class="lb-rank">${medal}</div><div class="lb-av">${p.avatar||'😊'}</div><div class="lb-info"><div class="lb-nm">${escHtml(p.name||'Player')}${isMe?' ✦':''}</div><div class="lb-sub lb-clan-sub"><span class="clan-emoji">${clanEmoji}</span><span class="clan-name">${escHtml(clanName)}</span></div></div><div style="text-align:right;"><div class="lb-xpv">${shownXp} XP</div><span class="lb-lvl">${l.name}</span></div>`;
     }
     list.appendChild(row);
   });
