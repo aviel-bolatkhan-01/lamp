@@ -43472,7 +43472,7 @@ function loadClanMembers(){
           ${avatarMarkup(m.avatar||'😊',m.photo||'','sm')}
           <span style="flex:1;font-size:13px;color:var(--ink);">${escHtml(m.name||'Player')}</span>
           <span style="font-size:11px;color:var(--gold1);margin-right:4px;">${m.xp||0} XP</span>
-          <button class="btn btn-ghost btn-sm" onclick="kickMember('${m.uid}','${escHtml(m.name||'Player')}')" style="color:var(--ink3);font-size:10px;padding:3px 8px;min-width:0;width:52px;">Remove</button>
+          <button class="btn btn-ghost" onclick="kickMember('${m.uid}','${escHtml(m.name||'Player')}')" style="color:var(--ink3);">Remove</button>
         </div>`).join('');
     });
   });
@@ -43855,7 +43855,7 @@ function buildSettingsList(){
   const el=document.getElementById('settings-list'); if(!el)return; el.innerHTML='';
 
   // Toggles
-  [{k:'sound',l:'🔔 Sound Effects'},{k:'hearts',l:'❤️ Lives System'}].forEach(o=>{
+  [{k:'sound',l:'🔔 Sound Effects'}].forEach(o=>{
     const row=document.createElement('div'); row.className='toggle-row';
     row.innerHTML=`<span class="toggle-lbl">${o.l}</span><button class="toggle-btn ${G.cfg[o.k]?'on':'off'}" id="stog-${o.k}" onclick="togGlobal('${o.k}')">${G.cfg[o.k]?'ON':'OFF'}</button>`;
     el.appendChild(row);
