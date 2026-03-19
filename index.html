@@ -3476,6 +3476,7 @@ html[data-theme="warmth"] .divider::before, html[data-theme="warmth"] .divider::
       <div class="stat-box"><span class="stat-val" id="ps-correct">0</span><span class="stat-key">✅ Correct Answers</span></div>
     </div>
     <div id="ps-summary" style="font-size:11px;color:var(--ink3);text-align:center;margin:-3px 0 12px;">Play games to build your profile stats.</div>
+    <button class="btn btn-share btn-sm" onclick="shareProfileProgress()" style="margin-bottom:8px;">📸 Share Progress Card</button>
     <div id="prof-clan" style="margin-bottom:12px;"></div>
     
     <!-- Church Dashboard Link -->
@@ -3497,7 +3498,6 @@ html[data-theme="warmth"] .divider::before, html[data-theme="warmth"] .divider::
     <div class="eyebrow" style="margin-bottom:9px;">Achievements</div>
     <div id="prof-achs"></div>
     <div class="divider"><span>✦</span></div>
-    <button class="btn btn-share btn-sm" onclick="shareProfileProgress()" style="margin-bottom:8px;">📸 Share Progress Card</button>
     <button class="btn btn-ghost btn-sm" onclick="openOv('ov-settings')" style="margin-bottom:8px;">⚙️ Settings</button>
     <button class="btn btn-ruby btn-sm" onclick="logOut()">Sign Out</button>
     <div class="pb"></div>
@@ -43864,66 +43864,63 @@ async function shareProfileProgress(){
   const best=p.bestStreak||0;
   const current=p.winStreak||0;
   const correct=p.correct||0;
-  const w=1920,h=1080;
+  const w=1080,h=1920;
   const c=document.createElement('canvas');
   c.width=w; c.height=h;
   const ctx=c.getContext('2d');
   if(!ctx){ toast('Unable to create image'); return; }
 
   const bg=ctx.createLinearGradient(0,0,w,h);
-  bg.addColorStop(0,'#131622');
-  bg.addColorStop(0.55,'#161b2b');
-  bg.addColorStop(1,'#1d1410');
+  bg.addColorStop(0,'#111528');
+  bg.addColorStop(0.6,'#171d33');
+  bg.addColorStop(1,'#22160f');
   ctx.fillStyle=bg;
   ctx.fillRect(0,0,w,h);
 
   ctx.globalAlpha=0.12;
-  for(let i=0;i<18;i++){
+  for(let i=0;i<24;i++){
     ctx.fillStyle=i%2?'#e0a860':'#4a6fa8';
     ctx.beginPath();
-    ctx.arc((i*197)%w,((i*139)+180)%h,70+(i%5)*18,0,Math.PI*2);
+    ctx.arc((i*157)%w,((i*211)+180)%h,58+(i%5)*15,0,Math.PI*2);
     ctx.fill();
   }
   ctx.globalAlpha=1;
 
   ctx.fillStyle='rgba(255,255,255,0.04)';
-  drawRoundRect(ctx,96,96,w-192,h-192,34);
+  drawRoundRect(ctx,56,70,w-112,h-140,34);
   ctx.fill();
   ctx.strokeStyle='rgba(224,168,96,0.35)';
   ctx.lineWidth=3;
-  drawRoundRect(ctx,96,96,w-192,h-192,34);
+  drawRoundRect(ctx,56,70,w-112,h-140,34);
   ctx.stroke();
 
-  ctx.font="700 64px 'Playfair Display', serif";
+  ctx.font="700 56px 'Playfair Display', serif";
   ctx.fillStyle='#f6efe4';
-  ctx.fillText('Lamp',170,200);
-  ctx.font="600 30px 'Nunito', sans-serif";
+  ctx.fillText('Lamp',110,186);
+  ctx.font="600 28px 'Nunito', sans-serif";
   ctx.fillStyle='#e0a860';
-  ctx.fillText('Bible Trivia Online',170,246);
-  ctx.font="600 22px 'Nunito', sans-serif";
+  ctx.fillText('Bible Trivia Online',110,228);
+  ctx.font="600 20px 'Nunito', sans-serif";
   ctx.fillStyle='rgba(246,239,228,0.75)';
-  ctx.fillText('Progress Card',170,282);
-  ctx.font="700 84px 'Nunito', sans-serif";
-  ctx.fillStyle='#f6efe4';
-  ctx.fillText(p.avatar||'😊',112,216);
+  ctx.fillText('Progress Card',110,262);
 
-  ctx.font="800 70px 'Nunito', sans-serif";
+  ctx.font="800 62px 'Nunito', sans-serif";
   ctx.fillStyle='#f6efe4';
-  ctx.fillText(p.name||'Player',170,380);
-  ctx.font="700 30px 'Cinzel', serif";
+  ctx.fillText(`${p.avatar||'😊'} ${p.name||'Player'}`,110,352);
+  ctx.font="700 27px 'Cinzel', serif";
   ctx.fillStyle='#e0a860';
-  ctx.fillText(`${l.name.toUpperCase()} · LEVEL ${l.lv}`,170,426);
+  ctx.fillText(`${l.name.toUpperCase()} · LEVEL ${l.lv}`,110,395);
 
   ctx.fillStyle='rgba(255,255,255,0.12)';
-  drawRoundRect(ctx,170,462,760,24,12);
+  drawRoundRect(ctx,110,440,860,24,12);
   ctx.fill();
   ctx.fillStyle='#e0a860';
-  drawRoundRect(ctx,170,462,Math.max(16,760*((parseFloat(l.pct)||0)/100)),24,12);
+  drawRoundRect(ctx,110,440,Math.max(16,860*((parseFloat(l.pct)||0)/100)),24,12);
   ctx.fill();
-  ctx.font="600 22px 'Nunito', sans-serif";
+  ctx.font="600 21px 'Nunito', sans-serif";
   ctx.fillStyle='rgba(246,239,228,0.82)';
-  ctx.fillText(`${p.xp||0} XP`,170,525);
-  ctx.fillText(`NEXT ${l.lv*XP_PER_LEVEL} XP`,760,525);
+  ctx.fillText(`${p.xp||0} XP`,110,494);
+  ctx.fillText(`NEXT ${l.lv*XP_PER_LEVEL} XP`,690,494);
 
   const cards=[
     ['Games',String(played)],
@@ -43933,7 +43930,7 @@ async function shareProfileProgress(){
     ['Best Streak',String(best)],
     ['Correct Answers',String(correct)]
   ];
-  const sx=1050, sy=212, cw=360, ch=155, gx=26, gy=22;
+  const sx=110, sy=590, cw=420, ch=170, gx=22, gy=22;
   cards.forEach((it,idx)=>{
     const row=Math.floor(idx/2), col=idx%2;
     const x=sx+col*(cw+gx), y=sy+row*(ch+gy);
@@ -43944,19 +43941,19 @@ async function shareProfileProgress(){
     ctx.lineWidth=2;
     drawRoundRect(ctx,x,y,cw,ch,22);
     ctx.stroke();
-    ctx.font="800 58px 'Nunito', sans-serif";
+    ctx.font="800 56px 'Nunito', sans-serif";
     ctx.fillStyle='#f6efe4';
-    ctx.fillText(it[1],x+34,y+86);
-    ctx.font="700 20px 'Cinzel', serif";
+    ctx.fillText(it[1],x+30,y+92);
+    ctx.font="700 19px 'Cinzel', serif";
     ctx.fillStyle='rgba(246,239,228,0.8)';
-    ctx.fillText(it[0].toUpperCase(),x+34,y+124);
+    ctx.fillText(it[0].toUpperCase(),x+30,y+135);
   });
 
   const dateStr=new Date().toLocaleDateString();
   ctx.font="600 20px 'Nunito', sans-serif";
   ctx.fillStyle='rgba(246,239,228,0.72)';
-  ctx.fillText(`Generated ${dateStr}`,170,918);
-  ctx.fillText('Play with friends at Lamp - Bible Trivia Online',170,952);
+  ctx.fillText(`Generated ${dateStr}`,110,1760);
+  ctx.fillText('Lamp - Bible Trivia Online',110,1794);
 
   try{
     const blob=await canvasToBlob(c);
