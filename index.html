@@ -3251,7 +3251,7 @@ html[data-theme="warmth"] .divider::before, html[data-theme="warmth"] .divider::
       <span class="g-av" id="g-av">😊</span>
       <span class="g-nm" id="g-nm">Player</span>
     </div>
-    <div class="g-mid" id="g-round" title="score · target"></div>
+    <div class="g-mid" id="g-round" title="round"></div>
     <div class="g-right">
       <div id="g-team-scores" style="display:none;align-items:center;gap:10px;margin-right:10px;">
         <div class="team-score-box"><span class="team-lbl">T1</span><span id="g-t1-score">0</span></div>
@@ -3291,7 +3291,7 @@ html[data-theme="warmth"] .divider::before, html[data-theme="warmth"] .divider::
       <span class="g-av" id="l-av">😊</span>
       <span class="g-nm" id="l-nm">Player</span>
     </div>
-    <div class="g-mid">⚡ Lightning</div>
+    <div class="g-mid" id="l-round">Round 1/12</div>
     <div class="g-right">
       <div class="hearts" id="l-hearts"></div>
       <div class="score-num" id="l-score">0</div>
@@ -41435,8 +41435,8 @@ function renderQ(){
   document.getElementById('g-nm').textContent=p.name + (p.team ? ` (${p.team})` : '');
   const scoreEl=document.getElementById('g-score');
   scoreEl.textContent=G.scores[p.name];
-  const goal=G.sub==='classic'||G.sub==='team'?G.cfg.winScore:'—';
-  document.getElementById('g-round').textContent=G.scores[p.name]+' / '+goal;
+  const totalRounds=Math.max(1,G.pool.length||currentRounds());
+  document.getElementById('g-round').textContent=`Round ${Math.min(G.qi+1,totalRounds)}/${totalRounds}`;
   renderHearts('g-hearts',G.hearts[p.name]);
   setCategoryBadge('g-cat',q.cat||q.r||'');
   document.getElementById('g-fb').style.display='none';
@@ -41457,6 +41457,7 @@ function renderQ(){
 
   const isVerseQuestion=G.sub==='verse'||q.kind==='verse'||(q&&q.b&&Array.isArray(q.o)&&q.blank!=null);
   const isTrueFalseQuestion=isTFQuestion(q)||q.kind==='truefalse';
+  document.getElementById('g-txt').style.marginTop=isTrueFalseQuestion?'12px':'';
   if(isVerseQuestion) renderVerseQ(q);
   else if(isTrueFalseQuestion) renderTFQ(q);
   else renderMCQ(q,'g-txt','g-opts',answerQ);
@@ -41518,7 +41519,6 @@ function answerQ(btn,isOk,q,order){
       document.getElementById(p.team === "Team 1" ? 'g-t1-score' : 'g-t2-score').textContent = G.teamScores[p.team];
     }
     const scoreEl=document.getElementById('g-score'); scoreEl.textContent=G.scores[p.name];
-    document.getElementById('g-round').textContent=G.scores[p.name]+' / '+(G.sub==='classic'||G.sub==='team'?G.cfg.winScore:'—');
     fb.className='fb ok'; fb.innerHTML=`<strong>✓ Correct!</strong> ${q.e}${typeof getTranslationBadge==='function'?getTranslationBadge():''}`;
     sfx.correct(); haptic('correct');
     awardAnswerXPForPlayer(p.name,btn);
@@ -41657,6 +41657,8 @@ function startLightning(pIdx){
   const p=G.players[pIdx];
   document.getElementById('l-av').textContent=p.avatar;
   document.getElementById('l-nm').textContent=p.name;
+  const lTotal=Math.max(1,G.pool.length||currentRounds());
+  document.getElementById('l-round').textContent=`Round ${Math.min(G.qi+1,lTotal)}/${lTotal}`;
   document.getElementById('l-score').textContent=G.scores[p.name]||0;
   renderHearts('l-hearts',G.hearts[p.name]||3);
   document.getElementById('l-streak').textContent='0 correct';
@@ -41682,6 +41684,8 @@ function queueLightningQuestion(delayMs=1000){
 function renderLQ(){
   if(G.qi>=G.pool.length){ endLightning(); return; }
   const q=G.pool[G.qi]; G.seen.add(questionKey(q)); G.done=false;
+  const lTotal=Math.max(1,G.pool.length||currentRounds());
+  document.getElementById('l-round').textContent=`Round ${Math.min(G.qi+1,lTotal)}/${lTotal}`;
   setCategoryBadge('l-cat',q.cat||'');
   document.getElementById('l-fb').style.display='none';
   renderMCQ(q,'l-txt','l-opts',(btn,isOk,q2,order)=>{
@@ -42654,7 +42658,8 @@ function renderOnlineQ(){
   document.getElementById('g-av').textContent=me?me.avatar:'';
   document.getElementById('g-nm').textContent=me?me.name+' (You)':'';
   document.getElementById('g-score').textContent=me?(G.scores[me.name]||0):0;
-  document.getElementById('g-round').textContent='Q '+(G.qi+1);
+  const totalOnline=Math.max(1,(G.roomPool&&G.roomPool.length)||currentRounds());
+  document.getElementById('g-round').textContent=`Round ${Math.min(G.qi+1,totalOnline)}/${totalOnline}`;
   renderHearts('g-hearts',me&&G.hearts[me.name]!=null?G.hearts[me.name]:3);
   setCategoryBadge('g-cat',q.cat||q.r||'');
   const fb=document.getElementById('g-fb');
