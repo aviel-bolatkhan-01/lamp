@@ -42348,9 +42348,9 @@ function playAgain(){
         const roomDiff=d.difficulty||G.diff||'easy';
         G.diff=roomDiff;
         G.TIM=G.diff==='easy'?25:G.diff==='hard'?12:20;
-        const existingRequests=(d&&d.rematchRequestedBy&&typeof d.rematchRequestedBy==='object')?d.rematchRequestedBy:{};
         const startedAt=(d&&d.status==='waiting'&&d.rematchStartedAt)?d.rematchStartedAt:Date.now();
-        const upd={status:'waiting',difficulty:roomDiff,sub:roomSub,qtype:roomSub,cfg:{hearts:!!G.cfg.hearts,winScore:clampRounds(G.cfg.winScore)},rematchStartedAt:startedAt,rematchRequestedBy:{...existingRequests,[G.uid]:true}};
+        const upd={status:'waiting',difficulty:roomDiff,sub:roomSub,qtype:roomSub,cfg:{hearts:!!G.cfg.hearts,winScore:clampRounds(G.cfg.winScore)},rematchStartedAt:startedAt};
+        upd['rematchRequestedBy/'+G.uid]=true;
         upd['players/'+G.uid]={name:G.profile.name,avatar:G.profile.avatar,photo:G.profile.photo||'',ready:false,score:0,hearts:3,diff:roomDiff,connected:true};
         Object.keys(d.players||{}).forEach(uid=>{
           upd['players/'+uid+'/ready']=false;
