@@ -41624,7 +41624,7 @@ function startLightning(pIdx){
   document.getElementById('l-txt').textContent='';
   document.getElementById('l-opts').innerHTML='';
   document.getElementById('l-fb').style.display='none';
-  go('lightning'); queueLightningQuestion();
+  go('lightning'); queueLightningQuestion(0);
   clearInterval(G.lTimId);
   let t=45;
   document.getElementById('l-clock').textContent=t;
@@ -41634,7 +41634,7 @@ function startLightning(pIdx){
     if(t<=0){ clearInterval(G.lTimId); endLightning(); }
   },1000);
 }
-function queueLightningQuestion(delayMs=1500){
+function queueLightningQuestion(delayMs=1000){
   clearTimeout(G.lQDelayId);
   G.lQDelayId=setTimeout(()=>renderLQ(),delayMs);
 }
