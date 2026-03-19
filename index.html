@@ -42355,10 +42355,11 @@ function playAgain(){
         upd['rematchRequestedBy/'+G.uid]=true;
         upd['players/'+G.uid]={name:G.profile.name,avatar:G.profile.avatar,photo:G.profile.photo||'',ready:false,score:0,hearts:3,diff:roomDiff,connected:true};
         Object.keys(d.players||{}).forEach(uid=>{
+          if(uid===G.uid) return;
           upd['players/'+uid+'/ready']=false;
           upd['players/'+uid+'/diff']=roomDiff;
         });
-        G.roomRef.update(upd);
+        G.roomRef.update(upd).catch(err=>console.error('playAgain host update failed:',err));
       }).catch(()=>{
         G.roomRef.update({
           status:'waiting',
@@ -42531,7 +42532,12 @@ function pruneRematchNonResponders(){
     if(!kept.includes(d.host)) updates.host=kept[0];
     updates.rematchRequestedBy=null;
     updates.rematchStartedAt=null;
-    G.roomRef.update(updates).then(()=>toast('Players who did not press Play Again were removed.')).catch(()=>{});
+    G.roomRef.update(updates).then(()=>{
+      G.meReady=false;
+      const readyBtn=document.getElementById('ready-btn');
+      if(readyBtn) readyBtn.textContent='✓ Mark Ready';
+      toast('Players who did not press Play Again were removed.');
+    }).catch(()=>{});
   }).catch(()=>{});
 }
 function scheduleRematchPrune(d){
@@ -43116,7 +43122,8 @@ function showOnlineResult(gs){
   setTimeout(()=>{
     if(!G.roomRef)return;
     let nqi=gs.nextQi!=null?gs.nextQi:G.qi+1;
-    if(nqi>=(G.roomPool?G.roomPool.length:currentRounds()))nqi=0;
+    const maxQ=G.roomPool?G.roomPool.length:currentRounds();
+    if(nqi>=maxQ){G.roomRef.child('gameState').update({phase:'ended'});endGame();return;}
     G.roomRef.child('gameState').update({phase:'question',qi:nqi,pi:0,votes:{},t:Date.now()});
   },2500);
 }
