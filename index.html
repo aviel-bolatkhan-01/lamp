@@ -41129,6 +41129,14 @@ function shuf(a){ const r=[...a]; for(let i=r.length-1;i>0;i--){ const j=0|Math.
 function slug(s){ return (s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); }
 function isTFQuestion(q){ return typeof q.a === 'boolean'; }
 function getOptionButtons(){ return document.querySelectorAll('#g-opts .opt, #g-opts .tf-btn'); }
+function setCategoryBadge(id,raw){
+  const el=document.getElementById(id);
+  if(!el) return;
+  const src=String(raw||'').trim();
+  if(!src){ el.textContent=''; el.style.display='none'; return; }
+  el.textContent=catLabel(src);
+  el.style.display='inline-flex';
+}
 function normDiff(d){
   if(d==='easy'||d==='medium'||d==='hard') return d;
   return null;
@@ -41319,7 +41327,7 @@ function renderQ(){
   const goal=G.sub==='classic'||G.sub==='team'?G.cfg.winScore:'—';
   document.getElementById('g-round').textContent=G.scores[p.name]+' / '+goal;
   renderHearts('g-hearts',G.hearts[p.name]);
-  document.getElementById('g-cat').textContent=catLabel(q.cat||q.r||'');
+  setCategoryBadge('g-cat',q.cat||q.r||'');
   document.getElementById('g-fb').style.display='none';
   document.getElementById('g-next-row').style.display='none';
   document.getElementById('g-auto-bar').style.display='none';
@@ -41529,7 +41537,7 @@ function startLightning(pIdx){
   renderHearts('l-hearts',G.hearts[p.name]||3);
   document.getElementById('l-streak').textContent='0 correct';
   document.getElementById('l-clock').style.color='var(--gold1)';
-  document.getElementById('l-cat').textContent='';
+  setCategoryBadge('l-cat','');
   document.getElementById('l-txt').textContent='';
   document.getElementById('l-opts').innerHTML='';
   document.getElementById('l-fb').style.display='none';
@@ -41550,7 +41558,7 @@ function queueLightningQuestion(delayMs=1500){
 function renderLQ(){
   if(G.qi>=G.pool.length){ endLightning(); return; }
   const q=G.pool[G.qi]; G.seen.add(questionKey(q)); G.done=false;
-  document.getElementById('l-cat').textContent=q.cat||'';
+  setCategoryBadge('l-cat',q.cat||'');
   document.getElementById('l-fb').style.display='none';
   renderMCQ(q,'l-txt','l-opts',(btn,isOk,q2,order)=>{
     if(G.done)return; G.done=true;
@@ -41641,9 +41649,7 @@ function renderTF(){
   G.done=false;
   document.getElementById('tf-round').textContent=`Round ${G.tfRound+1}/${totalRounds}`;
   document.getElementById('tf-txt').textContent=q.q;
-  const tfCat=document.getElementById('tf-cat');
-  tfCat.textContent=catLabel(q.cat||q.r||'');
-  tfCat.style.display=tfCat.textContent?'inline-flex':'none';
+  setCategoryBadge('tf-cat',q.cat||q.r||'');
   document.getElementById('tf-fb').style.display='none';
   document.getElementById('tf-next').style.display='none';
   const tfScores=document.getElementById('tf-scores');
@@ -42334,7 +42340,7 @@ function renderOnlineQ(){
   document.getElementById('g-score').textContent=me?(G.scores[me.name]||0):0;
   document.getElementById('g-round').textContent='Q '+(G.qi+1);
   renderHearts('g-hearts',me&&G.hearts[me.name]!=null?G.hearts[me.name]:3);
-  document.getElementById('g-cat').textContent=catLabel(q.cat||q.r||'');
+  setCategoryBadge('g-cat',q.cat||q.r||'');
   const fb=document.getElementById('g-fb');
   fb.style.display='block';fb.className='fb ok';
   fb.style.background='rgba(100,80,20,0.15)';fb.style.color='var(--gold)';
