@@ -43666,7 +43666,7 @@ function renderClans(){
   renderClanInvites();
   const mc=document.getElementById('my-clan');
   if(G.profile?.clanName){
-    const isOwner=G.uid&&G.profile.clanOwner&&G.uid===G.profile.clanOwner;
+    const isOwner=!G.profile.clanOwner||(G.uid&&G.uid===G.profile.clanOwner);
     mc.innerHTML=`<div class="clan-card" style="border-color:rgba(201,145,13,.32);">
       <div style="display:flex;align-items:center;gap:12px;">
         ${isOwner
