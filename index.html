@@ -43494,7 +43494,7 @@ function loadClanMembers(){
         others.map(m=>`<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid rgba(200,158,72,.07);">
           ${avatarMarkup(m.avatar||'😊',m.photo||'','lg')}
           <span style="flex:1;font-size:13px;color:var(--ink);">${escHtml(m.name||'Player')}</span>
-          <span style="font-size:11px;color:var(--gold1);margin-right:4px;">${m.xp||0} XP</span>
+          <div style="text-align:right;margin-right:4px;"><div class="lb-xpv">${m.xp||0} XP</div><span class="lb-lvl">${lvl(m.xp||0).name}</span></div>
           <button class="btn btn-ghost btn-sm" onclick="kickMember('${m.uid}','${escHtml(m.name||'Player')}')" style="color:var(--ink3);flex-shrink:0;width:80px;">Remove</button>
         </div>`).join('');
     });
