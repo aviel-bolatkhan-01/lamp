@@ -3013,9 +3013,9 @@ html[data-theme="warmth"] .divider::before, html[data-theme="warmth"] .divider::
     <div class="chips-wrap">
       <div class="label" style="margin-bottom:7px;">Play Style</div>
       <div class="chips" id="mode-chips">
-        <button class="chip" onclick="pickMode(this,'online')">🌐 Online Room</button>
+        <button class="chip sel" onclick="pickMode(this,'online')">🌐 Online Room</button>
         <button class="chip" onclick="pickMode(this,'nearby')">📡 Nearby</button>
-        <button class="chip sel" onclick="pickMode(this,'local')">👥 Pass &amp; Play</button>
+        <button class="chip" onclick="pickMode(this,'local')">👥 Pass &amp; Play</button>
         <button class="chip" onclick="pickMode(this,'practice')">🎓 Practice</button>
       </div>
     </div>
@@ -40567,7 +40567,7 @@ expandModeQuestionBanks();
    STATE
 ══════════════════════════════════════════════════ */
 const G={
-  mode:'local', sub:'classic',
+  mode:'online', sub:'classic',
   profile:null, uid:null,
   players:[], pool:[], qi:0, pi:0,
   seen:new Set(), // Tracks IDs or questions to prevent repeats
