@@ -42885,20 +42885,35 @@ function renderLB(tab){
     return;
   }
 
-  const ref=tab==='weekly'?G.db.ref('weekly/'+wk()).orderByChild('weeklyXP').limitToLast(30):
-            tab==='clan' ?G.db.ref('clans').orderByChild('totalXp').limitToLast(30):
-                          G.db.ref('leaderboard').orderByChild('xp').limitToLast(30);
-  ref.once('value').then(sn=>{
-    const rows=[]; sn.forEach(s=>rows.unshift({...s.val(),id:s.key}));
-    if(tab!=='clan'&&G.profile&&G.uid){
+  if(tab==='clan'){
+    G.db.ref('clans').orderByChild('totalXp').limitToLast(30).once('value').then(sn=>{
+      const rows=[]; sn.forEach(s=>rows.unshift({...s.val(),id:s.key}));
+      displayLBRows(list, rows, tab);
+    }).catch(()=>{ list.innerHTML='<div class="empty">Error loading ranks.</div>'; });
+    return;
+  }
+
+  const mergeById=(baseRows,extraRows)=>{
+    const map=new Map();
+    (extraRows||[]).forEach(r=>{ if(r&&r.id) map.set(r.id,{...r}); });
+    (baseRows||[]).forEach(r=>{ if(r&&r.id) map.set(r.id,{...(map.get(r.id)||{}),...r}); });
+    return Array.from(map.values());
+  };
+
+  const primaryRef=tab==='weekly'?G.db.ref('weekly/'+wk()):G.db.ref('leaderboard');
+  Promise.all([primaryRef.once('value'), G.db.ref('players').once('value')]).then(([primarySnap,playersSnap])=>{
+    const primaryRows=[]; primarySnap.forEach(s=>primaryRows.push({...s.val(),id:s.key}));
+    const playerRows=[]; playersSnap.forEach(s=>playerRows.push({...s.val(),id:s.key}));
+    let rows=mergeById(primaryRows,playerRows);
+    if(G.profile&&G.uid){
       const meIdx=rows.findIndex(r=>r.id===G.uid);
       const meData={id:G.uid,name:G.profile.name,avatar:G.profile.avatar,xp:G.profile.xp||0,weeklyXP:G.profile.weeklyXP||0,clan:G.profile.clanName||''};
       if(meIdx>=0) rows[meIdx]={...rows[meIdx],...meData};
       else rows.push(meData);
-      if(tab==='weekly') rows.sort((a,b)=>(b.weeklyXP||0)-(a.weeklyXP||0));
-      else rows.sort((a,b)=>(b.xp||0)-(a.xp||0));
     }
-    displayLBRows(list, rows, tab);
+    if(tab==='weekly') rows.sort((a,b)=>(b.weeklyXP||0)-(a.weeklyXP||0));
+    else rows.sort((a,b)=>(b.xp||0)-(a.xp||0));
+    displayLBRows(list, rows.slice(0,50), tab);
   }).catch(()=>{ list.innerHTML='<div class="empty">Error loading ranks.</div>'; });
 }
 
