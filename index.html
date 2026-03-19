@@ -40554,6 +40554,7 @@ const G={
   // firebase
   db:null, auth:null, fbOk:false,
   roomId:null, roomRef:null, isHost:false, meReady:false,
+  _onlineResultCommitKey:null,
   // battle royale
   alive:[], brRound:0,
   // tf
@@ -42256,7 +42257,7 @@ function joinFromRoom(d){
   G.scores={};G.hearts={};G.streaks={};
   G.players.forEach(p=>{G.scores[p.name]=0;G.hearts[p.name]=3;G.streaks[p.name]=0;});
 
-  G._myVoteSubmitted=false; G._votesRef=null;
+  G._myVoteSubmitted=false; G._votesRef=null; G._onlineResultCommitKey=null;
   G.roomRef.child('gameState').on('value',sn=>{
     const gs=sn.val();if(!gs)return;
     if(gs.pool&&!G.roomPool){G.roomPool=gs.pool;G.roomOrders=gs.orders;console.log('[BGN] Received pool with',G.roomPool.length,'questions');}
@@ -42277,15 +42278,7 @@ function joinFromRoom(d){
         if(G._resultTimeout){clearTimeout(G._resultTimeout);G._resultTimeout=null;}
         stopTimers();
         const q=G.roomPool[G.qi];
-        const correctA=tallyVotes(votes,q);
-        const reachedRoundLimit=(G.qi+1)>=(G.roomPool?G.roomPool.length:currentRounds());
-        const anyGameOver=shouldEndOnlineGame()||reachedRoundLimit;
-        let nqi=G.qi+1;
-        if(nqi>=(G.roomPool?G.roomPool.length:currentRounds()))nqi=G.qi;
-        G.roomRef.child('gameState').update({
-          phase:'result',votes,correctA:correctA,scores:G.scores,hearts:G.hearts,
-          nextQi:nqi,gameOver:anyGameOver||false,t:Date.now()
-        }).catch(err=>console.error('Update gameState failed:', err));
+        hostCommitOnlineResult(votes,q);
         return;
       }
     }
@@ -42412,15 +42405,7 @@ function renderOnlineQ(){
       if(G._votesRef){G._votesRef.off();G._votesRef=null;}
       if(G._resultTimeout){clearTimeout(G._resultTimeout);G._resultTimeout=null;}
       stopTimers();
-      const correctA=tallyVotes(votes,q);
-      const reachedRoundLimit=(G.qi+1)>=(G.roomPool?G.roomPool.length:currentRounds());
-      const anyGameOver=shouldEndOnlineGame()||reachedRoundLimit;
-      let nqi=G.qi+1;
-      if(nqi>=(G.roomPool?G.roomPool.length:currentRounds()))nqi=G.qi;
-      G.roomRef.child('gameState').update({
-        phase:'result',votes,correctA:correctA,scores:G.scores,hearts:G.hearts,
-        nextQi:nqi,gameOver:anyGameOver||false,t:Date.now()
-      }).catch(err=>console.error('Update gameState failed:', err));
+      hostCommitOnlineResult(votes,q);
     }
   };
   const onVoteError=err=>{
@@ -42441,21 +42426,32 @@ function renderOnlineQ(){
         G._votesRef.off();G._votesRef=null;
         stopTimers();
         const tq=G.roomPool[G.qi];
-        const correctA2=tallyVotes(v,tq);
-        const reachedRoundLimit=(G.qi+1)>=(G.roomPool?G.roomPool.length:currentRounds());
-        let nqi=G.qi+1;
-        if(nqi>=(G.roomPool?G.roomPool.length:currentRounds()))nqi=G.qi;
-        const anyGameOver=shouldEndOnlineGame()||reachedRoundLimit;
-        G.roomRef.child('gameState').update({
-          phase:'result',votes:v,correctA:correctA2,scores:G.scores,hearts:G.hearts,
-          nextQi:nqi,gameOver:anyGameOver||false,t:Date.now()
-        });
+        hostCommitOnlineResult(v,tq);
       });
     } else if(G._votesRef){
       // Non-host: just warn
       console.warn('Results timeout - host may not be syncing');
     }
   },25000);
+}
+
+function hostCommitOnlineResult(votes,q){
+  if(!G.isHost||!G.roomRef||!q) return;
+  const commitKey=`${G.qi}:${questionKey(q)}`;
+  if(G._onlineResultCommitKey===commitKey) return;
+  G._onlineResultCommitKey=commitKey;
+  const correctA=tallyVotes(votes,q);
+  const reachedRoundLimit=(G.qi+1)>=(G.roomPool?G.roomPool.length:currentRounds());
+  const anyGameOver=shouldEndOnlineGame()||reachedRoundLimit;
+  let nqi=G.qi+1;
+  if(nqi>=(G.roomPool?G.roomPool.length:currentRounds()))nqi=G.qi;
+  G.roomRef.child('gameState').update({
+    phase:'result',votes,correctA:correctA,scores:G.scores,hearts:G.hearts,
+    nextQi:nqi,gameOver:anyGameOver||false,t:Date.now()
+  }).catch(err=>{
+    console.error('Update gameState failed:', err);
+    if(G._onlineResultCommitKey===commitKey) G._onlineResultCommitKey=null;
+  });
 }
 
 function answerOnline(btn,isOk,q,timedOut){
