@@ -811,15 +811,15 @@ body::after {
 .clan-inline .avatar-photo { width: 100%; height: 100%; border-radius: 0; }
 .clan-pic-menu {
   position: absolute;
-  top: calc(100% + 4px);
+  top: calc(100% + 6px);
   left: 0;
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 6px;
+  background: #1e1509;
+  border: 1px solid rgba(200,158,72,.3);
+  border-radius: 12px;
+  padding: 8px;
   z-index: 300;
-  min-width: 175px;
-  box-shadow: 0 4px 20px rgba(0,0,0,.35);
+  min-width: 200px;
+  box-shadow: 0 8px 32px rgba(0,0,0,.7);
 }
 .clan-menu-btn {
   display: block;
@@ -827,37 +827,61 @@ body::after {
   text-align: left;
   background: none;
   border: none;
-  color: var(--ink1);
-  font-size: 13px;
-  padding: 6px 8px;
-  border-radius: 6px;
+  color: var(--ink);
+  font-size: 15px;
+  padding: 9px 10px;
+  border-radius: 8px;
   cursor: pointer;
   font-family: inherit;
 }
-.clan-menu-btn:hover { background: rgba(255,255,255,.07); }
+.clan-menu-btn:hover { background: rgba(200,158,72,.12); }
 .clan-menu-label {
   font-size: 10px;
   color: var(--ink3);
-  padding: 5px 8px 2px;
+  padding: 6px 10px 3px;
   text-transform: uppercase;
-  letter-spacing: .06em;
+  letter-spacing: .07em;
+  border-top: 1px solid rgba(200,158,72,.1);
+  margin-top: 4px;
 }
 .clan-emoji-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 2px;
-  padding: 2px 4px 4px;
+  gap: 4px;
+  padding: 4px 6px 6px;
 }
 .clan-emoji-btn {
   background: none;
   border: none;
-  font-size: 20px;
+  font-size: 24px;
   cursor: pointer;
-  padding: 3px;
-  border-radius: 6px;
+  padding: 4px;
+  border-radius: 8px;
   line-height: 1;
 }
-.clan-emoji-btn:hover { background: rgba(255,255,255,.1); }
+.clan-emoji-btn:hover { background: rgba(200,158,72,.15); }
+.clan-invite-row {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+  align-items: center;
+}
+.clan-invite-card {
+  background: rgba(200,158,72,.08);
+  border: 1px solid rgba(200,158,72,.2);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.clan-invite-actions {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
 .profile-bar .av.has-photo {
   width: 34px;
   height: 34px;
@@ -3519,6 +3543,7 @@ html[data-theme="warmth"] .divider::before, html[data-theme="warmth"] .divider::
     <!-- Congregations Panel -->
     <div id="comm-panel-clans" style="display:none;">
       <div style="padding:0 16px;margin-bottom:12px;">
+        <div id="clan-invites" style="display:none;margin-bottom:10px;"></div>
         <div id="my-clan"></div>
       </div>
       <div style="padding:0 16px;margin-bottom:9px;">
@@ -43444,6 +43469,87 @@ function setClanIcon(emoji){
   renderClans();
   toast('Congregation icon updated');
 }
+function inviteToClan(){
+  if(!G.profile||!G.profile.clanCode){toast('You need a congregation first');return;}
+  if(!G.fbOk){toast('Online required');return;}
+  const code=(document.getElementById('clan-invite-inp').value||'').trim().toUpperCase();
+  if(code.length<5){toast('Enter a valid friend code');return;}
+  if(code===G.profile.friendCode){toast("That's your own code!");return;}
+  G.db.ref('leaderboard').orderByChild('friendCode').equalTo(code).once('value').then(snap=>{
+    if(!snap.exists()){toast('Player not found');return;}
+    let uid=null,targetData=null; snap.forEach(c=>{uid=c.key;targetData=c.val()||{};});
+    if(uid===G.uid){toast("That's your own code!");return;}
+    const invite={
+      clanCode:G.profile.clanCode,
+      clanName:G.profile.clanName||'',
+      clanIcon:G.profile.clanIcon||'⛪',
+      clanPhoto:G.profile.clanPhoto||'',
+      fromUid:G.uid,
+      fromName:G.profile.name||'Someone',
+      ts:Date.now()
+    };
+    G.db.ref('clanInvites/'+uid+'/'+G.uid).set(invite).then(()=>{
+      document.getElementById('clan-invite-inp').value='';
+      toast('Invite sent to '+( targetData.name||'player')+' ✦');
+    }).catch(()=>toast('Could not send invite'));
+  }).catch(()=>toast('Player not found'));
+}
+function acceptClanInvite(fromUid,data){
+  if(!G.fbOk||!G.uid){toast('Online required');return;}
+  if(!data||!data.clanCode){toast('Invalid invite');return;}
+  G.db.ref('clans/'+data.clanCode).once('value').then(sn=>{
+    if(!sn.exists()){
+      G.db.ref('clanInvites/'+G.uid+'/'+fromUid).remove();
+      toast('Congregation no longer exists');
+      renderClanInvites();
+      return;
+    }
+    const clan=sn.val();
+    G.db.ref('clans/'+data.clanCode+'/members/'+G.uid).set({name:G.profile.name,xp:G.profile.xp||0}).then(()=>{
+      G.profile.clanName=clan.name;
+      G.profile.clanCode=data.clanCode;
+      G.profile.clanIcon=clan.icon||'⛪';
+      G.profile.clanPhoto=clan.photo||'';
+      saveProfile();
+      G.db.ref('clanInvites/'+G.uid+'/'+fromUid).remove();
+      renderClanInvites();
+      renderClans();
+      toast('Joined '+clan.name+'! ✦');
+    }).catch(()=>toast('Could not join congregation'));
+  });
+}
+function declineClanInvite(fromUid){
+  if(!G.fbOk||!G.uid) return;
+  G.db.ref('clanInvites/'+G.uid+'/'+fromUid).remove().then(()=>{
+    renderClanInvites();
+    toast('Invite declined');
+  });
+}
+function renderClanInvites(){
+  const el=document.getElementById('clan-invites');
+  if(!el) return;
+  if(!G.fbOk||!G.uid||G.profile?.clanCode){el.style.display='none';return;}
+  G.db.ref('clanInvites/'+G.uid).once('value').then(sn=>{
+    if(!sn.exists()){el.style.display='none';return;}
+    const invites=[];
+    sn.forEach(c=>invites.push({fromUid:c.key,...c.val()}));
+    if(!invites.length){el.style.display='none';return;}
+    G._pendingClanInvites={}; invites.forEach(inv=>G._pendingClanInvites[inv.fromUid]=inv);
+    el.style.display='block';
+    el.innerHTML='<div style="font-family:\'Cinzel\',serif;font-size:9px;letter-spacing:.1em;color:var(--gold1);text-transform:uppercase;margin-bottom:6px;">Congregation Invites</div>'+
+      invites.map(inv=>`<div class="clan-invite-card">
+        <span style="font-size:26px;">${clanBadgeMarkup(inv.clanIcon||'⛪',inv.clanPhoto||'','md')}</span>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:14px;font-weight:600;color:var(--ink);">${escHtml(inv.clanName)}</div>
+          <div style="font-size:11px;color:var(--ink3);">Invited by ${escHtml(inv.fromName)}</div>
+        </div>
+        <div class="clan-invite-actions">
+          <button class="btn btn-gold btn-sm" onclick="acceptClanInvite('${inv.fromUid}',G._pendingClanInvites['${inv.fromUid}'])">Join</button>
+          <button class="btn btn-ghost btn-sm" onclick="declineClanInvite('${inv.fromUid}')">✕</button>
+        </div>
+      </div>`).join('');
+  }).catch(()=>{el.style.display='none';});
+}
 function renderClanPhotoPreview(){
   const el=document.getElementById('clan-photo-preview');
   if(!el) return;
@@ -43585,6 +43691,7 @@ function joinClan(){
   }).catch(()=>toast('Congregation not found'));
 }
 function renderClans(){
+  renderClanInvites();
   const mc=document.getElementById('my-clan');
   if(G.profile?.clanName){
     mc.innerHTML=`<div class="clan-card" style="border-color:rgba(201,145,13,.32);">
@@ -43603,8 +43710,16 @@ function renderClans(){
           <div class="h2">${G.profile.clanName}</div>
           <div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;margin-top:2px;">Your Congregation</div>
           ${G.profile.clanCode?`<div style="display:inline-flex;align-items:center;gap:5px;background:rgba(201,145,13,.1);border:1px solid rgba(201,145,13,.22);border-radius:20px;padding:2px 9px;font-family:'Cinzel',serif;font-size:9px;letter-spacing:.1em;color:var(--gold1);margin-top:6px;">Code: ${G.profile.clanCode}</div>`:''}
-          <div class="profile-avatar-tools" style="justify-content:flex-start;margin-top:8px;">
-            <button class="btn btn-ruby btn-sm" onclick="requestRemoveCongregation()">🧹 Remove Congregation</button>
+          <div style="margin-top:10px;">
+            <div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:.07em;color:var(--ink3);text-transform:uppercase;margin-bottom:4px;">Invite by friend code</div>
+            <div style="font-size:11px;color:var(--ink3);margin-bottom:6px;">Share your friend code (found on the Friends tab) with someone and enter theirs here to invite them.</div>
+            <div class="clan-invite-row">
+              <input id="clan-invite-inp" class="inp" placeholder="Friend code…" style="flex:1;font-size:13px;padding:7px 10px;" maxlength="10" oninput="this.value=this.value.toUpperCase()">
+              <button class="btn btn-gold btn-sm" onclick="inviteToClan()" style="white-space:nowrap;">Invite</button>
+            </div>
+          </div>
+          <div style="margin-top:10px;text-align:right;">
+            <button onclick="requestRemoveCongregation()" style="background:none;border:none;color:var(--ink3);font-size:11px;cursor:pointer;font-family:inherit;padding:2px 0;text-decoration:underline;">🧹 Leave congregation</button>
           </div>
         </div>
       </div>
