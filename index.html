@@ -3107,7 +3107,7 @@ html[data-theme="warmth"] .divider::before, html[data-theme="warmth"] .divider::
         <div style="font-size:32px;">🔥</div>
       <div style="flex:1;">
         <div class="eyebrow" style="color:var(--gold1);">Daily Challenge</div>
-        <div style="font-family:'Playfair Display',serif;font-size:16px;color:var(--ink);">12 Trials</div>
+        <div style="font-family:'Playfair Display',serif;font-size:16px;color:var(--ink);">10 Trials</div>
         <div id="daily-streak-info" style="font-size:11px;color:var(--ink3);margin-top:2px;">Streak: 0 days</div>
       </div>
       <div class="btn btn-gold btn-sm" style="width:auto;padding:8px 16px;">Play</div>
@@ -41987,7 +41987,7 @@ const VERSE_Q=[
   {"b": "The heart of man plans his way, but the LORD ", "blank": "establishes", "a": " his steps.", "r": "Proverbs 16:9", "o": ["establishes", "directs", "orders", "guards"], "d": "medium"}
 ];
 const DEFAULT_ROUNDS=12;
-const MIN_ROUNDS=10;
+const MIN_ROUNDS=7;
 const MAX_ROUNDS=33;
 const ROUND_LIMIT=DEFAULT_ROUNDS;
 const MODE_EXTRA_QUESTIONS=500;
@@ -44758,7 +44758,7 @@ function startDailyChallenge(){
     });
   }
 
-  const rounds=currentRounds();
+  const rounds=10;
   const tfCount=Math.max(3,Math.round(rounds*0.27));
   const verseCount=Math.max(3,Math.round(rounds*0.27));
   const classicCount=Math.max(1,rounds-tfCount-verseCount);
