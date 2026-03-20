@@ -45142,7 +45142,7 @@ function createClan(){
   const icon=document.querySelector('#clan-icon-grid .sel-icon')?.textContent||'⛪';
   const photo=_pendingClanPhoto||'';
   const code=mkCode();
-  const save=()=>{ G.profile.clanName=name; G.profile.clanCode=code; G.profile.clanIcon=icon; G.profile.clanPhoto=photo; G.profile.clanOwner=G.uid; saveProfile(); _pendingClanPhoto=''; closeOv('ov-clan-create'); renderClans(); toast(`Congregation "${name}" created! Code: ${code}`); };
+  const save=()=>{ G.profile.clanName=name; G.profile.clanCode=code; G.profile.clanIcon=icon; G.profile.clanPhoto=photo; G.profile.clanOwner=G.uid; saveProfile(); if(G.fbOk) pushProfile(); _pendingClanPhoto=''; closeOv('ov-clan-create'); renderClans(); toast(`Congregation "${name}" created! Code: ${code}`); };
   if(G.fbOk&&G.uid){
     G.db.ref('clans/'+code).set({name,icon,photo,code,createdBy:G.uid,members:{[G.uid]:{name:G.profile.name,xp:G.profile.xp||0}},totalXp:G.profile.xp||0,weeklyXp:0,createdAt:Date.now()}).then(save).catch(e=>toast('Error: '+e.message));
   }else save();
@@ -45161,6 +45161,12 @@ function joinClan(){
 }
 function renderClans(){
   renderClanInvites();
+  // If user has a clan and Firebase is available, verify ownership from source of truth
+  if(G.profile?.clanCode && G.fbOk && G.uid && G.profile.clanOwner !== G.uid){
+    G.db.ref('clans/'+G.profile.clanCode+'/createdBy').once('value').then(sn=>{
+      if(sn.val()===G.uid){ G.profile.clanOwner=G.uid; saveProfile(); pushProfile(); renderClans(); }
+    }).catch(()=>{});
+  }
   const mc=document.getElementById('my-clan');
   if(G.profile?.clanName){
     const isOwner=!G.profile.clanOwner||(G.uid&&G.uid===G.profile.clanOwner);
