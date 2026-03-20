@@ -3302,7 +3302,7 @@ html.feat-bigQuestion #g-txt { font-size: 19px !important; line-height: 1.45; }
       <div class="label" style="margin-bottom:10px;">Play Style</div>
       <div class="ps-v3-wrap">
         <button class="ps-mode-btn ps-v3-seg sel" data-mode="online" onclick="pickMode(this,'online')"><span style="font-size:25px;line-height:1;">🌐</span><br><span style="display:inline-block;margin-top:5px;">Online</span></button>
-        <button class="ps-mode-btn ps-v3-seg" data-mode="nearby" onclick="pickMode(this,'nearby')"><span style="font-size:25px;line-height:1;">📡</span><br><span style="display:inline-block;margin-top:5px;">Same Room</span></button>
+        <button class="ps-mode-btn ps-v3-seg" data-mode="nearby" onclick="pickMode(this,'nearby')"><span style="font-size:25px;line-height:1;">📡</span><br><span style="display:inline-block;margin-top:5px;">Nearby</span></button>
         <button class="ps-mode-btn ps-v3-seg" data-mode="local" onclick="pickMode(this,'local')"><span style="font-size:25px;line-height:1;">👥</span><br><span style="display:inline-block;margin-top:5px;">Pass & Play</span></button>
         <button class="ps-mode-btn ps-v3-seg" data-mode="practice" onclick="pickMode(this,'practice')"><span style="font-size:25px;line-height:1;">🎓</span><br><span style="display:inline-block;margin-top:5px;">Solo</span></button>
       </div>
@@ -42309,7 +42309,7 @@ function renderDailyMeta(){
 /* Last played helpers */
 function saveLastPlayed(){
   if(!FEATURES.lastPlayed) return;
-  const ML={online:'Online',nearby:'Same Room',local:'Pass & Play',practice:'Solo'};
+  const ML={online:'Online',nearby:'Nearby',local:'Pass & Play',practice:'Solo'};
   const SL={classic:'Multiple Choice',truefalse:'True / False',verse:'Complete the Verse',lightning:'Lightning'};
   try{ localStorage.setItem('bgn3_lp',JSON.stringify({mode:G.mode,sub:G.sub,ml:ML[G.mode]||G.mode,sl:SL[G.sub]||G.sub})); }catch(e){}
 }
