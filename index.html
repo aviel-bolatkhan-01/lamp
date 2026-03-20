@@ -44791,7 +44791,7 @@ function renderLB(tab){
       const rows = snapshots.filter(s => s.exists()).map(s => ({...s.val(), id: s.key}));
       if(G.profile&&G.uid){
         const meIdx=rows.findIndex(r=>r.id===G.uid);
-        const meData={id:G.uid,name:G.profile.name,avatar:G.profile.avatar,photo:G.profile.photo||'',xp:G.profile.xp||0,weeklyXP:G.profile.weeklyXP||0,clan:G.profile.clanName||'',clanIcon:G.profile.clanIcon||'⛪',clanPhoto:G.profile.clanPhoto||''};
+        const meData={id:G.uid,name:G.profile.name,avatar:G.profile.avatar,photo:G.profile.photo||'',xp:G.profile.xp||0,weeklyXP:G.profile.weeklyXP||0,clan:G.profile.clanName||'',clanName:G.profile.clanName||'',clanIcon:G.profile.clanIcon||'⛪',clanPhoto:G.profile.clanPhoto||''};
         if(meIdx>=0) rows[meIdx]={...rows[meIdx],...meData};
         else rows.push(meData);
       }
@@ -44829,7 +44829,7 @@ function renderLB(tab){
     });
     if(G.profile&&G.uid){
       const meIdx=rows.findIndex(r=>r.id===G.uid);
-      const meData={id:G.uid,name:G.profile.name,avatar:G.profile.avatar,photo:G.profile.photo||'',xp:G.profile.xp||0,weeklyXP:(G.profile.weeklyReset===thisWeek?(G.profile.weeklyXP||0):0),clan:G.profile.clanName||'',clanIcon:G.profile.clanIcon||'⛪',clanPhoto:G.profile.clanPhoto||''};
+      const meData={id:G.uid,name:G.profile.name,avatar:G.profile.avatar,photo:G.profile.photo||'',xp:G.profile.xp||0,weeklyXP:(G.profile.weeklyReset===thisWeek?(G.profile.weeklyXP||0):0),clan:G.profile.clanName||'',clanName:G.profile.clanName||'',clanIcon:G.profile.clanIcon||'⛪',clanPhoto:G.profile.clanPhoto||''};
       if(meIdx>=0) rows[meIdx]={...rows[meIdx],...meData};
       else rows.push(meData);
     }
@@ -44853,7 +44853,7 @@ function displayLBRows(list, rows, tab) {
       if(isMeClan) row.classList.add('me');
       row.innerHTML=`<div class="lb-rank">${medal}</div><div class="lb-av">${clanBadgeMarkup(p.icon||'⛪',p.photo||'','sm')}</div><div class="lb-info"><div class="lb-nm">${escHtml(p.name||'')}${isMeClan?' ✦':''}</div><div class="lb-sub">${p.memberCount||Object.keys(p.members||{}).length} member${(p.memberCount||1)!==1?'s':''}</div></div><div class="lb-xpv">${p.totalXp||0} XP</div>`;
     }else{
-      const clanName=(p.clan&&String(p.clan).trim())?String(p.clan):'No congregation';
+      const clanName=(p.clan||p.clanName||'').trim()||'No congregation';
       const clanEmoji=(p.clanIcon&&String(p.clanIcon).trim())?String(p.clanIcon):'⛪';
       const clanMark=clanBadgeMarkup(clanEmoji,p.clanPhoto||'','sm');
       const shownXp=tab==='weekly'?(p.weeklyXP||0):(p.xp||0);
