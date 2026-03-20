@@ -42416,7 +42416,7 @@ function pushProfile(){
       xpResetVersion:p.xpResetVersion||XP_RESET_VERSION,
       wins:p.wins||0, played:p.played||0, correct:p.correct||0,
       bestStreak:p.bestStreak||0,
-      clan:p.clanName||'', clanIcon:p.clanIcon||'⛪', clanPhoto:p.clanPhoto||'',
+      clan:p.clanName||'', clanCode:p.clanCode||'', clanIcon:p.clanIcon||'⛪', clanPhoto:p.clanPhoto||'',
       friendCode:p.friendCode||'', ts:Date.now()
     };
     G.db.ref('players/'+G.uid).set(full);
@@ -44800,7 +44800,7 @@ function renderLB(tab){
     promises.push(G.db.ref('leaderboard/' + G.uid).once('value'));
     
     Promise.all([Promise.all(promises), G.db.ref('clans').once('value')]).then(([snapshots, clanSn])=>{
-      const clanMap={}; clanSn.forEach(c=>{ const v=c.val()||{}; clanMap[v.code||c.key]={icon:v.icon||'⛪',photo:v.photo||''}; });
+      const clanMap={}; clanSn.forEach(c=>{ const v=c.val()||{}; const entry={icon:v.icon||'⛪',photo:v.photo||''}; clanMap[v.code||c.key]=entry; if(v.name) clanMap[v.name]=entry; });
       const rows = snapshots.filter(s => s.exists()).map(s => ({...s.val(), id: s.key}));
       if(G.profile&&G.uid){
         const meIdx=rows.findIndex(r=>r.id===G.uid);
@@ -44869,7 +44869,7 @@ function displayLBRows(list, rows, tab, clanMap) {
     }else{
       const clanName=(p.clan||p.clanName||'').trim()||'No congregation';
       const clanCode=p.clanCode||'';
-      const canonical=clanMap&&clanCode?clanMap[clanCode]:null;
+      const canonical=clanMap?(clanMap[clanCode]||clanMap[clanName]||null):null;
       const clanEmoji=canonical?canonical.icon:((p.clanIcon&&String(p.clanIcon).trim())?String(p.clanIcon):'⛪');
       const clanPhoto=canonical?canonical.photo:(p.clanPhoto||'');
       const clanMark=clanBadgeMarkup(clanEmoji,clanPhoto,'sm');
