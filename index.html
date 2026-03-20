@@ -2295,6 +2295,36 @@ html[data-theme="dark"] .mode-btn.sel { background: rgba(255,255,255,.07); borde
 }
 html[data-theme="dark"] .mode-btn { background: var(--card-bg); border-color: var(--inp-border); color: var(--ink2); }
 html[data-theme="dark"] .mode-btn.sel { background: rgba(224,168,96,.12); border-color: #C49050; color: var(--ink); }
+/* ── Play style variant picker ── */
+.ps-variant { display: none; }
+.ps-variant.active { display: block; }
+.psv-btn { padding:4px 11px; font-family:'Cinzel',serif; font-size:10px; letter-spacing:.06em; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); border-radius:20px; color:var(--ink3); cursor:pointer; }
+.psv-btn.psv-sel { background:rgba(212,165,116,.2); border-color:#D4A574; color:#D4A574; }
+/* V1 — icon grid */
+.ps-v1-btn { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; padding:16px 8px; background:rgba(255,255,255,.04); border:1px solid var(--line); border-radius:var(--r2); cursor:pointer; color:var(--ink2); font-family:'Nunito',sans-serif; font-size:12px; font-weight:600; transition:all .15s; }
+.ps-v1-btn.sel { background:rgba(212,165,116,.15); border-color:#D4A574; color:var(--ink); box-shadow:0 0 10px rgba(212,165,116,.15); }
+/* V2 — stacked list */
+.ps-v2-btn { display:flex; align-items:center; gap:12px; width:100%; padding:12px 14px; background:rgba(255,255,255,.034); border:1px solid var(--line); border-radius:var(--r2); cursor:pointer; color:var(--ink2); font-family:'Nunito',sans-serif; text-align:left; margin-bottom:6px; transition:all .15s; }
+.ps-v2-btn.sel { background:rgba(212,165,116,.1); border-color:#D4A574; color:var(--ink); }
+.ps-v2-btn .ps-v2-check { display:none; color:#D4A574; font-size:15px; margin-left:auto; flex-shrink:0; }
+.ps-v2-btn.sel .ps-v2-check { display:block; }
+.ps-v2-sub { font-size:11px; color:var(--ink3); margin-top:2px; font-weight:400; }
+/* V3 — segmented */
+.ps-v3-wrap { display:flex; background:rgba(0,0,0,.18); border-radius:10px; padding:3px; margin-bottom:8px; }
+.ps-v3-seg { flex:1; padding:8px 4px; background:transparent; border:none; border-radius:8px; cursor:pointer; color:var(--ink3); font-family:'Nunito',sans-serif; font-size:11px; font-weight:600; transition:all .15s; text-align:center; line-height:1.4; }
+.ps-v3-seg.sel { background:var(--card-bg,rgba(255,255,255,.1)); color:var(--ink); box-shadow:0 1px 4px rgba(0,0,0,.25); }
+/* V4 — dominant selected */
+.ps-v4-btn { display:flex; align-items:center; gap:7px; padding:10px 16px; background:rgba(255,255,255,.04); border:1px solid var(--line); border-radius:40px; cursor:pointer; color:var(--ink3); font-family:'Cinzel',serif; font-size:10px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; opacity:.5; transition:all .2s; flex-shrink:0; }
+.ps-v4-btn.sel { opacity:1; font-size:13px; padding:13px 22px; background:rgba(212,165,116,.14); border-color:#D4A574; color:var(--ink); box-shadow:0 0 14px rgba(212,165,116,.2); letter-spacing:.04em; }
+/* Dark theme overrides */
+html[data-theme="dark"] .ps-v1-btn { background:var(--card-bg); border-color:var(--inp-border); }
+html[data-theme="dark"] .ps-v1-btn.sel { background:rgba(224,168,96,.12); border-color:#C49050; }
+html[data-theme="dark"] .ps-v2-btn { background:var(--card-bg); border-color:var(--inp-border); }
+html[data-theme="dark"] .ps-v2-btn.sel { background:rgba(224,168,96,.1); border-color:#C49050; }
+html[data-theme="dark"] .ps-v3-wrap { background:rgba(0,0,0,.3); }
+html[data-theme="dark"] .ps-v3-seg.sel { background:rgba(255,255,255,.08); }
+html[data-theme="dark"] .ps-v4-btn { background:var(--card-bg); border-color:var(--inp-border); }
+html[data-theme="dark"] .ps-v4-btn.sel { background:rgba(224,168,96,.12); border-color:#C49050; }
 /* Match history boxes */
 html[data-theme="dark"] .card-sm { background: var(--card-bg); border-color: var(--inp-border); color: var(--ink); }
 /* Game screen - answer options */
@@ -3171,13 +3201,72 @@ html[data-theme="warmth"] .divider::before, html[data-theme="warmth"] .divider::
     <!-- Play Style -->
     <div class="chips-wrap">
       <div class="label" style="margin-bottom:10px;">Play Style</div>
-      <div id="mode-chips" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-        <button class="chip sel" onclick="pickMode(this,'online')" style="border-radius:var(--r2);justify-content:center;font-family:'Nunito',sans-serif;font-size:13px;font-weight:400;letter-spacing:.02em;text-transform:none;">🌐 &nbsp;Online</button>
-        <button class="chip" onclick="pickMode(this,'nearby')" style="border-radius:var(--r2);justify-content:center;font-family:'Nunito',sans-serif;font-size:13px;font-weight:400;letter-spacing:.02em;text-transform:none;">📡 &nbsp;Same Room</button>
-        <button class="chip" onclick="pickMode(this,'local')" style="border-radius:var(--r2);justify-content:center;font-family:'Nunito',sans-serif;font-size:13px;font-weight:400;letter-spacing:.02em;text-transform:none;">👥 &nbsp;Pass & Play</button>
-        <button class="chip" onclick="pickMode(this,'practice')" style="border-radius:var(--r2);justify-content:center;font-family:'Nunito',sans-serif;font-size:13px;font-weight:400;letter-spacing:.02em;text-transform:none;">🎓 &nbsp;Solo</button>
+
+      <!-- Design switcher -->
+      <div style="display:flex;align-items:center;gap:5px;margin-bottom:12px;justify-content:center;">
+        <span style="font-size:9px;color:var(--ink3);font-family:'Cinzel',serif;letter-spacing:.1em;margin-right:2px;">DESIGN</span>
+        <button id="psv-1" class="psv-btn psv-sel" onclick="switchPSVariant(1)">1</button>
+        <button id="psv-2" class="psv-btn" onclick="switchPSVariant(2)">2</button>
+        <button id="psv-3" class="psv-btn" onclick="switchPSVariant(3)">3</button>
+        <button id="psv-4" class="psv-btn" onclick="switchPSVariant(4)">4</button>
+        <button id="psv-5" class="psv-btn" onclick="switchPSVariant(5)">5</button>
       </div>
-      <div id="mode-style-desc" style="font-size:11px;color:var(--ink3);margin-top:9px;text-align:center;letter-spacing:.02em;">✦ &nbsp;Compete with believers worldwide</div>
+
+      <!-- V1: Icon-first 2×2 grid -->
+      <div id="ps-v1" class="ps-variant active">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+          <button class="ps-mode-btn ps-v1-btn sel" data-mode="online" onclick="pickMode(this,'online')"><span style="font-size:26px;">🌐</span><span>Online</span></button>
+          <button class="ps-mode-btn ps-v1-btn" data-mode="nearby" onclick="pickMode(this,'nearby')"><span style="font-size:26px;">📡</span><span>Same Room</span></button>
+          <button class="ps-mode-btn ps-v1-btn" data-mode="local" onclick="pickMode(this,'local')"><span style="font-size:26px;">👥</span><span>Pass & Play</span></button>
+          <button class="ps-mode-btn ps-v1-btn" data-mode="practice" onclick="pickMode(this,'practice')"><span style="font-size:26px;">🎓</span><span>Solo</span></button>
+        </div>
+        <div class="ps-mode-desc" style="font-size:11px;color:var(--ink3);text-align:center;">✦ &nbsp;Compete with believers worldwide</div>
+      </div>
+
+      <!-- V2: Stacked list -->
+      <div id="ps-v2" class="ps-variant">
+        <button class="ps-mode-btn ps-v2-btn sel" data-mode="online" onclick="pickMode(this,'online')"><span style="font-size:22px;flex-shrink:0;">🌐</span><div style="flex:1;"><div style="font-weight:700;font-size:13px;">Online</div><div class="ps-v2-sub">Compete with believers worldwide</div></div><span class="ps-v2-check">✓</span></button>
+        <button class="ps-mode-btn ps-v2-btn" data-mode="nearby" onclick="pickMode(this,'nearby')"><span style="font-size:22px;flex-shrink:0;">📡</span><div style="flex:1;"><div style="font-weight:700;font-size:13px;">Same Room</div><div class="ps-v2-sub">Same WiFi, same spirit</div></div><span class="ps-v2-check">✓</span></button>
+        <button class="ps-mode-btn ps-v2-btn" data-mode="local" onclick="pickMode(this,'local')"><span style="font-size:22px;flex-shrink:0;">👥</span><div style="flex:1;"><div style="font-weight:700;font-size:13px;">Pass & Play</div><div class="ps-v2-sub">One device, take turns together</div></div><span class="ps-v2-check">✓</span></button>
+        <button class="ps-mode-btn ps-v2-btn" data-mode="practice" onclick="pickMode(this,'practice')" style="margin-bottom:0;"><span style="font-size:22px;flex-shrink:0;">🎓</span><div style="flex:1;"><div style="font-weight:700;font-size:13px;">Solo</div><div class="ps-v2-sub">Sharpen your faith, go at your own pace</div></div><span class="ps-v2-check">✓</span></button>
+      </div>
+
+      <!-- V3: Segmented control -->
+      <div id="ps-v3" class="ps-variant">
+        <div class="ps-v3-wrap">
+          <button class="ps-mode-btn ps-v3-seg sel" data-mode="online" onclick="pickMode(this,'online')">🌐<br>Online</button>
+          <button class="ps-mode-btn ps-v3-seg" data-mode="nearby" onclick="pickMode(this,'nearby')">📡<br>Same Room</button>
+          <button class="ps-mode-btn ps-v3-seg" data-mode="local" onclick="pickMode(this,'local')">👥<br>Pass & Play</button>
+          <button class="ps-mode-btn ps-v3-seg" data-mode="practice" onclick="pickMode(this,'practice')">🎓<br>Solo</button>
+        </div>
+        <div class="ps-mode-desc" style="font-size:11px;color:var(--ink3);text-align:center;">✦ &nbsp;Compete with believers worldwide</div>
+      </div>
+
+      <!-- V4: Dominant selected -->
+      <div id="ps-v4" class="ps-variant">
+        <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:8px;">
+          <button class="ps-mode-btn ps-v4-btn sel" data-mode="online" onclick="pickMode(this,'online')">🌐 Online</button>
+          <button class="ps-mode-btn ps-v4-btn" data-mode="nearby" onclick="pickMode(this,'nearby')">📡 Same Room</button>
+          <button class="ps-mode-btn ps-v4-btn" data-mode="local" onclick="pickMode(this,'local')">👥 Pass & Play</button>
+          <button class="ps-mode-btn ps-v4-btn" data-mode="practice" onclick="pickMode(this,'practice')">🎓 Solo</button>
+        </div>
+        <div class="ps-mode-desc" style="font-size:11px;color:var(--ink3);text-align:center;">✦ &nbsp;Compete with believers worldwide</div>
+      </div>
+
+      <!-- V5: Carousel -->
+      <div id="ps-v5" class="ps-variant">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <button onclick="psCarouselPrev()" style="font-size:24px;background:none;border:none;color:var(--ink3);cursor:pointer;padding:8px;line-height:1;">‹</button>
+          <div style="flex:1;background:rgba(196,136,10,.06);border:1px solid rgba(196,136,10,.2);border-radius:var(--r2);padding:22px 16px;text-align:center;">
+            <div style="font-size:36px;margin-bottom:8px;" id="ps-v5-icon">🌐</div>
+            <div style="font-family:'Playfair Display',serif;font-size:18px;margin-bottom:6px;color:var(--ink);" id="ps-v5-name">Online</div>
+            <div style="font-size:11px;color:var(--ink3);" id="ps-v5-desc">Compete with believers worldwide</div>
+          </div>
+          <button onclick="psCarouselNext()" style="font-size:24px;background:none;border:none;color:var(--ink3);cursor:pointer;padding:8px;line-height:1;">›</button>
+        </div>
+        <div style="display:flex;justify-content:center;gap:5px;margin-top:8px;" id="ps-v5-dots"></div>
+      </div>
+
     </div>
 
     <button class="btn btn-gold" onclick="onPlay()" style="margin-bottom:8px;">
@@ -42782,19 +42871,49 @@ function applyModeSubAvailability(){
   syncSubChipSelection();
 }
 const MODE_STYLE_DESCS={
-  online:'✦ &nbsp;Compete with believers worldwide',
-  nearby:'✦ &nbsp;Same WiFi, same spirit',
-  local:'✦ &nbsp;One device, take turns together',
-  practice:'✦ &nbsp;Sharpen your faith, go solo'
+  online:'Compete with believers worldwide',
+  nearby:'Same WiFi, same spirit',
+  local:'One device, take turns together',
+  practice:'Sharpen your faith, go at your own pace'
 };
+const PS_MODES=[
+  {mode:'online', icon:'🌐', name:'Online'},
+  {mode:'nearby', icon:'📡', name:'Same Room'},
+  {mode:'local',  icon:'👥', name:'Pass & Play'},
+  {mode:'practice',icon:'🎓',name:'Solo'}
+];
+let _psVariant=1, _psIdx=0;
+function switchPSVariant(n){
+  _psVariant=n;
+  document.querySelectorAll('.ps-variant').forEach((el,i)=>el.classList.toggle('active',i+1===n));
+  document.querySelectorAll('.psv-btn').forEach((el,i)=>el.classList.toggle('psv-sel',i+1===n));
+  if(n===5) psCarouselRender();
+}
+function psCarouselRender(){
+  const m=PS_MODES[_psIdx];
+  if(!m) return;
+  const ic=document.getElementById('ps-v5-icon');
+  const nm=document.getElementById('ps-v5-name');
+  const dc=document.getElementById('ps-v5-desc');
+  if(ic) ic.textContent=m.icon;
+  if(nm) nm.textContent=m.name;
+  if(dc) dc.textContent=MODE_STYLE_DESCS[m.mode]||'';
+  const dots=document.getElementById('ps-v5-dots');
+  if(dots) dots.innerHTML=PS_MODES.map((_,i)=>`<span style="width:6px;height:6px;border-radius:50%;display:inline-block;background:${i===_psIdx?'var(--gold1)':'rgba(255,255,255,.18)'};transition:background .2s;"></span>`).join('');
+}
+function psCarouselPrev(){ sfx.tap(); haptic('tap'); _psIdx=(_psIdx-1+PS_MODES.length)%PS_MODES.length; _syncMode(PS_MODES[_psIdx].mode); psCarouselRender(); }
+function psCarouselNext(){ sfx.tap(); haptic('tap'); _psIdx=(_psIdx+1)%PS_MODES.length; _syncMode(PS_MODES[_psIdx].mode); psCarouselRender(); }
+function _syncMode(m){
+  G.mode=m; G.seen.clear();
+  document.querySelectorAll('.ps-mode-btn').forEach(b=>b.classList.toggle('sel',b.dataset.mode===m));
+  document.querySelectorAll('.ps-mode-desc').forEach(d=>d.innerHTML='✦ &nbsp;'+MODE_STYLE_DESCS[m]);
+  applyModeSubAvailability();
+}
 function pickMode(el,m){
   sfx.tap(); haptic('tap');
-  G.mode=m; G.seen.clear();
-  document.querySelectorAll('#mode-chips .chip').forEach(c=>c.classList.remove('sel'));
-  el.classList.add('sel');
-  const d=document.getElementById('mode-style-desc');
-  if(d) d.innerHTML=MODE_STYLE_DESCS[m]||'';
-  applyModeSubAvailability();
+  _psIdx=PS_MODES.findIndex(x=>x.mode===m);
+  _syncMode(m);
+  if(_psVariant===5) psCarouselRender();
 }
 function pickSub(el,s){
   sfx.tap(); haptic('tap');
