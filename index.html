@@ -44915,8 +44915,9 @@ function buildClanIconPickerGrid(){
 function setClanIcon(emoji){
   if(!G.profile||!G.profile.clanCode){toast('No congregation');return;}
   G.profile.clanIcon=emoji;
+  G.profile.clanPhoto='';
   saveProfile();
-  if(G.fbOk){ G.db.ref('clans/'+G.profile.clanCode+'/icon').set(emoji); pushProfile(); }
+  if(G.fbOk){ G.db.ref('clans/'+G.profile.clanCode).update({icon:emoji,photo:''}); pushProfile(); }
   closeOv('ov-clan-icon');
   renderClans();
   toast('Congregation icon updated');
@@ -45116,14 +45117,16 @@ function updateCurrentClanPhoto(photoData){
   const nextPhoto=photoData||'';
   const applyLocal=()=>{
     G.profile.clanPhoto=nextPhoto;
+    if(nextPhoto) G.profile.clanIcon='⛪'; // clear emoji selection when photo is set
     saveProfile();
     if(G.fbOk) pushProfile();
     renderClans();
+    buildClanIconPickerGrid(); // refresh grid so no emoji appears selected
     if(document.getElementById('s-profile')?.classList.contains('active')) renderProfile();
     toast(nextPhoto?'Congregation photo updated':'Congregation photo removed');
   };
   if(G.fbOk&&G.db){
-    G.db.ref('clans/'+code+'/photo').set(nextPhoto).then(applyLocal).catch(()=>toast('Could not update congregation photo'));
+    G.db.ref('clans/'+code).update({photo:nextPhoto,...(nextPhoto?{icon:'⛪'}:{})}).then(applyLocal).catch(()=>toast('Could not update congregation photo'));
   }else{
     applyLocal();
   }
