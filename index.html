@@ -2256,7 +2256,7 @@ html[data-theme="dark"] .profile-bar .wins-num { color: #E0A860; }
 /* Play style mode buttons */
 .mode-btn {
   background: rgba(255,255,255,.034);
-  border: 1px solid var(--line);
+  border: 1px solid rgba(255,255,255,.08);
   border-radius: var(--r2);
   padding: 14px 8px;
   display: flex;
@@ -2269,11 +2269,11 @@ html[data-theme="dark"] .profile-bar .wins-num { color: #E0A860; }
   transition: background .15s, border-color .15s;
 }
 .mode-btn.sel {
-  background: rgba(196,136,10,.10);
-  border-color: rgba(196,136,10,.55);
+  background: rgba(255,255,255,.08);
+  border-color: rgba(255,255,255,.18);
 }
 html[data-theme="dark"] .mode-btn { background: var(--card-bg); border-color: var(--inp-border); color: var(--ink); }
-html[data-theme="dark"] .mode-btn.sel { background: rgba(196,136,10,.12); border-color: rgba(196,136,10,.5); }
+html[data-theme="dark"] .mode-btn.sel { background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.15); }
 /* Match history boxes */
 html[data-theme="dark"] .card-sm { background: var(--card-bg); border-color: var(--inp-border); color: var(--ink); }
 /* Game screen - answer options */
@@ -3168,7 +3168,7 @@ html[data-theme="warmth"] .divider::before, html[data-theme="warmth"] .divider::
           <span style="font-family:'Playfair Display',serif;font-size:16px;color:var(--ink);">Solo</span>
         </button>
       </div>
-      <div id="mode-style-desc" style="background:rgba(196,136,10,.07);border:1px solid rgba(196,136,10,.2);border-radius:var(--r2);padding:8px 14px;text-align:center;font-size:12px;color:var(--ink2);letter-spacing:.01em;">✦ &nbsp;Compete with believers worldwide</div>
+      <div id="mode-style-desc" style="text-align:center;font-size:12px;color:var(--ink3);letter-spacing:.01em;padding:4px 0;">✦ &nbsp;Compete with believers worldwide</div>
     </div>
 
     <button class="btn btn-gold" onclick="onPlay()" style="margin-bottom:8px;">
