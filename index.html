@@ -3455,7 +3455,7 @@ html.feat-gameHeader .g-nm { font-weight: 800 !important; max-width: 100px; over
     <!-- ── Messages panel ── -->
     <div class="social-panel" id="spanel-messages">
       <div id="conversations-list">
-        <div style="text-align:center;color:var(--ink3);padding:30px 0;font-size:14px;">No messages yet — challenge a friend to start!</div>
+        <div style="text-align:center;color:var(--ink3);padding:30px 0;font-size:14px;">No messages yet. Challenge a friend to get started.</div>
       </div>
     </div>
 
@@ -4194,9 +4194,9 @@ html.feat-gameHeader .g-nm { font-weight: 800 !important; max-width: 100px; over
     </div>
     </div><!-- end ch-live-options -->
     <button class="btn btn-gold" onclick="chModeSubmit()" id="ch-send-btn">
-      <span class="btn-icon">⚔️</span><span id="ch-send-txt"> Let's Go!</span>
+      <span class="btn-icon">⚔️</span><span id="ch-send-txt"> Send Challenge</span>
     </button>
-    <button class="btn btn-ghost btn-sm" style="margin-top:8px;" onclick="closeOv('ov-challenge')">Never mind</button>
+    <button class="btn btn-ghost btn-sm" style="margin-top:8px;" onclick="closeOv('ov-challenge')">Cancel</button>
   </div>
 </div>
 
@@ -4213,8 +4213,8 @@ html.feat-gameHeader .g-nm { font-weight: 800 !important; max-width: 100px; over
     </div>
     <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold1);margin-bottom:10px;text-align:center;">⚔️ Duel Request!</div>
     <div style="display:flex;gap:8px;">
-      <button class="btn btn-gold btn-sm" style="flex:1;" onclick="acceptChallenge()">I'm in!</button>
-      <button class="btn btn-ghost btn-sm" style="flex:1;" onclick="declineChallenge()">Nah</button>
+      <button class="btn btn-gold btn-sm" style="flex:1;" onclick="acceptChallenge()">Accept</button>
+      <button class="btn btn-ghost btn-sm" style="flex:1;" onclick="declineChallenge()">Decline</button>
     </div>
   </div>
 </div>
@@ -45287,7 +45287,7 @@ function chSetMode(m){
     ?'You play first. Your friend gets the same questions later and tries to beat your score.'
     :'Play live against your friend in real time.';
   if(sendBtn) sendBtn.querySelector('.btn-icon').textContent=isGhost?'👻':'⚔️';
-  if(sendTxt) sendTxt.textContent=isGhost?' Send It!':" Let's Go!";
+  if(sendTxt) sendTxt.textContent=' Send Challenge';
 }
 function chModeSubmit(){
   if(_ghostChallengeMode==='ghost') sendGhostChallenge();
@@ -45603,11 +45603,11 @@ function inviteToClan(){
   if(!G.fbOk){toast('Online required');return;}
   const code=(document.getElementById('clan-invite-inp').value||'').trim().toUpperCase();
   if(code.length<5){toast('Enter a valid friend code');return;}
-  if(code===G.profile.friendCode){toast("That's your own code!");return;}
+  if(code===G.profile.friendCode){toast("This is your own code.");return;}
   G.db.ref('leaderboard').orderByChild('friendCode').equalTo(code).once('value').then(snap=>{
     if(!snap.exists()){toast('Player not found');return;}
     let uid=null,targetData=null; snap.forEach(c=>{uid=c.key;targetData=c.val()||{};});
-    if(uid===G.uid){toast("That's your own code!");return;}
+    if(uid===G.uid){toast("This is your own code.");return;}
     const invite={
       clanCode:G.profile.clanCode,
       clanName:G.profile.clanName||'',
@@ -47601,12 +47601,12 @@ function addFriendFromFriends(){
   normalizeSocialProfile();
   const code=(document.getElementById('friends-screen-code-inp').value||'').toUpperCase().trim();
   if(code.length<5){ toast('Enter a valid code'); return; }
-  if(code===G.profile.friendCode){ toast("That's your own code!"); return; }
+  if(code===G.profile.friendCode){ toast("This is your own code."); return; }
   // Search leaderboard (same as original addFriend)
   G.db.ref('leaderboard').orderByChild('friendCode').equalTo(code).once('value').then(snap=>{
     if(!snap.exists()){ toast('Player not found'); return; }
     let uid=null, targetData=null; snap.forEach(c=>{ uid=c.key; targetData=c.val()||{}; });
-    if(uid===G.uid){ toast("That's your own code!"); return; }
+    if(uid===G.uid){ toast("This is your own code."); return; }
     // Cache friend data for display
     if(!G._friendCache) G._friendCache={};
     G._friendCache[uid]={name:targetData.name||'Friend',avatar:targetData.avatar||'😊',photo:targetData.photo||'',xp:targetData.xp||0};
@@ -47617,7 +47617,7 @@ function addFriendFromFriends(){
     }).catch(err=>{
       if(err&&err.message==='already') toast('Already your friend!');
       else if(err&&err.message==='already-sent') toast('Request already sent');
-      else if(err&&err.message==='self') toast("That's your own code!");
+      else if(err&&err.message==='self') toast("This is your own code.");
       else toast('Could not send request');
     });
   });
