@@ -3130,7 +3130,7 @@ html[data-theme="warmth"] .divider::before, html[data-theme="warmth"] .divider::
     <div class="chips-wrap">
       <div class="label" style="margin-bottom:7px;">Play Style</div>
       <div class="chips" id="mode-chips">
-        <button class="chip sel" onclick="pickMode(this,'online')">🌐 Play Online</button>
+        <button class="chip sel" onclick="pickMode(this,'online')">🌐 Online</button>
         <button class="chip" onclick="pickMode(this,'nearby')">📡 Same Room</button>
         <button class="chip" onclick="pickMode(this,'local')">👥 Take Turns</button>
         <button class="chip" onclick="pickMode(this,'practice')">🎓 Solo</button>
@@ -3152,9 +3152,9 @@ html[data-theme="warmth"] .divider::before, html[data-theme="warmth"] .divider::
     <div style="margin-bottom:14px;">
       <div class="label" style="margin-bottom:7px;">Difficulty</div>
       <div class="diff-row">
-        <button class="diff-chip sel" id="diff-easy"   onclick="pickDiff(this,'easy')">🌿 Easy<span class="diff-hint">Basic questions</span></button>
-        <button class="diff-chip"     id="diff-medium" onclick="pickDiff(this,'medium')">📖 Medium<span class="diff-hint">Know your Bible</span></button>
-        <button class="diff-chip"     id="diff-hard"   onclick="pickDiff(this,'hard')">⚔️ Hard<span class="diff-hint">For scholars</span></button>
+        <button class="diff-chip sel" id="diff-easy"   onclick="pickDiff(this,'easy')">🌿 Easy</button>
+        <button class="diff-chip"     id="diff-medium" onclick="pickDiff(this,'medium')">📖 Medium</button>
+        <button class="diff-chip"     id="diff-hard"   onclick="pickDiff(this,'hard')">⚔️ Hard</button>
       </div>
     </div>
 
@@ -3303,9 +3303,9 @@ html[data-theme="warmth"] .divider::before, html[data-theme="warmth"] .divider::
       <div>
         <div class="label" style="margin-bottom:7px;">Difficulty</div>
         <div class="diff-row" id="setup-room-diff-chips">
-          <button class="diff-chip sel" data-diff="easy" onclick="pickSetupDiff(this,'easy')">🌿 Easy<span class="diff-hint">Basic questions</span></button>
-          <button class="diff-chip" data-diff="medium" onclick="pickSetupDiff(this,'medium')">📖 Medium<span class="diff-hint">Know your Bible</span></button>
-          <button class="diff-chip" data-diff="hard" onclick="pickSetupDiff(this,'hard')">⚔️ Hard<span class="diff-hint">For scholars</span></button>
+          <button class="diff-chip sel" data-diff="easy" onclick="pickSetupDiff(this,'easy')">🌿 Easy</button>
+          <button class="diff-chip" data-diff="medium" onclick="pickSetupDiff(this,'medium')">📖 Medium</button>
+          <button class="diff-chip" data-diff="hard" onclick="pickSetupDiff(this,'hard')">⚔️ Hard</button>
         </div>
       </div>
     </div>
@@ -3945,39 +3945,12 @@ html[data-theme="warmth"] .divider::before, html[data-theme="warmth"] .divider::
       <div class="mtitle" id="ch-friend-name" style="margin-bottom:0;">Friend</div>
     </div>
 
-    <div style="display:flex;gap:0;margin-bottom:16px;background:rgba(0,0,0,.18);border-radius:12px;padding:4px;border:1px solid rgba(201,145,13,.15);">
-      <button id="ch-mode-live" onclick="chSetMode('live')" style="flex:1;padding:9px 6px;border:none;border-radius:9px;background:rgba(201,145,13,.28);color:var(--gold1);font-family:'Cinzel',serif;font-weight:700;font-size:11px;letter-spacing:.06em;cursor:pointer;">⚡ Live Duel</button>
-      <button id="ch-mode-ghost" onclick="chSetMode('ghost')" style="flex:1;padding:9px 6px;border:none;border-radius:9px;background:transparent;color:var(--ink3);font-family:'Cinzel',serif;font-weight:700;font-size:11px;letter-spacing:.06em;cursor:pointer;">👻 Ghost Trial</button>
+    <div class="diff-row" style="margin-bottom:16px;">
+      <button class="diff-chip sel" id="ch-mode-live" onclick="chSetMode('live')">⚡ Live Duel</button>
+      <button class="diff-chip" id="ch-mode-ghost" onclick="chSetMode('ghost')">👻 Ghost Trial</button>
     </div>
-    <div id="ch-ghost-desc" style="display:none;font-size:12px;color:var(--ink3);margin-bottom:16px;line-height:1.6;text-align:center;font-style:italic;padding:10px 4px;border-top:1px solid rgba(201,145,13,.12);border-bottom:1px solid rgba(201,145,13,.12);">Set your mark upon the scroll — your friend must face the same scripture and surpass your score.</div>
+    <div id="ch-ghost-desc" style="display:none;font-size:13px;color:var(--ink3);margin-bottom:16px;line-height:1.6;text-align:center;padding:10px 4px;border-top:1px solid rgba(201,145,13,.12);border-bottom:1px solid rgba(201,145,13,.12);">You play first. Your friend gets the same questions later and tries to beat your score.</div>
 
-    <div id="ch-category-row" style="display:none;margin-bottom:16px;">
-      <label class="label">Scripture</label>
-      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px;">
-        <div id="ch-category-chips" style="display:flex;gap:6px;width:max-content;">
-          <button class="chip sel" onclick="pickChCategory(this,'all')" id="ch-cat-all">✦ All Scripture</button>
-          <button class="chip" onclick="pickChCategory(this,'Genesis')">Genesis</button>
-          <button class="chip" onclick="pickChCategory(this,'Exodus')">Exodus</button>
-          <button class="chip" onclick="pickChCategory(this,'Judges')">Judges</button>
-          <button class="chip" onclick="pickChCategory(this,'Kings')">Kings</button>
-          <button class="chip" onclick="pickChCategory(this,'Psalms')">Psalms</button>
-          <button class="chip" onclick="pickChCategory(this,'Prophets')">Prophets</button>
-          <button class="chip" onclick="pickChCategory(this,'Gospels')">Gospels</button>
-          <button class="chip" onclick="pickChCategory(this,'Parables')">Parables</button>
-          <button class="chip" onclick="pickChCategory(this,'Acts')">Acts</button>
-          <button class="chip" onclick="pickChCategory(this,'Epistles')">Epistles</button>
-          <button class="chip" onclick="pickChCategory(this,'Revelation')">Revelation</button>
-          <button class="chip" onclick="pickChCategory(this,'Who Am I?')">Who Am I?</button>
-          <button class="chip" onclick="pickChCategory(this,'Miracles')">Miracles</button>
-          <button class="chip" onclick="pickChCategory(this,'Women of the Bible')">Women</button>
-          <button class="chip" onclick="pickChCategory(this,'Animals in the Bible')">Animals</button>
-          <button class="chip" onclick="pickChCategory(this,'Bible Geography')">Geography</button>
-          <button class="chip" onclick="pickChCategory(this,'Numbers &amp; Dates')">Numbers</button>
-          <button class="chip" onclick="pickChCategory(this,'Old Testament Law')">OT Law</button>
-          <button class="chip" onclick="pickChCategory(this,'Worship &amp; Music')">Worship</button>
-        </div>
-      </div>
-    </div>
     <label class="label">⚔️ Choose Your Weapon</label>
     <div id="ch-qtype-chips" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;">
       <button class="chip sel" onclick="pickChQType(this,'classic')" id="ch-qtype-classic">🎯 Multiple Choice</button>
@@ -3987,10 +3960,15 @@ html[data-theme="warmth"] .divider::before, html[data-theme="warmth"] .divider::
     </div>
 
     <label class="label">🏹 Level of Trial</label>
-    <div id="ch-diff-chips" style="display:flex;gap:8px;margin-bottom:20px;">
-      <button class="chip sel" onclick="pickChDiff(this,'easy')" id="ch-diff-easy">🌿 Easy · New Believer</button>
-      <button class="chip" onclick="pickChDiff(this,'medium')" id="ch-diff-medium">📖 Medium · Walking the Word</button>
-      <button class="chip" onclick="pickChDiff(this,'hard')" id="ch-diff-hard">⚔️ Hard · Sage of Scripture</button>
+    <div style="margin-bottom:20px;padding:0 2px;">
+      <input type="range" id="ch-diff-slider" min="1" max="3" step="1" value="1"
+        oninput="chDiffSlider(this.value)"
+        style="width:100%;accent-color:var(--gold1);cursor:pointer;height:6px;">
+      <div style="display:flex;justify-content:space-between;margin-top:8px;">
+        <span style="font-size:12px;color:var(--ink3);">🌿 Easy</span>
+        <span style="font-size:12px;color:var(--ink3);">📖 Medium</span>
+        <span style="font-size:12px;color:var(--ink3);">⚔️ Hard</span>
+      </div>
     </div>
 
     <label class="label">🛡️ Match Settings</label>
@@ -42848,7 +42826,7 @@ function buildModeSetup(kind,fromHomeSelection){
   const showModeDiff=(kind==='online'||kind==='nearby')&&!_setupUseHomeSelection;
   document.getElementById('setup-room-mode-wrap').style.display=showModeDiff?'block':'none';
   if(kind==='online'){
-    document.getElementById('setup-eyebrow').textContent='Play Online';
+    document.getElementById('setup-eyebrow').textContent='Online';
     document.getElementById('setup-title').innerHTML='Game <em>Settings</em>';
     document.getElementById('setup-subtitle').textContent=_setupUseHomeSelection
       ?'Using game mode and difficulty from Home. Set room rules below.'
@@ -44971,26 +44949,14 @@ function chSetMode(m){
   const liveBtn=document.getElementById('ch-mode-live');
   const ghostBtn=document.getElementById('ch-mode-ghost');
   const ghostDesc=document.getElementById('ch-ghost-desc');
-  const catRow=document.getElementById('ch-category-row');
   const sendBtn=document.getElementById('ch-send-btn');
   const sendTxt=document.getElementById('ch-send-txt');
   const isGhost=m==='ghost';
-  liveBtn.style.background=isGhost?'transparent':'rgba(201,145,13,.25)';
-  liveBtn.style.color=isGhost?'var(--ink3)':'var(--gold1)';
-  ghostBtn.style.background=isGhost?'rgba(201,145,13,.25)':'transparent';
-  ghostBtn.style.color=isGhost?'var(--gold1)':'var(--ink3)';
+  liveBtn.classList.toggle('sel',!isGhost);
+  ghostBtn.classList.toggle('sel',isGhost);
   if(ghostDesc) ghostDesc.style.display=isGhost?'':'none';
   if(sendBtn) sendBtn.querySelector('.btn-icon').textContent=isGhost?'👻':'⚔️';
   if(sendTxt) sendTxt.textContent=isGhost?' Send It!':" Let's Go!";
-  // Show category only for ghost + classic
-  updateGhostCategoryVisibility();
-}
-function updateGhostCategoryVisibility(){
-  const catRow=document.getElementById('ch-category-row');
-  if(!catRow) return;
-  const isGhost=_ghostChallengeMode==='ghost';
-  const isClassic=_chQType==='classic'||!_chQType;
-  catRow.style.display=(isGhost&&isClassic)?'':'none';
 }
 function chModeSubmit(){
   if(_ghostChallengeMode==='ghost') sendGhostChallenge();
@@ -45004,7 +44970,6 @@ function pickChQType(el,qtype){
   _chQType=qtype;
   document.querySelectorAll('#ch-qtype-chips .chip').forEach(c=>c.classList.remove('sel'));
   el.classList.add('sel');
-  updateGhostCategoryVisibility();
 }
 function seededShuffle(arr,seed){
   let s=seed>>>0;
@@ -47351,10 +47316,9 @@ function challengeFriend(uid){
   document.getElementById('ch-friend-av').innerHTML=avatarMarkup(f.avatar||'😊',f.photo||'','lg');
   document.getElementById('ch-friend-name').textContent=f.name||'Friend';
 
-  // Reset chip selections
-  document.querySelectorAll('#ch-diff-chips .chip').forEach(c=>c.classList.remove('sel'));
-  const diffChip=document.getElementById('ch-diff-'+_chDiff)||document.getElementById('ch-diff-easy');
-  if(diffChip) diffChip.classList.add('sel');
+  // Set difficulty slider
+  const diffSlider=document.getElementById('ch-diff-slider');
+  if(diffSlider){const diffMap={easy:1,medium:2,hard:3};diffSlider.value=diffMap[_chDiff]||1;}
   document.querySelectorAll('#ch-qtype-chips .chip').forEach(c=>c.classList.remove('sel'));
   const modeChip=document.getElementById('ch-qtype-'+_chQType)||document.getElementById('ch-qtype-classic');
   if(modeChip) modeChip.classList.add('sel');
@@ -47369,11 +47333,10 @@ function challengeFriend(uid){
   openOv('ov-challenge');
 }
 
-function pickChDiff(el,diff){
+function chDiffSlider(val){
+  const diffs=['easy','medium','hard'];
+  _chDiff=diffs[parseInt(val)-1]||'easy';
   sfx.tap();
-  _chDiff=diff;
-  document.querySelectorAll('#ch-diff-chips .chip').forEach(c=>c.classList.remove('sel'));
-  el.classList.add('sel');
 }
 
 function pickChQType(el,qtype){
