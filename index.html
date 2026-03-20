@@ -45805,17 +45805,202 @@ function pickDiff(el,d){
 /* ══════════════════════════════════════════════════
    SHARE RESULT
 ══════════════════════════════════════════════════ */
-function shareResult(){
+async function shareResult(){
   sfx.tap();
   const sorted=[...G.players].sort((a,b)=>G.scores[b.name]-G.scores[a.name]);
-  const win=sorted[0];
-  const lines=sorted.map((p,i)=>`${i===0?'👑':i+1}. ${p.avatar} ${p.name} — ${G.scores[p.name]} pts`).join('\n');
-  const text=`🕯️ Lamp Bible Trivia Results!\n\n${lines}\n\nPlay at: Lamp - Bible Trivia with friends`;
-  if(navigator.share){
-    navigator.share({title:'Lamp - Bible Trivia',text}).catch(()=>{});
-  }else{
-    navigator.clipboard&&navigator.clipboard.writeText(text).then(()=>toast('Copied to clipboard!'));
+  const winner=sorted[0];
+  if(!winner){ toast('No results to share'); return; }
+
+  const w=1080,h=1920;
+  const c=document.createElement('canvas');
+  c.width=w; c.height=h;
+  const ctx=c.getContext('2d');
+  if(!ctx){ toast('Unable to create image'); return; }
+
+  // ── Background: deep midnight gradient ──────────────────────
+  const bg=ctx.createLinearGradient(0,0,w,h);
+  bg.addColorStop(0,'#08060f');
+  bg.addColorStop(0.45,'#0c0a1c');
+  bg.addColorStop(0.8,'#120808');
+  bg.addColorStop(1,'#090610');
+  ctx.fillStyle=bg; ctx.fillRect(0,0,w,h);
+
+  // Starfield
+  ctx.globalAlpha=0.55;
+  for(let i=0;i<140;i++){
+    const sx=(i*239+71)%w, sy=(i*317+53)%h;
+    const sr=0.8+(i%4)*0.5;
+    ctx.fillStyle=i%7===0?'#f5c842':i%3===0?'rgba(200,180,255,0.9)':'#ffffff';
+    ctx.beginPath(); ctx.arc(sx,sy,sr,0,Math.PI*2); ctx.fill();
   }
+  ctx.globalAlpha=1;
+
+  // Radial halo behind winner area
+  const halo=ctx.createRadialGradient(w/2,620,0,w/2,620,500);
+  halo.addColorStop(0,'rgba(245,200,66,0.11)');
+  halo.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=halo; ctx.fillRect(0,0,w,h);
+
+  // ── Outer border frame ───────────────────────────────────────
+  ctx.strokeStyle='rgba(245,200,66,0.22)';
+  ctx.lineWidth=2;
+  drawRoundRect(ctx,50,60,w-100,h-120,44);
+  ctx.stroke();
+  // Inner glow line
+  ctx.strokeStyle='rgba(245,200,66,0.07)';
+  ctx.lineWidth=6;
+  drawRoundRect(ctx,56,66,w-112,h-132,40);
+  ctx.stroke();
+
+  // ── Branding ─────────────────────────────────────────────────
+  ctx.textAlign='center';
+  ctx.font="800 58px 'Playfair Display',serif";
+  ctx.fillStyle='#f5c842';
+  ctx.fillText('🕯 LAMP',w/2,182);
+  ctx.font="500 23px 'Nunito',sans-serif";
+  ctx.fillStyle='rgba(245,200,66,0.65)';
+  ctx.fillText('Bible Trivia Online',w/2,220);
+
+  // Ornamental divider
+  ctx.strokeStyle='rgba(245,200,66,0.28)';
+  ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(220,250); ctx.lineTo(860,250); ctx.stroke();
+  ctx.fillStyle='rgba(245,200,66,0.55)';
+  ctx.font='18px serif';
+  ctx.fillText('✦  MATCH RESULTS  ✦',w/2,292);
+
+  // ── Winner showcase ──────────────────────────────────────────
+  // Glow disc
+  const disc=ctx.createRadialGradient(w/2,500,0,w/2,500,200);
+  disc.addColorStop(0,'rgba(245,200,66,0.14)');
+  disc.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=disc; ctx.fillRect(0,300,w,430);
+
+  ctx.font='80px sans-serif';
+  ctx.fillText('👑',w/2,410);
+
+  ctx.font='88px sans-serif';
+  ctx.fillText(winner.avatar||'😊',w/2,530);
+
+  ctx.font="900 70px 'Nunito',sans-serif";
+  ctx.fillStyle='#f6efe4';
+  // Truncate long names
+  let wName=winner.name||'Player';
+  while(ctx.measureText(wName).width>760&&wName.length>4) wName=wName.slice(0,-1)+'…';
+  ctx.fillText(wName,w/2,616);
+
+  ctx.font="700 32px 'Cinzel',serif";
+  ctx.fillStyle='#f5c842';
+  ctx.fillText(`${G.scores[winner.name]||0} POINTS`,w/2,666);
+
+  // ── Leaderboard ──────────────────────────────────────────────
+  // Dashed separator
+  ctx.save();
+  ctx.strokeStyle='rgba(245,200,66,0.18)';
+  ctx.lineWidth=1; ctx.setLineDash([5,9]);
+  ctx.beginPath(); ctx.moveTo(160,716); ctx.lineTo(920,716); ctx.stroke();
+  ctx.restore();
+
+  ctx.font="600 22px 'Cinzel',serif";
+  ctx.fillStyle='rgba(245,200,66,0.55)';
+  ctx.fillText('LEADERBOARD',w/2,762);
+
+  const display=sorted.slice(0,6);
+  const rowH=display.length<=4?104:display.length<=5?94:84;
+  const lbStartY=796;
+
+  display.forEach((p,i)=>{
+    const ry=lbStartY+i*rowH;
+    const isTop=i===0;
+    // Row bg
+    ctx.fillStyle=isTop?'rgba(245,200,66,0.10)':'rgba(255,255,255,0.035)';
+    drawRoundRect(ctx,120,ry,840,rowH-8,18); ctx.fill();
+    if(isTop){
+      ctx.strokeStyle='rgba(245,200,66,0.35)';
+      ctx.lineWidth=1.5;
+      drawRoundRect(ctx,120,ry,840,rowH-8,18); ctx.stroke();
+    }
+    const mid=ry+(rowH-8)/2+2;
+    // Rank / crown
+    ctx.textAlign='left';
+    ctx.font=isTop?"700 28px 'Nunito',sans-serif":"600 26px 'Nunito',sans-serif";
+    ctx.fillStyle=isTop?'#f5c842':'rgba(246,239,228,0.38)';
+    ctx.fillText(isTop?'👑':`${i+1}`,148,mid+10);
+    // Avatar
+    ctx.font='32px sans-serif';
+    ctx.fillText(p.avatar||'😊',208,mid+11);
+    // Name
+    ctx.font=isTop?"700 32px 'Nunito',sans-serif":"500 28px 'Nunito',sans-serif";
+    ctx.fillStyle=isTop?'#f6efe4':'rgba(246,239,228,0.78)';
+    let pn=p.name||'Player';
+    while(ctx.measureText(pn).width>420&&pn.length>4) pn=pn.slice(0,-1)+'…';
+    ctx.fillText(pn,268,mid+11);
+    // Score
+    ctx.textAlign='right';
+    ctx.font=isTop?"800 32px 'Nunito',sans-serif":"600 28px 'Nunito',sans-serif";
+    ctx.fillStyle=isTop?'#f5c842':'rgba(246,239,228,0.58)';
+    ctx.fillText(`${G.scores[p.name]||0}`,930,mid+11);
+    ctx.textAlign='center';
+  });
+
+  // ── Bible verse ──────────────────────────────────────────────
+  const verseY=lbStartY+display.length*rowH+40;
+  ctx.fillStyle='rgba(245,200,66,0.055)';
+  drawRoundRect(ctx,110,verseY,860,220,26); ctx.fill();
+  ctx.strokeStyle='rgba(245,200,66,0.18)';
+  ctx.lineWidth=1;
+  drawRoundRect(ctx,110,verseY,860,220,26); ctx.stroke();
+
+  const v=nextWinVerse();
+  ctx.font="italic 500 28px 'Cormorant Garamond',serif";
+  ctx.fillStyle='rgba(246,239,228,0.82)';
+  const verseWords=`"${v.t}"`.split(' ');
+  let vLine='', vLineY=verseY+66;
+  for(const wd of verseWords){
+    const test=vLine+(vLine?' ':'')+wd;
+    if(ctx.measureText(test).width>740&&vLine){
+      ctx.fillText(vLine,w/2,vLineY); vLine=wd; vLineY+=38;
+    } else { vLine=test; }
+  }
+  if(vLine) ctx.fillText(vLine,w/2,vLineY);
+  ctx.font="700 20px 'Cinzel',serif";
+  ctx.fillStyle='rgba(245,200,66,0.7)';
+  ctx.fillText(`— ${v.r}`,w/2,verseY+196);
+
+  // ── Footer ───────────────────────────────────────────────────
+  const footY=verseY+260;
+  ctx.strokeStyle='rgba(245,200,66,0.14)';
+  ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(160,footY); ctx.lineTo(920,footY); ctx.stroke();
+
+  ctx.font="700 24px 'Cinzel',serif";
+  ctx.fillStyle='rgba(245,200,66,0.6)';
+  ctx.fillText('aviel-bolatkhan-01.github.io/bible-game-night',w/2,footY+48);
+
+  drawStoreBadge(ctx,120,footY+72,380,78,'apple');
+  drawStoreBadge(ctx,560,footY+72,400,78,'google');
+
+  ctx.font="500 18px 'Nunito',sans-serif";
+  ctx.fillStyle='rgba(246,239,228,0.3)';
+  ctx.fillText(new Date().toLocaleDateString(),w/2,footY+192);
+
+  // ── Export & share ───────────────────────────────────────────
+  try{
+    const caption=`🏆 Lamp Bible Trivia — ${winner.name} won with ${G.scores[winner.name]||0} pts! ✨ #LampBibleTrivia`;
+    const blob=await canvasToBlob(c,'image/jpeg',0.94);
+    const file=new File([blob],`lamp-result-${Date.now()}.jpg`,{type:'image/jpeg'});
+    if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
+      await navigator.share({title:'Lamp - Bible Trivia Results',text:caption,files:[file]});
+      return;
+    }
+    try{ if(navigator.clipboard) await navigator.clipboard.writeText(caption); }catch(e){}
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url; a.download=`lamp-result-${Date.now()}.jpg`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1200);
+    toast('Result image saved + caption copied ✦');
+  }catch(e){ toast('Unable to share image right now'); }
 }
 function drawRoundRect(ctx,x,y,w,h,r){
   const rr=Math.max(0,Math.min(r,Math.min(w,h)/2));
