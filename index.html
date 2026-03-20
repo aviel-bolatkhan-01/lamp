@@ -3619,7 +3619,7 @@ html.feat-gameHeader .g-nm { font-weight: 800 !important; max-width: 100px; over
       <span class="g-av" id="l-av">😊</span>
       <span class="g-nm" id="l-nm">Player</span>
     </div>
-    <div class="g-mid" id="l-round">Round 1/12</div>
+    <div class="g-mid" id="l-round" style="display:none;"></div>
     <div class="g-right">
       <div class="hearts" id="l-hearts"></div>
       <div class="score-num" id="l-score">0</div>
@@ -43732,7 +43732,7 @@ function startLightning(pIdx){
   document.getElementById('l-av').innerHTML=avatarMarkup(p.avatar,resolvePlayerPhoto(p),'sm');
   document.getElementById('l-nm').textContent=p.name;
   const lTotal=Math.max(1,G.pool.length||currentRounds());
-  document.getElementById('l-round').textContent=`Round ${Math.min(G.qi+1,lTotal)}/${lTotal}`;
+  document.getElementById('l-round').textContent='';
   document.getElementById('l-score').textContent=G.scores[p.name]||0;
   renderHearts('l-hearts',G.hearts[p.name]||3);
   document.getElementById('l-streak').textContent='0 correct';
@@ -43759,7 +43759,7 @@ function renderLQ(){
   if(G.qi>=G.pool.length){ endLightning(); return; }
   const q=G.pool[G.qi]; G.seen.add(questionKey(q)); G.done=false;
   const lTotal=Math.max(1,G.pool.length||currentRounds());
-  document.getElementById('l-round').textContent=`Round ${Math.min(G.qi+1,lTotal)}/${lTotal}`;
+  document.getElementById('l-round').textContent='';
   setCategoryBadge('l-cat',q.cat||'');
   document.getElementById('l-fb').style.display='none';
   renderMCQ(q,'l-txt','l-opts',(btn,isOk,q2,order)=>{
