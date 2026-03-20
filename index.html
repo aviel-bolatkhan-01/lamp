@@ -3107,7 +3107,7 @@ html[data-theme="warmth"] .divider::before, html[data-theme="warmth"] .divider::
         <div style="font-size:32px;">🔥</div>
       <div style="flex:1;">
         <div class="eyebrow" style="color:var(--gold1);">Daily Challenge</div>
-        <div style="font-family:'Playfair Display',serif;font-size:16px;color:var(--ink);">12 Trials · Ember Run</div>
+        <div style="font-family:'Playfair Display',serif;font-size:16px;color:var(--ink);">12 Trials</div>
         <div id="daily-streak-info" style="font-size:11px;color:var(--ink3);margin-top:2px;">Streak: 0 days</div>
       </div>
       <div class="btn btn-gold btn-sm" style="width:auto;padding:8px 16px;">Play</div>
@@ -3309,6 +3309,7 @@ html[data-theme="warmth"] .divider::before, html[data-theme="warmth"] .divider::
       </div>
     </div>
 
+    <div id="mode-desc" style="font-size:12px;color:var(--ink3);margin-bottom:8px;line-height:1.5;"></div>
     <div class="eyebrow" style="margin-bottom:9px;">Options</div>
     <div id="opt-list" class="gap-8" style="margin-bottom:16px;"></div>
     <button class="btn btn-gold" id="setup-go-btn" onclick="beginFromSetup()">
@@ -3964,8 +3965,9 @@ html[data-theme="warmth"] .divider::before, html[data-theme="warmth"] .divider::
       </div>
     </div>
 
+    <div id="ch-mode-desc-settings" style="font-size:12px;color:var(--ink3);margin-bottom:8px;line-height:1.5;">Pick the right answer from 4 options.</div>
+    <div class="eyebrow" style="margin-bottom:9px;">Options</div>
     <div id="ch-live-options" style="margin-bottom:16px;">
-    <div id="ch-mode-desc-settings" style="font-size:12px;color:var(--ink3);margin-bottom:10px;line-height:1.5;">Pick the right answer from 4 options.</div>
     <div class="toggle-row" style="margin-bottom:10px;">
       <span class="toggle-lbl">❤️ Hearts</span>
       <button class="toggle-btn on" id="ch-tog-hearts" onclick="togChHearts()">ON</button>
@@ -42766,7 +42768,7 @@ function pickSub(el,s){
   }
   if(s==='team') s='classic';
   G.sub=s; G.seen.clear();
-  if(s==='lightning') G.cfg.hearts=true;
+  if(s==='lightning') G.cfg.hearts=false;
   document.querySelectorAll('#sub-chips .chip').forEach(c=>c.classList.remove('sel'));
   el.classList.add('sel');
   renderOpts();
@@ -42849,7 +42851,7 @@ function pickSetupSub(el,s){
   sfx.tap(); haptic('tap');
   if(s==='team') s='classic';
   G.sub=s; G.seen.clear();
-  if(s==='lightning') G.cfg.hearts=true;
+  if(s==='lightning') G.cfg.hearts=false;
   document.querySelectorAll('#setup-room-sub-chips .chip').forEach(c=>c.classList.remove('sel'));
   el.classList.add('sel');
   renderOpts();
@@ -42901,24 +42903,14 @@ const MODE_DESCS={
 function renderOpts(){
   const el=document.getElementById('opt-list'); el.innerHTML='';
   const isLightning=G.sub==='lightning';
-  // Force hearts on for lightning
-  if(isLightning) G.cfg.hearts=true;
-  // Mode description
-  const desc=MODE_DESCS[G.sub]||MODE_DESCS.classic;
-  const descEl=document.createElement('div');
-  descEl.style.cssText='font-size:12px;color:var(--ink3);margin-bottom:10px;line-height:1.5;';
-  descEl.textContent=desc;
-  el.appendChild(descEl);
-  // Hearts toggle (locked on for lightning)
+  // Mode description above Options
+  const modeDescEl=document.getElementById('mode-desc');
+  if(modeDescEl) modeDescEl.textContent=MODE_DESCS[G.sub]||MODE_DESCS.classic;
+  // Hearts toggle
   const heartsRow=document.createElement('div'); heartsRow.className='toggle-row';
-  G.cfg.hearts=G.cfg.hearts!==undefined?G.cfg.hearts:true;
-  if(isLightning){
-    heartsRow.innerHTML=`<span class="toggle-lbl">❤️ Lives / Hearts</span>
-      <button class="toggle-btn on" disabled style="opacity:.5;cursor:default;">ON</button>`;
-  } else {
-    heartsRow.innerHTML=`<span class="toggle-lbl">❤️ Lives / Hearts</span>
-      <button class="toggle-btn ${G.cfg.hearts?'on':'off'}" id="tog-hearts" onclick="togCfg('hearts')">${G.cfg.hearts?'ON':'OFF'}</button>`;
-  }
+  if(G.cfg.hearts===undefined) G.cfg.hearts=!isLightning;
+  heartsRow.innerHTML=`<span class="toggle-lbl">❤️ Lives / Hearts</span>
+    <button class="toggle-btn ${G.cfg.hearts?'on':'off'}" id="tog-hearts" onclick="togCfg('hearts')">${G.cfg.hearts?'ON':'OFF'}</button>`;
   el.appendChild(heartsRow);
   // Rounds (hidden for lightning)
   if(!isLightning){
@@ -47356,14 +47348,11 @@ function pickChQType(el,qtype){
   if(roundsRow) roundsRow.style.display=isLightning?'none':'';
   const descEl=document.getElementById('ch-mode-desc-settings');
   if(descEl) descEl.textContent=MODE_DESCS[qtype]||MODE_DESCS.classic;
-  // Force hearts on for lightning
+  // Default hearts off for lightning
   if(isLightning){
-    _chCfg.hearts=true;
+    _chCfg.hearts=false;
     const hBtn=document.getElementById('ch-tog-hearts');
-    if(hBtn){ hBtn.textContent='ON'; hBtn.className='toggle-btn on'; hBtn.disabled=true; hBtn.style.opacity='.5'; hBtn.style.cursor='default'; }
-  } else {
-    const hBtn=document.getElementById('ch-tog-hearts');
-    if(hBtn){ hBtn.disabled=false; hBtn.style.opacity=''; hBtn.style.cursor=''; }
+    if(hBtn){ hBtn.textContent='OFF'; hBtn.className='toggle-btn off'; }
   }
 }
 function togChHearts(){
