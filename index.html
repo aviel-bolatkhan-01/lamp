@@ -3222,6 +3222,10 @@ html[data-theme="warmth"] .divider::before, html[data-theme="warmth"] .divider::
         <input class="inp" id="friends-screen-code-inp" placeholder="Enter a friend's code…" style="flex:1;" maxlength="8" autocomplete="off">
         <button class="btn btn-primary" style="flex-shrink:0;width:auto;padding:0 20px;" onclick="addFriendFromFriends()">Add</button>
       </div>
+      <div id="async-challenges-section" style="display:none;">
+        <div class="settings-section-title">Ghost Race Challenges</div>
+        <div id="async-challenges-list" style="margin-bottom:14px;"></div>
+      </div>
       <div class="settings-section-title">Friend Requests</div>
       <div id="friends-requests-list" style="margin-bottom:14px;">
         <div style="text-align:center;color:var(--ink3);padding:12px 0;font-size:13px;">No pending requests</div>
@@ -3491,6 +3495,27 @@ html[data-theme="warmth"] .divider::before, html[data-theme="warmth"] .divider::
     <button class="btn btn-ghost btn-sm" style="margin-bottom:8px;" onclick="postMatchGoHome()">Home</button>
     <button class="btn btn-ghost btn-sm" onclick="postMatchGoDonation()">❤️ Support This Ministry</button>
     <div class="pb"></div>
+  </div>
+</div>
+
+<!-- ████████  GHOST RACE RESULT  ████████ -->
+<div id="ghost-result-ov" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:9000;flex-direction:column;align-items:center;justify-content:center;padding:24px;">
+  <div style="background:var(--card-bg,#1e1a14);border:1px solid rgba(201,145,13,.3);border-radius:20px;padding:28px 24px;max-width:380px;width:100%;text-align:center;">
+    <div id="gr-emoji" style="font-size:52px;margin-bottom:8px;">👻</div>
+    <div id="gr-headline" style="font-family:'Cinzel',serif;font-size:22px;font-weight:700;color:var(--gold1);margin-bottom:6px;">Ghost Race</div>
+    <div id="gr-sub" style="font-size:13px;color:var(--ink3);margin-bottom:20px;line-height:1.5;"></div>
+    <div style="display:flex;gap:12px;justify-content:center;margin-bottom:20px;">
+      <div style="background:rgba(201,145,13,.1);border:1px solid rgba(201,145,13,.22);border-radius:14px;padding:12px 20px;min-width:90px;">
+        <div style="font-size:10px;color:var(--ink3);font-family:'Cinzel',serif;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;">You</div>
+        <div id="gr-my-score" style="font-size:26px;font-weight:800;color:var(--gold1);font-family:'Cormorant Garamond',serif;">—</div>
+      </div>
+      <div id="gr-op-row" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:12px 20px;min-width:90px;">
+        <div id="gr-op-name" style="font-size:10px;color:var(--ink3);font-family:'Cinzel',serif;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;">Opponent</div>
+        <div id="gr-op-score" style="font-size:26px;font-weight:800;color:var(--ink);font-family:'Cormorant Garamond',serif;">—</div>
+      </div>
+    </div>
+    <div id="w-xp-txt" style="font-size:13px;color:var(--gold1);margin-bottom:16px;">✦ +0 XP earned</div>
+    <button class="btn btn-gold" onclick="closeGhostResult()" style="width:100%;">Done</button>
   </div>
 </div>
 
@@ -3903,8 +3928,36 @@ html[data-theme="warmth"] .divider::before, html[data-theme="warmth"] .divider::
       <div class="mtitle" id="ch-friend-name" style="margin-bottom:0;">Friend</div>
     </div>
 
-    <div style="font-size:12px;color:var(--ink3);margin-bottom:16px;line-height:1.5;">Both players play live from their own devices.</div>
+    <div style="display:flex;gap:0;margin-bottom:16px;background:rgba(0,0,0,.15);border-radius:10px;padding:3px;">
+      <button id="ch-mode-live" onclick="chSetMode('live')" style="flex:1;padding:7px;border:none;border-radius:8px;background:rgba(201,145,13,.25);color:var(--gold1);font-family:'Nunito',sans-serif;font-weight:800;font-size:12px;cursor:pointer;">⚡ Live</button>
+      <button id="ch-mode-ghost" onclick="chSetMode('ghost')" style="flex:1;padding:7px;border:none;border-radius:8px;background:transparent;color:var(--ink3);font-family:'Nunito',sans-serif;font-weight:800;font-size:12px;cursor:pointer;">👻 Ghost Race</button>
+    </div>
+    <div id="ch-ghost-desc" style="display:none;font-size:12px;color:var(--ink3);margin-bottom:16px;line-height:1.5;">You play first — your score is saved. Friend plays the same questions later and tries to beat you.</div>
 
+    <div id="ch-category-row" style="display:none;margin-bottom:16px;">
+      <label class="label">Category</label>
+      <select id="ch-category-sel" class="inp" style="font-size:14px;padding:10px;">
+        <option value="Genesis">Genesis</option>
+        <option value="Exodus">Exodus</option>
+        <option value="Judges">Judges</option>
+        <option value="Kings">Kings</option>
+        <option value="Psalms">Psalms</option>
+        <option value="Prophets">Prophets</option>
+        <option value="Gospels">Gospels</option>
+        <option value="Parables">Parables</option>
+        <option value="Acts">Acts</option>
+        <option value="Epistles">Epistles</option>
+        <option value="Revelation">Revelation</option>
+        <option value="Who Am I?">Who Am I?</option>
+        <option value="Miracles">Miracles</option>
+        <option value="Women of the Bible">Women of the Bible</option>
+        <option value="Animals in the Bible">Animals in the Bible</option>
+        <option value="Bible Geography">Bible Geography</option>
+        <option value="Numbers &amp; Dates">Numbers &amp; Dates</option>
+        <option value="Old Testament Law">Old Testament Law</option>
+        <option value="Worship &amp; Music">Worship &amp; Music</option>
+      </select>
+    </div>
     <label class="label">Game Mode</label>
     <div id="ch-qtype-chips" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;">
       <button class="chip sel" onclick="pickChQType(this,'classic')" id="ch-qtype-classic">🎯 Classic</button>
@@ -3920,7 +3973,14 @@ html[data-theme="warmth"] .divider::before, html[data-theme="warmth"] .divider::
       <button class="chip" onclick="pickChDiff(this,'hard')" id="ch-diff-hard">⚔️ Hard</button>
     </div>
 
-    <label class="label">Options</label>
+    <div id="ch-ghost-count-row" style="display:none;margin-bottom:16px;">
+      <label class="label">Questions</label>
+      <div class="toggle-row">
+        <span class="toggle-lbl">📝 10 questions per challenge</span>
+      </div>
+    </div>
+    <label class="label" id="ch-options-lbl">Options</label>
+    <div id="ch-live-options">
     <div class="toggle-row" style="margin-bottom:8px;">
       <span class="toggle-lbl">❤️ Lives / Hearts</span>
       <button class="toggle-btn on" id="ch-tog-hearts" onclick="togChHearts()">ON</button>
@@ -3934,7 +3994,8 @@ html[data-theme="warmth"] .divider::before, html[data-theme="warmth"] .divider::
       </div>
     </div>
 
-    <button class="btn btn-gold" onclick="sendChallenge()" id="ch-send-btn">
+    </div><!-- end ch-live-options -->
+    <button class="btn btn-gold" onclick="chModeSubmit()" id="ch-send-btn">
       <span class="btn-icon">⚔️</span> Send Challenge
     </button>
     <button class="btn btn-ghost btn-sm" style="margin-top:8px;" onclick="closeOv('ov-challenge')">Cancel</button>
@@ -42211,13 +42272,13 @@ function initFB(){
         } else {
           if(G.profile) pushProfile();
         }
-        listenForChallenges(); cleanExpiredChallenges(); listenFriendRequests(); listenFriendLinks();
+        listenForChallenges(); cleanExpiredChallenges(); listenFriendRequests(); listenFriendLinks(); listenAsyncChallenges();
       } else {
         if(G._loggingOut){ G._loggingOut=false; return; }
         if(getAuthRedirectPending()) return;
         // Fall back to anonymous if no social session
         G.auth.signInAnonymously()
-          .then(c=>{ G.uid=c.user.uid; G.fbOk=true; fbDot(true); if(G.profile)pushProfile(); listenForChallenges(); cleanExpiredChallenges(); listenFriendRequests(); listenFriendLinks(); })
+          .then(c=>{ G.uid=c.user.uid; G.fbOk=true; fbDot(true); if(G.profile)pushProfile(); listenForChallenges(); cleanExpiredChallenges(); listenFriendRequests(); listenFriendLinks(); listenAsyncChallenges(); })
           .catch(()=>fbDot(false));
       }
     });
@@ -42523,7 +42584,7 @@ function createProfile(){
   renderHomeBar();
   initTheme();
   go('home'); toast('Welcome, '+name+'! ✦');
-  if(G.fbOk){ pushProfile(); listenFriendRequests(); listenFriendLinks(); }
+  if(G.fbOk){ pushProfile(); listenFriendRequests(); listenFriendLinks(); listenAsyncChallenges(); }
   const pendingRoom = sessionStorage.getItem('pending_room');
   if(pendingRoom){ sessionStorage.removeItem('pending_room'); setTimeout(()=>joinRoomByCode(pendingRoom.toUpperCase()), 400); }
 }
@@ -42593,7 +42654,7 @@ function go(id){
   if(id==='community') communityTab('rankings');
   if(id==='profile') renderProfile();
   if(id==='lobby') renderLobby();
-  if(id==='friends') renderFriends();
+  if(id==='friends'){ renderFriends(); renderAsyncChallenges(); }
 }
 function setNb(btn){
   document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
@@ -43775,6 +43836,7 @@ function endGame(){
     G.cfg.hearts=!!G._dailyPrevHearts;
     G._dailyPrevHearts=null;
   }
+  if(G.mode==='async_challenge'){ finishGhostRace(); return; }
   go('winner'); sfx.win(); haptic('win'); confetti(); checkAchs();
   if(G.mode==='daily'){
     setTimeout(()=>{
@@ -44877,6 +44939,256 @@ function displayLBRows(list, rows, tab, clanMap) {
       row.innerHTML=`<div class="lb-rank">${medal}</div><div class="lb-av">${avatarMarkup(p.avatar||'😊',p.photo||'','sm')}</div><div class="lb-info"><div class="lb-nm">${escHtml(p.name||'Player')}${isMe?' ✦':''}</div><div class="lb-sub lb-clan-sub"><span class="clan-emoji">${clanMark}</span><span class="clan-name">${escHtml(clanName)}</span></div></div><div style="text-align:right;"><div class="lb-xpv">${shownXp} XP</div><span class="lb-lvl">${l.name}</span></div>`;
     }
     list.appendChild(row);
+  });
+}
+
+/* ══════════════════════════════════════════════════
+   GHOST RACE (ASYNC CHALLENGE)
+══════════════════════════════════════════════════ */
+let _ghostChallengeMode='live'; // 'live' | 'ghost'
+function chSetMode(m){
+  _ghostChallengeMode=m;
+  const liveBtn=document.getElementById('ch-mode-live');
+  const ghostBtn=document.getElementById('ch-mode-ghost');
+  const ghostDesc=document.getElementById('ch-ghost-desc');
+  const catRow=document.getElementById('ch-category-row');
+  const ghostCount=document.getElementById('ch-ghost-count-row');
+  const liveOpts=document.getElementById('ch-live-options');
+  const lbl=document.getElementById('ch-options-lbl');
+  const sendBtn=document.getElementById('ch-send-btn');
+  const isGhost=m==='ghost';
+  liveBtn.style.background=isGhost?'transparent':'rgba(201,145,13,.25)';
+  liveBtn.style.color=isGhost?'var(--ink3)':'var(--gold1)';
+  ghostBtn.style.background=isGhost?'rgba(201,145,13,.25)':'transparent';
+  ghostBtn.style.color=isGhost?'var(--gold1)':'var(--ink3)';
+  if(ghostDesc) ghostDesc.style.display=isGhost?'':'none';
+  if(liveOpts) liveOpts.style.display=isGhost?'none':'';
+  if(lbl) lbl.style.display=isGhost?'none':'';
+  if(ghostCount) ghostCount.style.display=isGhost?'':'none';
+  if(sendBtn) sendBtn.querySelector('.btn-icon').textContent=isGhost?'👻':'⚔️';
+  if(sendBtn) sendBtn.childNodes[1].textContent=isGhost?' Play & Send Challenge':' Send Challenge';
+  // Show category only for ghost + classic
+  updateGhostCategoryVisibility();
+}
+function updateGhostCategoryVisibility(){
+  const catRow=document.getElementById('ch-category-row');
+  if(!catRow) return;
+  const isGhost=_ghostChallengeMode==='ghost';
+  const isClassic=_chQType==='classic'||!_chQType;
+  catRow.style.display=(isGhost&&isClassic)?'':'none';
+}
+function chModeSubmit(){
+  if(_ghostChallengeMode==='ghost') sendGhostChallenge();
+  else sendChallenge();
+}
+// Override pickChQType to also update category visibility
+const _origPickChQType=typeof pickChQType==='function'?pickChQType:null;
+function pickChQType(el,qtype){
+  sfx.tap();
+  if(qtype==='team') qtype='classic';
+  _chQType=qtype;
+  document.querySelectorAll('#ch-qtype-chips .chip').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel');
+  updateGhostCategoryVisibility();
+}
+function seededShuffle(arr,seed){
+  let s=seed>>>0;
+  const rand=()=>{ s=(Math.imul(s,1664525)+1013904223)>>>0; return s/0x100000000; };
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(rand()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+function buildGhostPool(mode,category,difficulty,seed,count){
+  let src=[];
+  if(mode==='classic'||mode==='truefalse'&&false){
+    const cat=category||(Object.keys(QB)[0]);
+    src=(QB[cat]||[]).filter(q=>q&&(difficulty==='all'||!difficulty||q.d===difficulty));
+    if(!src.length) src=QB[cat]||[];
+  } else if(mode==='truefalse'){
+    src=TF_Q.filter(q=>q&&(difficulty==='all'||!difficulty||q.d===difficulty));
+  } else if(mode==='verse'||mode==='fillin'){
+    src=VERSE_Q.filter(q=>q&&(difficulty==='all'||!difficulty||q.d===difficulty));
+  }
+  return seededShuffle([...src],seed).slice(0,count);
+}
+function sendGhostChallenge(){
+  if(!_chTargetUid||!G.fbOk||!G.uid||!G.profile){ toast('Cannot send challenge'); return; }
+  sfx.tap();
+  const mode=_chQType||'classic';
+  const diff=_chDiff||'medium';
+  const count=10;
+  const seed=Math.floor(Math.random()*2147483647);
+  const category=mode==='classic'?(document.getElementById('ch-category-sel')?.value||Object.keys(QB)[0]):'';
+  const pool=buildGhostPool(mode,category,diff,seed,count);
+  if(!pool.length){ toast('Not enough questions for this selection'); return; }
+  const f=getFriendData(_chTargetUid);
+  G.asyncChallenge={
+    role:'challenger', to:_chTargetUid, toName:f.name||'Friend',
+    mode, category, difficulty:diff, seed, count,
+    pendingId:null
+  };
+  G.mode='async_challenge';
+  G._xpAtGameStart=G.profile?(G.profile.xp||0):0;
+  G._correctAtGameStart=G.profile?(G.profile.correct||0):0;
+  G.diff=diff;
+  G.TIM=diff==='easy'?25:diff==='hard'?12:20;
+  G.sub=mode==='truefalse'?'truefalse':mode==='verse'?'verse':'classic';
+  G.pool=pool;
+  G.qi=0; G.pi=0; G.done=false;
+  G.players=[{name:G.profile.name||'Player',avatar:G.profile.avatar||'😊',photo:G.profile.photo||''}];
+  G.scores={[G.profile.name||'Player']:0};
+  G.hearts={[G.profile.name||'Player']:3};
+  G.streaks={[G.profile.name||'Player']:0};
+  G.cfg.winScore=count;
+  closeOv('ov-challenge');
+  showSplash(0,()=>{ go('game'); renderQ(); });
+}
+function finishGhostRace(){
+  const ac=G.asyncChallenge; if(!ac) { go('winner'); sfx.win(); haptic('win'); confetti(); checkAchs(); return; }
+  const playerName=G.profile?.name||'Player';
+  const myScore=G.scores[playerName]||0;
+  const myTotal=G.pool?.length||ac.count||10;
+  if(ac.role==='challenger'){
+    // Save challenge to Firebase, then show "waiting" screen
+    const now=Date.now();
+    const id='gr_'+G.uid+'_'+now;
+    const rec={
+      id, from:G.uid, fromName:G.profile.name||'Player',
+      fromAvatar:G.profile.avatar||'😊', fromPhoto:G.profile.photo||'',
+      to:ac.to, toName:ac.toName,
+      mode:ac.mode, category:ac.category||'', difficulty:ac.difficulty,
+      seed:ac.seed, count:myTotal,
+      fromScore:myScore, fromTotal:myTotal, fromPlayedAt:now,
+      status:'pending', createdAt:now, expiresAt:now+172800000
+    };
+    G.db.ref('asyncChallenges/'+ac.to+'/'+id).set(rec).then(()=>{
+      toast(`Challenge sent to ${ac.toName}! They have 48h to respond.`);
+    }).catch(()=>toast('Challenge saved locally — send failed'));
+    showGhostResult(myScore,myTotal,null,null,ac.toName,'sent');
+  } else {
+    // Challenged player finished — compare and finalize
+    const src=ac.srcChallenge;
+    const now=Date.now();
+    const winner=myScore>src.fromScore?'to':myScore<src.fromScore?'from':'tie';
+    const iWon=winner==='to';
+    const isTie=winner==='tie';
+    G.db.ref('asyncChallenges/'+G.uid+'/'+src.id).update({
+      toScore:myScore, toTotal:myTotal, toPlayedAt:now,
+      status:'completed', winner
+    }).catch(()=>{});
+    // Award bonus XP
+    const bonus=isTie?25:iWon?75:0;
+    if(bonus>0){ addXP(bonus); toast(isTie?'Tie! +25 XP bonus':'You won! +75 XP bonus 🏆'); }
+    showGhostResult(myScore,myTotal,src.fromScore,src.fromTotal,src.fromName,winner);
+  }
+  checkAchs();
+}
+function showGhostResult(myScore,myTotal,opScore,opTotal,opName,outcome){
+  const el=document.getElementById('ghost-result-ov');
+  if(!el){ go('winner'); sfx.win(); haptic('win'); confetti(); return; }
+  const pct=n=>Math.round((n/myTotal)*100);
+  let headline='', sub='', emoji='';
+  if(outcome==='sent'){
+    headline='Challenge Sent!'; sub=`You scored ${myScore}/${myTotal}. Waiting for ${opName}…`; emoji='📤';
+  } else if(outcome==='tie'){
+    headline='It\'s a Tie!'; sub=`Both scored ${myScore}/${myTotal} (+25 XP)`; emoji='🤝';
+  } else if(outcome==='to'){
+    headline='You Won! 🏆'; sub=`You: ${myScore}/${myTotal} vs ${opName}: ${opScore}/${opTotal} (+75 XP)`; emoji='🥇';
+  } else {
+    headline='You Lost'; sub=`You: ${myScore}/${myTotal} vs ${opName}: ${opScore}/${opTotal}`; emoji='😤';
+  }
+  document.getElementById('gr-emoji').textContent=emoji;
+  document.getElementById('gr-headline').textContent=headline;
+  document.getElementById('gr-sub').textContent=sub;
+  document.getElementById('gr-my-score').textContent=myScore+'/'+myTotal;
+  const opRow=document.getElementById('gr-op-row');
+  if(opRow) opRow.style.display=(outcome==='sent')?'none':'';
+  if(outcome!=='sent'){
+    document.getElementById('gr-op-name').textContent=opName||'Opponent';
+    document.getElementById('gr-op-score').textContent=opScore+'/'+opTotal;
+  }
+  const xpEl=document.getElementById('w-xp-txt');
+  if(xpEl){ const startXp=G._xpAtGameStart||0; const gained=Math.max(0,(G.profile?.xp||0)-startXp); xpEl.textContent='✦ +'+gained+' XP earned'; }
+  el.style.display='flex';
+  sfx.win(); haptic('win'); confetti();
+}
+function closeGhostResult(){
+  const el=document.getElementById('ghost-result-ov');
+  if(el) el.style.display='none';
+  G.asyncChallenge=null;
+  go('friends');
+}
+function listenAsyncChallenges(){
+  if(!G.fbOk||!G.db||!G.uid) return;
+  if(G._asyncChalRef){ G._asyncChalRef.off(); G._asyncChalRef=null; }
+  const ref=G.db.ref('asyncChallenges/'+G.uid);
+  G._asyncChalRef=ref;
+  ref.on('value',sn=>{
+    G._pendingAsyncChallenges=sn.val()||{};
+    if(document.getElementById('s-friends')?.classList.contains('active')){
+      renderAsyncChallenges();
+    }
+  });
+}
+function renderAsyncChallenges(){
+  const sec=document.getElementById('async-challenges-section');
+  const list=document.getElementById('async-challenges-list');
+  if(!sec||!list) return;
+  const all=G._pendingAsyncChallenges||{};
+  const now=Date.now();
+  // Pending = sent to me, not yet played, not expired
+  const pending=Object.entries(all).filter(([,c])=>c&&c.status==='pending'&&c.expiresAt>now);
+  if(!pending.length){ sec.style.display='none'; return; }
+  sec.style.display='';
+  list.innerHTML=pending.map(([id,c])=>{
+    const modeLabel=c.mode==='classic'?(c.category||'Classic'):c.mode==='truefalse'?'True/False':'Fill-in-Verse';
+    const diffLabel=c.difficulty?(' · '+c.difficulty.charAt(0).toUpperCase()+c.difficulty.slice(1)):'';
+    const timeLeft=Math.max(0,Math.floor((c.expiresAt-now)/3600000));
+    return `<div class="friend-row" style="margin-bottom:8px;">
+      <div class="friend-av">${avatarMarkup(c.fromAvatar||'😊',c.fromPhoto||'','md')}</div>
+      <div class="friend-info">
+        <div class="friend-name">👻 ${escHtml(c.fromName||'Friend')}</div>
+        <div class="friend-xp">${escHtml(modeLabel)}${escHtml(diffLabel)} · ${c.fromScore}/${c.fromTotal} pts · ${timeLeft}h left</div>
+      </div>
+      <div class="friend-actions">
+        <button class="friend-btn friend-btn-chat" onclick="acceptGhostChallenge('${id}')">Race!</button>
+        <button class="friend-btn" style="background:#4a3f35;color:#fff;" onclick="declineGhostChallenge('${id}')">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+  G._asyncChallengeMap={};
+  pending.forEach(([id,c])=>G._asyncChallengeMap[id]=c);
+}
+function acceptGhostChallenge(id){
+  const c=G._asyncChallengeMap?.[id];
+  if(!c){ toast('Challenge not found'); return; }
+  if(!G.profile){ toast('Create a profile first'); return; }
+  sfx.tap();
+  const pool=buildGhostPool(c.mode,c.category,c.difficulty,c.seed,c.count);
+  if(!pool.length){ toast('Could not load questions'); return; }
+  G.asyncChallenge={
+    role:'challenged', srcChallenge:{...c,id},
+    mode:c.mode, category:c.category, difficulty:c.difficulty
+  };
+  G.mode='async_challenge';
+  G._xpAtGameStart=G.profile?(G.profile.xp||0):0;
+  G._correctAtGameStart=G.profile?(G.profile.correct||0):0;
+  G.diff=c.difficulty||'medium';
+  G.TIM=G.diff==='easy'?25:G.diff==='hard'?12:20;
+  G.sub=c.mode==='truefalse'?'truefalse':c.mode==='verse'?'verse':'classic';
+  G.pool=pool; G.qi=0; G.pi=0; G.done=false;
+  G.players=[{name:G.profile.name||'Player',avatar:G.profile.avatar||'😊',photo:G.profile.photo||''}];
+  G.scores={[G.profile.name||'Player']:0};
+  G.hearts={[G.profile.name||'Player']:3};
+  G.streaks={[G.profile.name||'Player']:0};
+  G.cfg.winScore=c.count||10;
+  showSplash(0,()=>{ go('game'); renderQ(); });
+}
+function declineGhostChallenge(id){
+  if(!G.fbOk||!G.uid) return;
+  G.db.ref('asyncChallenges/'+G.uid+'/'+id).update({status:'declined'}).then(()=>{
+    renderAsyncChallenges();
+    toast('Challenge declined');
   });
 }
 
