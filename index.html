@@ -3132,7 +3132,7 @@ html[data-theme="warmth"] .divider::before, html[data-theme="warmth"] .divider::
       <div class="chips" id="mode-chips">
         <button class="chip sel" onclick="pickMode(this,'online')">🌐 Online</button>
         <button class="chip" onclick="pickMode(this,'nearby')">📡 Same Room</button>
-        <button class="chip" onclick="pickMode(this,'local')">👥 Take Turns</button>
+        <button class="chip" onclick="pickMode(this,'local')">👥 Pass & Play</button>
         <button class="chip" onclick="pickMode(this,'practice')">🎓 Solo</button>
       </div>
     </div>
@@ -43056,7 +43056,7 @@ function buildPool(){
 }
 
 function beginGame(){
-  if(G.mode==='local'&&setupPs.length<2){ toast('Take Turns requires at least 2 players.'); return; }
+  if(G.mode==='local'&&setupPs.length<2){ toast('Pass & Play requires at least 2 players.'); return; }
   if(G.mode==='local'&&G.sub==='lightning'){
     G.sub='classic';
     syncSubChipSelection();
