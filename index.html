@@ -49781,6 +49781,7 @@ function renderProfile(){
   if(churchCta) churchCta.style.display = (p.tier === 'church') ? 'block' : 'none';
 
   renderAchs(false);
+  setTimeout(()=>renderAchs(false), 400);
   buildSettingsList();
   updateProfileSigninCard();
 }
