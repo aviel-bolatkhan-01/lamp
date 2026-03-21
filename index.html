@@ -47629,6 +47629,7 @@ function renderMatchHistory(expanded) {
   }
   const show = expanded ? history.length : Math.min(3, history.length);
   const modeLabel = { classic: 'Classic MCQ', truefalse: 'True/False', fillinverse: 'Fill-in-Verse', lightning: 'Lightning', solo: 'Solo', multiplayer: 'Multiplayer' };
+  const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   let html = '';
   for (let i = 0; i < show; i++) {
     const m = history[i];
@@ -47643,19 +47644,19 @@ function renderMatchHistory(expanded) {
       else badge = '<span style="background:#e05050;color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:20px;margin-left:6px;">L</span>';
     }
     const winnerImg = m.winner && m.winner.photo
-      ? '<img src="' + m.winner.photo + '" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">'
-      : '<span style="font-size:22px;">' + (m.winner ? m.winner.avatar || '🎮' : '🎮') + '</span>';
-    const mLabel = modeLabel[m.mode] || m.mode || 'Game';
+      ? '<img src="' + esc(m.winner.photo) + '" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">'
+      : '<span style="font-size:22px;">' + esc(m.winner ? m.winner.avatar || '🎮' : '🎮') + '</span>';
+    const mLabel = modeLabel[m.mode] || esc(m.mode) || 'Game';
     const diff = m.difficulty ? m.difficulty.charAt(0).toUpperCase() + m.difficulty.slice(1) : '';
-    const cat = m.category ? ' · ' + m.category : '';
+    const cat = m.category ? ' · ' + esc(m.category) : '';
     const subLabel = [mLabel, diff].filter(Boolean).join(' · ') + cat;
-    const scoreStr = m.scores ? m.scores.map(s => (s.name || '?') + ' ' + (s.score || 0)).join(' · ') : '';
+    const scoreStr = m.scores ? m.scores.map(s => esc(s.name || '?') + ' ' + (s.score || 0)).join(' · ') : '';
     const expandedDetail = m.scores ? m.scores.map(s => {
       const sImg = s.photo
-        ? '<img src="' + s.photo + '" style="width:20px;height:20px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:4px;">'
-        : '<span style="font-size:14px;margin-right:4px;">' + (s.avatar || '👤') + '</span>';
+        ? '<img src="' + esc(s.photo) + '" style="width:20px;height:20px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:4px;">'
+        : '<span style="font-size:14px;margin-right:4px;">' + esc(s.avatar || '👤') + '</span>';
       return '<div style="display:flex;align-items:center;justify-content:space-between;padding:3px 0;">' +
-        '<span>' + sImg + '<span style="font-size:12px;">' + (s.name || '?') + '</span></span>' +
+        '<span>' + sImg + '<span style="font-size:12px;">' + esc(s.name || '?') + '</span></span>' +
         '<span style="font-size:12px;font-weight:700;color:var(--gold1);">' + (s.score || 0) + '</span>' +
         '</div>';
     }).join('') : '';
@@ -47663,11 +47664,11 @@ function renderMatchHistory(expanded) {
       '<div style="display:flex;align-items:center;gap:10px;">' +
         '<span style="display:flex;align-items:center;">' + winnerImg + '</span>' +
         '<div style="flex:1;min-width:0;">' +
-          '<div style="font-size:13px;font-weight:700;display:flex;align-items:center;flex-wrap:wrap;">' + (m.winner ? m.winner.name : '?') + ' won' + badge + '</div>' +
+          '<div style="font-size:13px;font-weight:700;display:flex;align-items:center;flex-wrap:wrap;">' + esc(m.winner ? m.winner.name : '?') + ' won' + badge + '</div>' +
           '<div style="font-size:10px;color:var(--ink3);margin-top:1px;">' + subLabel + '</div>' +
           '<div style="font-size:10px;color:var(--ink2);margin-top:1px;">' + scoreStr + '</div>' +
         '</div>' +
-        '<div style="font-size:10px;color:var(--ink3);white-space:nowrap;">' + (m.date || '') + '</div>' +
+        '<div style="font-size:10px;color:var(--ink3);white-space:nowrap;">' + esc(m.date || '') + '</div>' +
       '</div>' +
       '<div class="match-detail" style="display:none;margin-top:10px;border-top:1px solid var(--inp-border);padding-top:8px;">' +
         expandedDetail +
@@ -47676,9 +47677,9 @@ function renderMatchHistory(expanded) {
   }
   if (history.length > 3) {
     if (!expanded) {
-      html += '<button class="btn-ghost" style="width:100%;font-size:12px;padding:6px;" onclick="renderMatchHistory(true)">Show all ' + history.length + ' matches</button>';
+      html += '<button class="btn btn-ghost btn-sm" style="width:100%;margin-top:4px;" onclick="renderMatchHistory(true)">Show all ' + history.length + ' matches</button>';
     } else {
-      html += '<button class="btn-ghost" style="width:100%;font-size:12px;padding:6px;" onclick="renderMatchHistory(false)">Show less</button>';
+      html += '<button class="btn btn-ghost btn-sm" style="width:100%;margin-top:4px;" onclick="renderMatchHistory(false)">Show less</button>';
     }
   }
   el.innerHTML = html;
