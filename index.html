@@ -3906,7 +3906,7 @@ html[data-theme="warmth"] .divider::before, html[data-theme="warmth"] .divider::
 ══════════════════════════════════════════════════ */
 const FB_CFG={
   apiKey:"AIzaSyBrGI0SKrE_puVG-qlnGhEKmxA8N3p17PU",
-  authDomain:"bible-game-night.firebaseapp.com",
+  authDomain:"thelampgame.com",
   databaseURL:"https://bible-game-night-default-rtdb.firebaseio.com",
   projectId:"bible-game-night",
   storageBucket:"bible-game-night.firebasestorage.app",
@@ -4111,7 +4111,7 @@ function signInWithGoogle(){
       .catch(e=>{
         if(e.code==='auth/credential-already-in-use' || e.code==='auth/email-already-in-use'){
           // Already has an account, just sign in
-          G.auth.signInWithPopup(provider)
+          G.auth.signInWithRedirect(provider)
             .then(()=>toast('Signed in with Google!'))
             .catch(err=>handleAuthError(err,'Google sign-in failed'));
           return;
@@ -4121,7 +4121,7 @@ function signInWithGoogle(){
     return;
   }
 
-  G.auth.signInWithPopup(provider)
+  G.auth.signInWithRedirect(provider)
     .then(res=>{
       toast('Signed in with Google!');
       updateProfileSigninCard();
@@ -7343,7 +7343,7 @@ function showAuthMethodDisabledModal(){
 function signInWithApple(){
   if(!G.auth){ toast('Firebase not configured'); return; }
   const provider=new firebase.auth.OAuthProvider('apple.com');
-  G.auth.signInWithPopup(provider).catch(e=>handleAuthError(e,'Apple sign-in failed'));
+  G.auth.signInWithRedirect(provider).catch(e=>handleAuthError(e,'Apple sign-in failed'));
 }
 function toggleEmailAuth(){
   const f=document.getElementById('email-auth-form');
@@ -7396,7 +7396,7 @@ function profileSignIn(method){
     }).catch(e=>{
       if(e.code==='auth/unauthorized-domain'){ showDomainErrorModal(); return; }
       if(e.code==='auth/credential-already-in-use'||e.code==='auth/email-already-in-use'){
-        const signInCall=G.auth.signInWithPopup(provider);
+        const signInCall=G.auth.signInWithRedirect(provider);
         signInCall.then(()=>{
           toast('Signed in! Progress synced.');
           updateProfileSigninCard();
@@ -7406,7 +7406,7 @@ function profileSignIn(method){
       }
     });
   } else {
-    const signInCall=G.auth.signInWithPopup(provider);
+    const signInCall=G.auth.signInWithRedirect(provider);
     signInCall.then(()=>{
       toast('Signed in!');
       updateProfileSigninCard();
