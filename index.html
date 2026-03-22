@@ -46035,69 +46035,18 @@ function setAuthRedirectPending(v){
 function getAuthRedirectPending(){
   try{ return sessionStorage.getItem('auth_redirect_pending')||''; }catch(e){ return ''; }
 }
-function isMobileBrowser(){
-  return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-}
 function signInWithGoogle(){
   if(!G.auth){ toast('Firebase not configured'); return; }
   const provider=new firebase.auth.GoogleAuthProvider();
   provider.setCustomParameters({ prompt:'select_account' });
   const cu=G.auth.currentUser;
-  const mobile=isMobileBrowser();
-
-  const handleLink=(res)=>{
-    toast('Account linked! Your progress is saved.');
-    updateProfileSigninCard();
-    if(document.getElementById('s-auth')?.classList.contains('active')) go('home');
-  };
-
   if(cu && cu.isAnonymous){
-    if(mobile){
-      setAuthRedirectPending('google-link');
-      cu.linkWithRedirect(provider);
-    } else {
-      cu.linkWithPopup(provider)
-        .then(handleLink)
-        .catch(e=>{
-          if(e.code==='auth/credential-already-in-use' || e.code==='auth/email-already-in-use'){
-            const guestProfile = G.profile ? {...G.profile} : null;
-            G.auth.signInWithPopup(provider)
-              .then(res=>{
-                const newUid = res.user.uid;
-                G.uid = newUid;
-                G.db.ref('players/' + newUid).once('value').then(sn=>{
-                  const remote = sn.val();
-                  G.profile = mergeProfiles(remote, guestProfile);
-                  if(!G.profile.friendCode) G.profile.friendCode = Math.random().toString(36).slice(2,8).toUpperCase();
-                  normalizeSocialProfile();
-                  saveProfile();
-                  pushProfile();
-                  toast('Welcome back! Your progress has been merged.');
-                  updateProfileSigninCard();
-                  renderHomeBar();
-                  if(document.getElementById('s-auth')?.classList.contains('active')) go('home');
-                });
-              })
-              .catch(err=>handleAuthError(err,'Google sign-in failed'));
-            return;
-          }
-          handleAuthError(e,'Google link failed');
-        });
-    }
+    setAuthRedirectPending('google-link');
+    cu.linkWithRedirect(provider);
     return;
   }
-
-  if(mobile){
-    setAuthRedirectPending('google');
-    G.auth.signInWithRedirect(provider);
-  } else {
-    G.auth.signInWithPopup(provider)
-      .then(res=>{
-        toast('Signed in with Google!');
-        updateProfileSigninCard();
-      })
-      .catch(e=>handleAuthError(e,'Google sign-in failed'));
-  }
+  setAuthRedirectPending('google');
+  G.auth.signInWithRedirect(provider);
 }
 
 /* ══════════════════════════════════════════════════
@@ -51079,12 +51028,8 @@ function showAuthMethodDisabledModal(){
 function signInWithApple(){
   if(!G.auth){ toast('Firebase not configured'); return; }
   const provider=new firebase.auth.OAuthProvider('apple.com');
-  if(isMobileBrowser()){
-    setAuthRedirectPending('apple');
-    G.auth.signInWithRedirect(provider);
-  } else {
-    G.auth.signInWithPopup(provider).catch(e=>handleAuthError(e,'Apple sign-in failed'));
-  }
+  setAuthRedirectPending('apple');
+  G.auth.signInWithRedirect(provider);
 }
 function toggleEmailAuth(){
   const f=document.getElementById('email-auth-form');
