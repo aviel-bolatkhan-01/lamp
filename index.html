@@ -3814,7 +3814,18 @@ html.feat-gameHeader .g-nm { font-weight: 800 !important; max-width: 100px; over
       <div class="prof-avatar" id="prof-av" onclick="openOv('ov-avatars','prof')">😊</div>
       <div style="display:inline-flex;align-items:center;gap:8px;">
         <div class="h2" id="prof-name">Your Name</div>
-        <button onclick="startEditName()" style="background:none;border:none;cursor:pointer;padding:2px 4px;color:var(--gold);font-size:16px;line-height:1;" title="Edit name">✏️</button>
+        <button onclick="startEditName()" id="prof-name-edit-btn" style="background:none;border:none;cursor:pointer;padding:2px 4px;color:var(--gold);font-size:16px;line-height:1;" title="Edit name">✏️</button>
+      </div>
+      <!-- Inline name editor -->
+      <div id="prof-name-editor" style="display:none;margin:10px auto 0;max-width:260px;background:var(--card-bg,#fff);border:1px solid var(--gold);border-radius:14px;padding:14px 16px;box-shadow:0 4px 20px rgba(196,136,10,.15);">
+        <div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:.15em;color:var(--gold);text-transform:uppercase;margin-bottom:8px;">Your Display Name</div>
+        <input id="prof-name-input" class="inp" type="text" maxlength="20" autocomplete="off" autocorrect="off" spellcheck="false"
+          style="width:100%;box-sizing:border-box;font-family:'Playfair Display',serif;font-size:15px;text-align:center;border-radius:10px;padding:9px 12px;margin-bottom:10px;"
+          onkeydown="if(event.key==='Enter')saveEditName();if(event.key==='Escape')cancelEditName();">
+        <div style="display:flex;gap:8px;">
+          <button onclick="cancelEditName()" class="btn btn-ghost" style="flex:1;padding:9px 0;font-size:13px;">Cancel</button>
+          <button onclick="saveEditName()" class="btn btn-gold" style="flex:1;padding:9px 0;font-size:13px;">Save</button>
+        </div>
       </div>
       <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;margin-top:4px;" id="prof-level"></div>
       <div class="xp-wrap" style="max-width:200px;margin:10px auto 0;">
@@ -49891,15 +49902,28 @@ function renderAchs(expanded){
 }
 function startEditName(){
   if(!G.profile){ toast('Sign in first'); return; }
-  const cur=G.profile.name||'';
-  const name=prompt('Enter your new name (max 20 characters):', cur);
-  if(name===null) return; // cancelled
-  const trimmed=name.trim().slice(0,20);
-  if(!trimmed){ toast('Name cannot be empty'); return; }
+  const editor=document.getElementById('prof-name-editor');
+  const inp=document.getElementById('prof-name-input');
+  const btn=document.getElementById('prof-name-edit-btn');
+  if(editor.style.display!=='none'){ cancelEditName(); return; }
+  inp.value=G.profile.name||'';
+  editor.style.display='block';
+  btn.textContent='✕';
+  setTimeout(()=>inp.focus(),50);
+}
+function cancelEditName(){
+  document.getElementById('prof-name-editor').style.display='none';
+  document.getElementById('prof-name-edit-btn').textContent='✏️';
+}
+function saveEditName(){
+  const inp=document.getElementById('prof-name-input');
+  const trimmed=(inp.value||'').trim().slice(0,20);
+  if(!trimmed){ toast('Name cannot be empty'); inp.focus(); return; }
   G.profile.name=trimmed;
   saveProfile();
   if(G.fbOk) pushProfile();
   document.getElementById('prof-name').textContent=trimmed;
+  cancelEditName();
   renderHomeBar();
   toast('Name updated!');
 }
