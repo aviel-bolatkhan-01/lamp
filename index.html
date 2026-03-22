@@ -4423,13 +4423,10 @@ function renderSeasonalBanner(){
     reformation:{icon:'\uD83D\uDCDA',label:'Reformation Week',color:'#2c3e50'},
     thanksgiving:{icon:'\uD83D\uDE4F',label:'Thanksgiving',color:'#795548'}
   }[season];
-  banner.style.display='block';
   const today=new Date().toISOString().split('T')[0];
-  const playedToday=G.profile&&G.profile.lastSeasonalDate===today;
-  const subLabel=playedToday?'Played today ✓ — come back tomorrow':'Special questions unlocked →';
-  const cursor=playedToday?'default':'cursor:pointer';
-  const clickAttr=playedToday?'':'onclick="playSeasonalQuestions(\''+season+'\')"';
-  banner.innerHTML='<div style="background:'+info.color+';color:#fff;padding:14px 18px;border-radius:14px;margin:10px 0;display:flex;align-items:center;gap:12px;'+cursor+'" '+clickAttr+'><span style="font-size:28px">'+info.icon+'</span><div><div style="font-weight:800;font-size:15px">'+info.label+'</div><div style="font-size:12px;opacity:.85">'+subLabel+'</div></div></div>';
+  if(G.profile&&G.profile.lastSeasonalDate===today){ banner.style.display='none'; return; }
+  banner.style.display='block';
+  banner.innerHTML='<div style="background:'+info.color+';color:#fff;padding:14px 18px;border-radius:14px;margin:10px 0;display:flex;align-items:center;gap:12px;cursor:pointer" onclick="playSeasonalQuestions(\''+season+'\')"><span style="font-size:28px">'+info.icon+'</span><div><div style="font-weight:800;font-size:15px">'+info.label+'</div><div style="font-size:12px;opacity:.85">Special questions unlocked →</div></div></div>';
 }
 
 function playSeasonalQuestions(season){
