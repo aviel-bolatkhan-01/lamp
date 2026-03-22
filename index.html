@@ -46158,8 +46158,14 @@ function initFB(){
         go('home');
         const pendingRoom=sessionStorage.getItem('pending_room');
         if(pendingRoom){ sessionStorage.removeItem('pending_room'); setTimeout(()=>joinRoomByCode(pendingRoom.toUpperCase()),600); }
+      } else if(getAuthRedirectPending()){
+        toast('Sign-in returned no user — check Firebase authorized domains');
+        setAuthRedirectPending('');
       }
-    }).catch(e=>{ setAuthRedirectPending(''); handleAuthError(e,'Sign-in failed'); });
+    }).catch(e=>{
+      setAuthRedirectPending('');
+      toast('Sign-in error: '+(e.code||e.message));
+    });
     // Auth state observer — handles all sign-in methods
     G.auth.onAuthStateChanged(user=>{
       if(user){
