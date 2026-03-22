@@ -46120,6 +46120,8 @@ function initFB(){
               document.getElementById('main-nav').style.display='';
               renderHomeBar();
               if(document.getElementById('s-auth')?.classList.contains('active')) go('home');
+              const pendingRoom=sessionStorage.getItem('pending_room');
+              if(pendingRoom){ sessionStorage.removeItem('pending_room'); setTimeout(()=>joinRoomByCode(pendingRoom.toUpperCase()),600); }
             }
           }).catch(()=>{ if(G.profile) pushProfile(); });
         } else {
