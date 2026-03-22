@@ -3970,10 +3970,10 @@ html.feat-gameHeader .g-nm { font-weight: 800 !important; max-width: 100px; over
       <div class="card-sm" style="cursor:pointer;text-align:center;" onclick="pickAmt(this,'$5')"><div class="gold" style="font-family:'Cinzel',serif;font-size:17px;font-weight:700;">$5</div><div class="small dim">A gift</div></div>
       <div class="card-sm" style="cursor:pointer;text-align:center;border-color:var(--gold);" id="amt-sel" onclick="pickAmt(this,'$10')"><div class="gold" style="font-family:'Cinzel',serif;font-size:17px;font-weight:700;">$10</div><div class="small dim">Popular ✦</div></div>
       <div class="card-sm" style="cursor:pointer;text-align:center;" onclick="pickAmt(this,'$25')"><div class="gold" style="font-family:'Cinzel',serif;font-size:17px;font-weight:700;">$25</div><div class="small dim">Generous</div></div>
-      <div class="card-sm" id="amt-custom-card" style="cursor:text;text-align:center;grid-column:1/-1;display:flex;align-items:center;justify-content:center;gap:6px;" onclick="document.getElementById('custom-amt-input').focus()">
-        <div class="gold" style="font-family:'Cinzel',serif;font-size:17px;font-weight:700;">$</div>
-        <input id="custom-amt-input" type="number" min="1" placeholder="Enter amount" style="border:none;background:transparent;font-family:'Cinzel',serif;font-size:17px;font-weight:700;color:var(--gold);width:110px;outline:none;" oninput="pickCustomAmt(this)" onfocus="pickAmtCard(document.getElementById('amt-custom-card'))">
-        <div class="small dim">· Your choice</div>
+      <div class="card-sm" id="amt-custom-card" style="cursor:text;text-align:center;grid-column:1/-1;display:flex;align-items:center;justify-content:center;gap:4px;" onclick="document.getElementById('custom-amt-input').focus()">
+        <div class="gold" style="font-family:'Cinzel',serif;font-size:17px;font-weight:700;flex-shrink:0;">$</div>
+        <input id="custom-amt-input" type="text" inputmode="decimal" placeholder="Your amount" style="-moz-appearance:textfield;appearance:textfield;border:none;background:transparent;font-family:'Cinzel',serif;font-size:17px;font-weight:700;color:var(--gold);width:0;flex:1;min-width:0;outline:none;" oninput="pickCustomAmt(this)" onfocus="pickAmtCard(document.getElementById('amt-custom-card'))">
+        <div class="small dim" style="flex-shrink:0;">· Your choice</div>
       </div>
     </div>
     <button class="btn btn-gold" onclick="openDonate()" style="margin-bottom:8px;"><span class="btn-icon">❤️</span>Donate via Ko-fi</button>
