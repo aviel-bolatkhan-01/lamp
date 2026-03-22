@@ -3812,7 +3812,10 @@ html.feat-gameHeader .g-nm { font-weight: 800 !important; max-width: 100px; over
   <div class="scroller">
     <div style="text-align:center;padding:18px 0 14px;">
       <div class="prof-avatar" id="prof-av" onclick="openOv('ov-avatars','prof')">😊</div>
-      <div class="h2" id="prof-name">Your Name</div>
+      <div style="display:inline-flex;align-items:center;gap:8px;">
+        <div class="h2" id="prof-name">Your Name</div>
+        <button onclick="startEditName()" style="background:none;border:none;cursor:pointer;padding:2px 4px;color:var(--gold);font-size:16px;line-height:1;" title="Edit name">✏️</button>
+      </div>
       <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;margin-top:4px;" id="prof-level"></div>
       <div class="xp-wrap" style="max-width:200px;margin:10px auto 0;">
         <div class="xp-track"><div class="xp-fill" id="prof-xp-fill" style="--pct:0%;width:0;"></div></div>
@@ -49886,6 +49889,21 @@ function renderAchs(expanded){
   }
   ae.innerHTML=html;
 }
+function startEditName(){
+  if(!G.profile){ toast('Sign in first'); return; }
+  const cur=G.profile.name||'';
+  const name=prompt('Enter your new name (max 20 characters):', cur);
+  if(name===null) return; // cancelled
+  const trimmed=name.trim().slice(0,20);
+  if(!trimmed){ toast('Name cannot be empty'); return; }
+  G.profile.name=trimmed;
+  saveProfile();
+  if(G.fbOk) pushProfile();
+  document.getElementById('prof-name').textContent=trimmed;
+  renderHomeBar();
+  toast('Name updated!');
+}
+
 function renderProfile(){
   if(!G.profile){ go('auth'); buildAvGrid(); return; }
   const p=G.profile, l=lvl(p.xp||0);
