@@ -49414,14 +49414,18 @@ function acceptGhostChallenge(id){
   G._correctAtGameStart=G.profile?(G.profile.correct||0):0;
   G.diff=c.difficulty||'medium';
   G.TIM=G.diff==='easy'?25:G.diff==='hard'?12:20;
-  G.sub=c.mode==='truefalse'?'truefalse':c.mode==='verse'?'verse':'classic';
+  G.sub=c.mode==='truefalse'?'truefalse':c.mode==='verse'?'verse':c.mode==='lightning'?'lightning':'classic';
   G.pool=pool; G.qi=0; G.pi=0; G.done=false;
   G.players=[{name:G.profile.name||'Player',avatar:G.profile.avatar||'😊',photo:G.profile.photo||''}];
   G.scores={[G.profile.name||'Player']:0};
   G.hearts={[G.profile.name||'Player']:3};
   G.streaks={[G.profile.name||'Player']:0};
   G.cfg.winScore=c.count||10;
-  showSplash(0,()=>{ go('game'); renderQ(); });
+  if(c.mode==='lightning'){
+    showSplash(0,()=>startLightning(0));
+  } else {
+    showSplash(0,()=>{ go('game'); renderQ(); });
+  }
 }
 function declineGhostChallenge(id){
   if(!G.fbOk||!G.uid) return;
