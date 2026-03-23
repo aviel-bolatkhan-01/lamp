@@ -51724,6 +51724,8 @@ function sendChallenge(){
   G.diff=_chDiff;
   G.TIM=_chDiff==='easy'?25:_chDiff==='hard'?12:20;
   G.sub=challengeSub;
+  G.cfg.hearts=!!_chCfg.hearts;
+  G.cfg.winScore=clampRounds(_chCfg.winScore);
 
   // Get target friend data for adding to room
   const targetF=getFriendData(_chTargetUid);
