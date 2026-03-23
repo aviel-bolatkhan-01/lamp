@@ -4348,7 +4348,7 @@ html.feat-gameHeader .g-nm { font-weight: 800 !important; max-width: 100px; over
 ══════════════════════════════════════════════════ */
 const FB_CFG={
   apiKey:"AIzaSyBrGI0SKrE_puVG-qlnGhEKmxA8N3p17PU",
-  authDomain:"bible-game-night.firebaseapp.com",
+  authDomain:"thelampgame.com",
   databaseURL:"https://bible-game-night-default-rtdb.firebaseio.com",
   projectId:"bible-game-night",
   storageBucket:"bible-game-night.firebasestorage.app",
@@ -46140,13 +46140,14 @@ function getAuthRedirectPending(){
   try{ return sessionStorage.getItem('auth_redirect_pending')||''; }catch(e){ return ''; }
 }
 function _isMobile(){ return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || ('ontouchstart' in window); }
+function _makeProfile(u){
+  const displayName=u.displayName||(u.email?u.email.split('@')[0]:'Player');
+  return {name:displayName.split(' ')[0].slice(0,20),avatar:u.photoURL?'🧑':'😊',photo:u.photoURL||'',church:'',xp:0,correct:0,bestStreak:0,winStreak:0,wins:0,played:0,dailyStreak:0,lastDaily:'',theme:'light',weeklyXP:0,weeklyReset:wk(),xpResetVersion:XP_RESET_VERSION,friendCode:Math.random().toString(36).slice(2,8).toUpperCase(),friends:[],achs:[],notifications:false,clanName:'',clanCode:'',clanIcon:'⛪',clanPhoto:'',clanOwner:''};
+}
 function _afterSignIn(u, providerName){
   G.uid=u.uid; G.fbOk=true;
   return pullProfile().then(()=>{
-    if(!G.profile && u.displayName){
-      G.profile={name:u.displayName.split(' ')[0].slice(0,20),avatar:'🧑',photo:u.photoURL||'',church:'',xp:0,correct:0,bestStreak:0,winStreak:0,wins:0,played:0,dailyStreak:0,lastDaily:'',theme:'light',weeklyXP:0,weeklyReset:wk(),xpResetVersion:XP_RESET_VERSION,friendCode:Math.random().toString(36).slice(2,8).toUpperCase(),friends:[],achs:[],notifications:false,clanName:'',clanCode:'',clanIcon:'⛪',clanPhoto:'',clanOwner:''};
-      normalizeSocialProfile(); saveProfile();
-    }
+    if(!G.profile){ G.profile=_makeProfile(u); normalizeSocialProfile(); saveProfile(); }
     if(G.fbOk){ pushProfile(); listenFriendRequests(); listenFriendLinks(); listenAsyncChallenges(); }
     updateProfileSigninCard();
     document.getElementById('main-nav').style.display=''; renderHomeBar(); go('home');
@@ -46212,10 +46213,7 @@ function initFB(){
         const u=res.user;
         G.uid=u.uid; G.fbOk=true;
         pullProfile().then(()=>{
-          if(!G.profile && u.displayName){
-            G.profile={name:u.displayName.split(' ')[0].slice(0,20),avatar:'🧑',photo:u.photoURL||'',church:'',xp:0,correct:0,bestStreak:0,winStreak:0,wins:0,played:0,dailyStreak:0,lastDaily:'',theme:'light',weeklyXP:0,weeklyReset:wk(),xpResetVersion:XP_RESET_VERSION,friendCode:Math.random().toString(36).slice(2,8).toUpperCase(),friends:[],achs:[],notifications:false,clanName:'',clanCode:'',clanIcon:'⛪',clanPhoto:'',clanOwner:''};
-            normalizeSocialProfile(); saveProfile();
-          }
+          if(!G.profile){ G.profile=_makeProfile(u); normalizeSocialProfile(); saveProfile(); }
           if(G.fbOk){ pushProfile(); listenFriendRequests(); listenFriendLinks(); listenAsyncChallenges(); }
           const provider=res.additionalUserInfo?.providerId||'';
           const name=provider.includes('google')?'Google':'Apple';
@@ -46240,21 +46238,9 @@ function initFB(){
         // If signed in via social, pull full profile from Firebase and merge
         if(!user.isAnonymous && G.db){
           pullProfile().then(merged=>{
-            if(!merged && !G.profile && user.displayName){
+            if(!merged && !G.profile){
               // Brand new social user — create fresh profile
-              G.profile={
-                name:user.displayName.split(' ')[0].slice(0,20),
-                avatar:user.photoURL?'🧑':'😊', photo:user.photoURL||'',
-                church:'', xp:0, correct:0, bestStreak:0, winStreak:0,
-                wins:0, played:0, dailyStreak:0, lastDaily:'',
-                theme:'light', weeklyXP:0, weeklyReset:wk(),
-                xpResetVersion:XP_RESET_VERSION,
-                friendCode:Math.random().toString(36).slice(2,8).toUpperCase(),
-                friends:[], achs:[], notifications:false,
-                clanName:'', clanCode:'', clanIcon:'⛪', clanPhoto:'', clanOwner:''
-              };
-              normalizeSocialProfile();
-              saveProfile();
+              G.profile=_makeProfile(user); normalizeSocialProfile(); saveProfile();
             }
             if(G.profile){
               pushProfile();
