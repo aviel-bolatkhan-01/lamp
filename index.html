@@ -47528,7 +47528,7 @@ function startLightning(pIdx){
     endLightning();
     return;
   }
-  G.pi=pIdx; G.lScore=0; G.pool=buildPool().slice(0,currentRounds()); G.qi=0;
+  G.pi=pIdx; G.lScore=0; if(G.mode!=='async_challenge') G.pool=buildPool().slice(0,currentRounds()); G.qi=0;
   const p=G.players[pIdx];
   document.getElementById('l-av').innerHTML=avatarMarkup(p.avatar,resolvePlayerPhoto(p),'sm');
   document.getElementById('l-nm').textContent=p.name;
@@ -49234,7 +49234,7 @@ function sendGhostChallenge(){
   G._correctAtGameStart=G.profile?(G.profile.correct||0):0;
   G.diff=diff;
   G.TIM=diff==='easy'?25:diff==='hard'?12:20;
-  G.sub=mode==='truefalse'?'truefalse':mode==='verse'?'verse':'classic';
+  G.sub=mode==='truefalse'?'truefalse':mode==='verse'?'verse':mode==='lightning'?'lightning':'classic';
   G.pool=pool;
   G.qi=0; G.pi=0; G.done=false;
   G.players=[{name:G.profile.name||'Player',avatar:G.profile.avatar||'😊',photo:G.profile.photo||''}];
@@ -49245,7 +49245,11 @@ function sendGhostChallenge(){
   G.cfg.hearts=!!_chCfg.hearts;
   if(G.profile){ G.profile.sentGhostChallenge=true; saveProfile(); }
   closeOv('ov-challenge');
-  showSplash(0,()=>{ go('game'); renderQ(); });
+  if(mode==='lightning'){
+    showSplash(0,()=>startLightning(0));
+  } else {
+    showSplash(0,()=>{ go('game'); renderQ(); });
+  }
 }
 function finishGhostRace(){
   const ac=G.asyncChallenge; if(!ac) { go('winner'); sfx.win(); haptic('win'); confetti(); checkAchs(); return; }
