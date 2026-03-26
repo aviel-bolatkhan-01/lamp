@@ -1,11 +1,11 @@
 {
-  "name": "Lamp - Bible Trivia with friends",
+  "name": "Lamp: Bible Trivia Game",
   "short_name": "Lamp",
-  "description": "Lamp - Bible trivia game for families and churches. Play locally or online with friends.",
+  "description": "The ultimate Bible trivia game with 9,000+ questions. Play multiplayer scripture quizzes and join Houses of Faith.",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#FAFAF8",
-  "theme_color": "#58CC02",
+  "background_color": "#0d0906",
+  "theme_color": "#0d0906",
   "orientation": "portrait",
   "categories": ["games", "education"],
   "icons": [
