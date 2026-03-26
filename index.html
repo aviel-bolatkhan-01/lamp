@@ -46216,6 +46216,20 @@ function isNameTaken(name, excludeUid = null) {
     return uids.length > 0;
   });
 }
+function isClanNameTaken(name, excludeCode = null) {
+  if (!G.fbOk || !G.db) return Promise.resolve(false);
+  const clean = (name || "").trim().toLowerCase();
+  if (!clean) return Promise.resolve(false);
+  return G.db.ref("clans").orderByChild("name").equalTo((name || "").trim()).once("value").then(sn => {
+    const data = sn.val();
+    if (!data) return false;
+    const codes = Object.keys(data);
+    if (excludeCode) {
+      return codes.some(code => code !== excludeCode);
+    }
+    return codes.length > 0;
+  });
+}
 function _makeProfile(u){
   const displayName=u.displayName||(u.email?u.email.split('@')[0]:'Player');
   return {name:displayName.split(' ')[0].slice(0,20),avatar:u.photoURL?'🧑':'😊',photo:u.photoURL||'',church:'',xp:0,correct:0,bestStreak:0,winStreak:0,wins:0,played:0,dailyStreak:0,lastDaily:'',theme:'light',weeklyXP:0,weeklyReset:wk(),xpResetVersion:XP_RESET_VERSION,friendCode:Math.random().toString(36).slice(2,8).toUpperCase(),friends:[],achs:[],notifications:false,clanName:'',clanCode:'',clanIcon:'⛪',clanPhoto:'',clanOwner:''};
@@ -46682,7 +46696,14 @@ async function createProfile(){
     weeklyXP: 0, weeklyReset: wk(), xpResetVersion: XP_RESET_VERSION
   };
   normalizeSocialProfile();
-  if(church){ G.profile.clanName=church; autoCreateClan(church,av); }
+  if(church){ 
+    const ok = await autoCreateClan(church,av); 
+    if(ok) {
+      G.profile.clanName=church; 
+    } else {
+      toast('Congregation name taken, profile created without it.');
+    }
+  }
   saveProfile();
   document.getElementById('main-nav').style.display='';
   renderHomeBar();
@@ -47437,10 +47458,28 @@ function renderHearts(id,cur,max=3){
 }
 
 function renderVerseQ(q){
+  // Fix data redundancy: strip the blank word from 'before' and 'after' if it was left in
+  const cleanVerseParts = (q) => {
+    let b = q.b || "";
+    let a = q.a || "";
+    const blank = (q.blank || "").trim();
+    if (!blank) return { b, a };
+
+    // Regex to match the blank word at the end of 'b' or start of 'a', ignoring trailing/leading punctuation
+    const bRegex = new RegExp(`(\\s|^)${blank}[^a-zA-Z0-9]*$`, "i");
+    const aRegex = new RegExp(`^[^a-zA-Z0-9]*${blank}(\\s|$)`, "i");
+
+    if (bRegex.test(b.trim())) b = b.trim().replace(bRegex, "").trim();
+    if (aRegex.test(a.trim())) a = a.trim().replace(aRegex, "").trim();
+
+    return { b, a };
+  };
+
+  const { b, a } = cleanVerseParts(q);
   const wrap=document.getElementById('g-opts'); wrap.innerHTML='';
   document.getElementById('g-txt').textContent='Complete the verse:';
   const vb=document.createElement('div'); vb.className='verse-cloze';
-  vb.innerHTML=`${q.b} <span class="vblank">__________</span> ${q.a}`;
+  vb.innerHTML=`${b} <span class="vblank">__________</span> ${a}`;
   wrap.appendChild(vb);
   const od=document.createElement('div'); od.className='opts';
   od.style.marginTop='0';
@@ -47455,7 +47494,8 @@ function renderVerseQ(q){
     const btn=document.createElement('button'); btn.className='opt';
     btn.style.cssText=`animation:scrIn .3s ${di*.06}s both`;
     btn.innerHTML=`<span class="opt-key">${keys[di]||'•'}</span><span>${opts[orig]}</span>`;
-    btn.onclick=()=>answerQ(btn,orig===correctOrig,{e:`${q.r} — "${q.b} ${q.blank} ${q.a}"`,a:correctOrig},order);
+    // Pass cleaned strings to answerQ so feedback doesn't repeat either
+    btn.onclick=()=>answerQ(btn,orig===correctOrig,{e:`${q.r} — "${b} ${q.blank}${a.startsWith('.') || a.startsWith(',') ? '' : ' '}${a}"`,a:correctOrig},order);
     od.appendChild(btn);
   });
   wrap.appendChild(od);
@@ -49568,13 +49608,17 @@ function declineGhostChallenge(id){
 /* ══════════════════════════════════════════════════
    CLANS
 ══════════════════════════════════════════════════ */
-function autoCreateClan(name,icon){
-  if(!G.fbOk||!G.uid)return;
+async function autoCreateClan(name,icon){
+  if(!G.fbOk||!G.uid)return false;
+  const taken = await isClanNameTaken(name);
+  if(taken) return false; // Skip auto-creation if name already exists
   const code=mkCode();
   try{
-    G.db.ref('clans/'+code).set({name,icon,photo:'',code,members:{[G.uid]:{name:G.profile.name,xp:0}},totalXp:0,weeklyXp:0,createdAt:Date.now()});
-    G.profile.clanCode=code; saveProfile();
-  }catch(e){}
+    await G.db.ref('clans/'+code).set({name,icon,photo:'',code,members:{[G.uid]:{name:G.profile.name,xp:0}},totalXp:0,weeklyXp:0,createdAt:Date.now()});
+    G.profile.clanCode=code; 
+    saveProfile();
+    return true;
+  }catch(e){ return false; }
 }
 let _pendingClanPhoto='';
 let _clanPhotoCtx='create';
@@ -49859,11 +49903,20 @@ function removeCongregationConfirmed(){
     .then(clearLocal)
     .catch(()=>toast('Could not remove congregation right now'));
 }
-function createClan(){
+async function createClan(){
   const name=(document.getElementById('clan-nm-inp').value||'').trim();
   if(!name){ toast('Enter a congregation name'); return; }
   if(!G.profile){ toast('Create a profile first'); return; }
   sfx.tap();
+
+  if (G.fbOk && G.db) {
+    const taken = await isClanNameTaken(name);
+    if (taken) {
+      toast('A congregation with that name already exists!');
+      return;
+    }
+  }
+
   const icon=document.querySelector('#clan-icon-grid .sel-icon')?.textContent||'⛪';
   const photo=_pendingClanPhoto||'';
   const code=mkCode();
