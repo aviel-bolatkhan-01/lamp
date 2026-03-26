@@ -3529,6 +3529,7 @@ html.feat-gameHeader .g-nm { font-weight: 800 !important; max-width: 100px; over
       <div class="chips-wrap" style="margin-bottom:12px;">
         <div class="label" style="margin-bottom:7px;">Game Mode</div>
         <div class="chips" id="setup-room-sub-chips">
+          <button class="chip" data-sub="mix" onclick="pickSetupSub(this,'mix')">🔀 Multi-verse</button>
           <button class="chip sel" data-sub="classic" onclick="pickSetupSub(this,'classic')">🎯 Multiple Choice</button>
           <button class="chip" data-sub="truefalse" onclick="pickSetupSub(this,'truefalse')">✅ True or False</button>
           <button class="chip" data-sub="verse" onclick="pickSetupSub(this,'verse')">📖 Complete the Verse</button>
@@ -4302,6 +4303,7 @@ html.feat-gameHeader .g-nm { font-weight: 800 !important; max-width: 100px; over
     <div class="chips-wrap">
       <div class="label" style="margin-bottom:7px;">Game Mode</div>
       <div class="chips" id="ch-qtype-chips">
+        <button class="chip" onclick="pickChQType(this,'mix')" id="ch-qtype-mix">🔀 Multi-verse</button>
         <button class="chip sel" onclick="pickChQType(this,'classic')" id="ch-qtype-classic">🎯 Multiple Choice</button>
         <button class="chip" onclick="pickChQType(this,'truefalse')" id="ch-qtype-truefalse">✅ True or False</button>
         <button class="chip" onclick="pickChQType(this,'verse')" id="ch-qtype-fillin">📖 Complete the Verse</button>
@@ -4447,7 +4449,7 @@ const SEASONAL_Q=[
   {q:"What did Simeon say he could now do after seeing the infant Jesus?",o:["Go to Jerusalem","Depart in peace","Begin his ministry","Proclaim to the nations"],a:1,e:"Luke 2:29 — Simeon said: 'Sovereign Lord, you may now dismiss your servant in peace.'",d:"medium",season:"christmas"},
   {q:"Which Gospel does NOT contain a nativity or birth narrative of Jesus?",o:["Matthew","Luke","Mark","None — all four have one"],a:2,e:"Mark begins with John the Baptist and Jesus' baptism — it contains no birth story.",d:"medium",season:"christmas"},
   {q:"Where did Joseph, Mary, and Jesus flee to escape King Herod?",o:["Syria","Babylon","Egypt","Persia"],a:2,e:"Matthew 2:13-14 — An angel told Joseph to flee to Egypt to escape Herod's plan to kill Jesus.",d:"easy",season:"christmas"},
-  // ── Easter (15) ──
+  // ── Easter (20) ──
   {q:"On what day of the week did Jesus rise from the dead?",o:["Saturday","Sunday","Friday","Monday"],a:1,e:"Matthew 28:1 — After the Sabbath, at dawn on the first day of the week, Jesus rose from the dead.",d:"easy",season:"easter"},
   {q:"Who was the first person to see the risen Jesus according to John's Gospel?",o:["Peter","James","Mary Magdalene","The disciples"],a:2,e:"John 20:14-16 — Mary Magdalene was the first to see the risen Jesus.",d:"easy",season:"easter"},
   {q:"What did Jesus say to Thomas when Thomas doubted the resurrection?",o:["You should have believed the others","Because you have seen me, you have believed; blessed are those who have not seen","Blessed are those who mourn","Go and tell my brothers"],a:1,e:"John 20:29 — Jesus said: 'Because you have seen me, you have believed; blessed are those who have not seen and yet have believed.'",d:"medium",season:"easter"},
@@ -4463,6 +4465,12 @@ const SEASONAL_Q=[
   {q:"What does the Hebrew word 'Hallelujah' mean?",o:["God is near","Praise the Lord","He is risen","Thanks be to God"],a:1,e:"Hallelujah is Hebrew for 'Praise the Lord' (Praise Yah/Yahweh) — used throughout Psalms and Revelation.",d:"easy",season:"easter"},
   {q:"In Romans 6, Paul connects baptism to what aspect of Christ's death and resurrection?",o:["Dying to the law","Being buried and raised with Christ","Receiving the Holy Spirit","Becoming a new creation"],a:1,e:"Romans 6:4 — 'We were buried with him through baptism into death in order that, just as Christ was raised, we too may live a new life.'",d:"hard",season:"easter"},
   {q:"At the empty tomb, who did the women first meet according to Matthew?",o:["Jesus himself","Two angels","One angel","The disciples"],a:2,e:"Matthew 28:2-5 — An angel of the Lord descended from heaven, rolled back the stone, and spoke to the women.",d:"medium",season:"easter"},
+  // New Easter questions with mixed types
+  {q:"The Roman soldiers placed a crown of thorns on Jesus' head.",a:true,e:"Matthew 27:29",d:"easy",season:"easter",type:"truefalse"},
+  {q:"Jesus was crucified at a place called Gethsemane.",a:false,e:"Matthew 27:33 — He was crucified at Golgotha (The Place of the Skull).",d:"easy",season:"easter",type:"truefalse"},
+  {q:"'He is not here; he has _____, just as he said.'",o:["risen","ascended","departed","gone"],a:0,e:"Matthew 28:6",d:"medium",season:"easter",type:"verse"},
+  {q:"'For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have _____ life.'",o:["eternal","forever","everlasting","holy"],a:0,e:"John 3:16",d:"easy",season:"easter",type:"verse"},
+  {q:"Barabbas was the prisoner released by Pilate instead of Jesus.",a:true,e:"Matthew 27:26",d:"medium",season:"easter",type:"truefalse"},
   // ── Pentecost (15) ──
   {q:"How many days after the Passover did Pentecost occur?",o:["7 days","30 days","40 days","50 days"],a:3,e:"Leviticus 23:16 — Pentecost (Feast of Weeks) occurred 50 days after the Feast of Firstfruits, which followed Passover.",d:"easy",season:"pentecost"},
   {q:"What sound accompanied the coming of the Holy Spirit at Pentecost?",o:["Thunder and lightning","A mighty rushing wind","A still small voice","A trumpet blast"],a:1,e:"Acts 2:2 — 'Suddenly a sound like the blowing of a violent wind came from heaven and filled the whole house.'",d:"easy",season:"pentecost"},
@@ -46004,10 +46012,13 @@ function normTxt(s){
 }
 function canonicalQuestionKey(q,subOverride){
   const mode=normalizeOnlineSub(subOverride||G.sub||'classic');
-  if(mode==='truefalse'){
+  const isTF=mode==='truefalse' || q.type==='truefalse' || (typeof q.a === 'boolean');
+  const isVerse=mode==='verse' || q.type==='verse' || (q.b && q.blank);
+
+  if(isTF){
     return `tf:${normTxt(q.q)}`;
   }
-  if(mode==='verse'){
+  if(isVerse){
     return `verse:${normTxt(q.b)}|${normTxt(q.blank)}|${normTxt(q.a)}|${normTxt(q.r)}`;
   }
   return `mcq:${normTxt(q.q)}|${normTxt((q.o||[]).join('|'))}|${normTxt(q.cat||q.r||'')}`;
@@ -46102,7 +46113,7 @@ function renderDailyMeta(){
 function saveLastPlayed(){
   if(!FEATURES.lastPlayed) return;
   const ML={online:'Online',nearby:'Nearby',local:'Pass & Play',practice:'Practice'};
-  const SL={classic:'Multiple Choice',truefalse:'True / False',verse:'Complete the Verse',lightning:'Lightning'};
+  const SL={mix:'Multi-verse',classic:'Multiple Choice',truefalse:'True / False',verse:'Complete the Verse',lightning:'Lightning'};
   try{ localStorage.setItem('bgn3_lp',JSON.stringify({mode:G.mode,sub:G.sub,ml:ML[G.mode]||G.mode,sl:SL[G.sub]||G.sub})); }catch(e){}
 }
 function renderLastPlayed(){
@@ -47027,6 +47038,7 @@ function removeP(i){
   renderSetup();
 }
 const MODE_DESCS={
+  mix:'A variety of question types: Multiple Choice, True/False, and Verse completion.',
   classic:'Pick the right answer from 4 options.',
   truefalse:'Decide if each statement is true or false.',
   verse:'Fill in the missing word from scripture.',
@@ -47154,7 +47166,12 @@ function buildPool(){
   let raw = [];
   if(G.sub==='truefalse') raw = [...TF_Q];
   else if(G.sub==='verse') raw = [...VERSE_Q];
-  else {
+  else if(G.sub==='mix'){
+    // Mix everything
+    Object.keys(QB).forEach(cat => QB[cat].forEach(q => raw.push({...q, cat})));
+    TF_Q.forEach(q => raw.push({...q, type:'truefalse'}));
+    VERSE_Q.forEach(q => raw.push({...q, type:'verse'}));
+  } else {
     Object.keys(QB).forEach(cat => QB[cat].forEach(q => raw.push({...q, cat})));
   }
   raw=dedupeQuestions(raw,G.sub).map(q=>ensureQuestionDifficulty(q,G.sub));
@@ -47346,8 +47363,8 @@ function renderQ(){
     tsEl.style.display = 'none';
   }
 
-  const isVerseQuestion=G.sub==='verse'||q.kind==='verse'||(q&&q.b&&Array.isArray(q.o)&&q.blank!=null);
-  const isTrueFalseQuestion=isTFQuestion(q)||q.kind==='truefalse';
+  const isVerseQuestion=G.sub==='verse'||q.kind==='verse'||q.type==='verse'||(q&&q.b&&Array.isArray(q.o)&&q.blank!=null);
+  const isTrueFalseQuestion=isTFQuestion(q)||q.kind==='truefalse'||q.type==='truefalse';
   const badgeLabel=isTrueFalseQuestion?'True or False':(q.cat||q.r||'');
   setCategoryBadge('g-cat',badgeLabel);
   document.getElementById('g-txt').style.marginTop=isTrueFalseQuestion?'12px':'';
@@ -47866,7 +47883,7 @@ function renderMatchHistory(expanded) {
     return;
   }
   const show = expanded ? history.length : Math.min(3, history.length);
-  const modeLabel = { classic: 'Classic MCQ', truefalse: 'True/False', fillinverse: 'Fill-in-Verse', lightning: 'Lightning', solo: 'Practice', practice: 'Practice', multiplayer: 'Multiplayer' };
+  const modeLabel = { mix: 'Multi-verse', classic: 'Classic MCQ', truefalse: 'True/False', fillinverse: 'Fill-in-Verse', lightning: 'Lightning', solo: 'Practice', practice: 'Practice', multiplayer: 'Multiplayer' };
   const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   let html = '';
   for (let i = 0; i < show; i++) {
@@ -48453,7 +48470,7 @@ function shouldEndOnlineGame(){
   return scoreReached||shouldEndByHearts();
 }
 function chQTypeLabel(qtype){
-  const qtLabels={classic:'🎯 Multiple Choice',truefalse:'✅ True or False',verse:'📖 Complete the Verse',fillin:'📖 Complete the Verse',lightning:'⚡ Lightning'};
+  const qtLabels={mix:'🔀 Multi-verse',classic:'🎯 Multiple Choice',truefalse:'✅ True or False',verse:'📖 Complete the Verse',fillin:'📖 Complete the Verse',lightning:'⚡ Lightning'};
   return qtLabels[normalizeOnlineSub(qtype)]||'🎯 Classic';
 }
 function chDiffLabel(diff){
