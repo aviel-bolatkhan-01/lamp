@@ -3808,6 +3808,13 @@ html.feat-gameHeader .g-nm { font-weight: 800 !important; max-width: 100px; over
     <div id="w-verse" style="background:rgba(201,145,13,.06);border:1px solid rgba(201,145,13,.18);border-radius:var(--r2);padding:16px 18px;margin-bottom:14px;font-style:italic;font-family:'Cormorant Garamond',serif;font-size:16px;line-height:1.8;text-align:center;color:var(--ink2);"></div>
     <div id="w-others" style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:16px;"></div>
     <button class="btn btn-gold" id="w-play-again" onclick="playAgain()" style="margin-bottom:8px;">🔄 Play Again</button>
+    <!-- Daily streak banner — only shown after daily challenge -->
+    <div id="w-daily-streak" style="display:none;background:linear-gradient(135deg,rgba(224,168,96,.12),rgba(196,132,42,.06));border:1px solid rgba(224,168,96,.35);border-radius:14px;padding:14px 16px;margin-bottom:10px;text-align:center;">
+      <div id="w-ds-emoji" style="font-size:32px;line-height:1;margin-bottom:4px;">🔥</div>
+      <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;margin-bottom:2px;">Daily Streak</div>
+      <div id="w-ds-label" style="font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:800;color:var(--gold1);line-height:1.1;margin-bottom:10px;">1 Day</div>
+      <button class="btn btn-gold btn-sm" style="width:100%;" onclick="shareStreakText()">🔥 Share Your Streak</button>
+    </div>
     <button class="btn btn-share btn-sm" onclick="postMatchShareResult()" style="margin-bottom:8px;">↗ Share Result</button>
     <button class="btn btn-ghost btn-sm" style="margin-bottom:8px;" onclick="postMatchGoHome()">Home</button>
     <button class="btn btn-ghost btn-sm" onclick="postMatchGoDonation()">❤️ Support This Ministry</button>
@@ -48440,6 +48447,16 @@ function endGame(){
         G.profile.lastDaily = today;
         addXP(100); // Daily bonus
         toast(`☀️ Daily Challenge Complete! +100 XP`);
+        // Populate streak banner on win screen
+        const dsEl=document.getElementById('w-daily-streak');
+        const dsLabel=document.getElementById('w-ds-label');
+        const dsEmoji=document.getElementById('w-ds-emoji');
+        if(dsEl&&dsLabel&&dsEmoji){
+          const s=G.profile.dailyStreak||1;
+          dsEmoji.textContent=s>=7?'👑':s>=3?'🔥':'⚡';
+          dsLabel.textContent=s+' Day'+(s===1?'':'s');
+          dsEl.style.display='block';
+        }
       }
 
       const wasSeasonal = G._seasonalMode;
@@ -48526,6 +48543,9 @@ function endGame(){
     }
     const wvEl=document.getElementById('w-verse');
     if(wvEl) wvEl.innerHTML=`"${v.t}"<br><span style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:.2em;color:var(--gold);display:block;margin-top:8px;">— ${v.r}</span>`;
+    // Hide streak banner for non-daily modes; shown by daily completion block above
+    const dsEl=document.getElementById('w-daily-streak');
+    if(dsEl && G.mode!=='daily') dsEl.style.display='none';
     const oth=document.getElementById('w-others'); 
     if(oth){
       oth.innerHTML='';
@@ -48712,6 +48732,14 @@ function leaveCurrentRoom(opts){
     if(!quiet) toast('Left room '+roomId+'.');
     if(after) after();
   });
+}
+function shareStreakText(){
+  sfx.tap();
+  const streak=G.profile&&G.profile.dailyStreak||1;
+  const emoji=streak>=7?'👑':streak>=3?'🔥':'⚡';
+  const text=`${emoji} Day ${streak} streak on Lamp Bible Trivia!\n\nI'm testing my scripture knowledge daily — can you keep up? 📖\n\nPlay free: https://thelampgame.com`;
+  if(navigator.share){ navigator.share({title:'Lamp Bible Trivia',text}).catch(()=>{}); }
+  else{ navigator.clipboard.writeText(text).then(()=>toast('Copied to clipboard! Share with friends 📋')).catch(()=>{}); }
 }
 function postMatchShareResult(){
   if((G.mode==='online'||G.mode==='nearby'||G.onlineGame) && G.roomRef && G.roomId){
@@ -51698,6 +51726,9 @@ function updateDailyStreak(){
   const fire=streak>=7?'👑':streak>=3?'🔥':'⚡';
   el.textContent=streak>0?fire+' '+streak+'-day streak'+(last===today?' · done today!':' · play to keep it!'):
     'Play daily to build your streak!';
+  el.style.color=streak>0?'var(--gold1)':'var(--ink3)';
+  el.style.fontSize=streak>0?'13px':'11px';
+  el.style.fontWeight=streak>0?'700':'400';
 }
 
 /* ══════════════════════════════════════════════════
