@@ -52215,6 +52215,27 @@ function renderConversations(){
     list.innerHTML='<div style="text-align:center;color:var(--ink3);padding:30px 0;font-size:14px;">Add friends to start chatting!</div>';
     return;
   }
+  _drawConversationList(uids);
+  // Fetch last message for any friend whose preview we don't have yet
+  if(G.fbOk&&G.db&&G.uid){
+    uids.forEach(uid=>{
+      if(G._convPreviews&&G._convPreviews[uid]) return; // already have it
+      const pair=[G.uid,uid].sort().join('_');
+      G.db.ref('chats/'+pair+'/messages').limitToLast(1).once('value',sn=>{
+        sn.forEach(child=>{
+          const m=child.val();
+          if(!m) return;
+          if(!G._convPreviews) G._convPreviews={};
+          G._convPreviews[uid]={text:m.text,ts:m.ts||Date.now()};
+        });
+        _drawConversationList(getFriendList());
+      });
+    });
+  }
+}
+function _drawConversationList(uids){
+  const list=document.getElementById('conversations-list');
+  if(!list) return;
   list.innerHTML=uids.map(uid=>{
     const f=getFriendData(uid);
     const preview=G._convPreviews&&G._convPreviews[uid];
