@@ -3546,6 +3546,17 @@ html.feat-gameHeader .g-nm { font-weight: 800 !important; max-width: 100px; over
       style="width:100%;padding:10px;background:transparent;border:1px dashed rgba(0,0,0,.15);border-radius:var(--r2);color:var(--ink3);cursor:pointer;margin-bottom:14px;">
       + Add Player
     </button>
+    <!-- Team Mode toggle — only shown for Pass & Play -->
+    <div id="team-mode-wrap" style="display:none;margin-bottom:14px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;background:var(--bg2);border-radius:12px;padding:12px 14px;">
+        <div>
+          <div style="font-weight:800;font-size:14px;color:var(--ink);">👥 Team Mode</div>
+          <div style="font-size:11px;color:var(--ink3);margin-top:2px;">Split players into Team A vs Team B</div>
+        </div>
+        <button id="team-mode-toggle" onclick="toggleTeamMode()"
+          style="min-width:52px;height:28px;border-radius:14px;border:none;cursor:pointer;font-size:12px;font-weight:800;transition:all .2s;background:#ccc;color:#fff;padding:0 10px;">OFF</button>
+      </div>
+    </div>
     <div id="team-picker" style="display:none;margin-bottom:14px;"></div>
 
     <div id="setup-room-mode-wrap" style="display:none;margin-bottom:14px;">
@@ -3557,7 +3568,6 @@ html.feat-gameHeader .g-nm { font-weight: 800 !important; max-width: 100px; over
           <button class="chip" data-sub="truefalse" onclick="pickSetupSub(this,'truefalse')">✅ True or False</button>
           <button class="chip" data-sub="verse" onclick="pickSetupSub(this,'verse')">📖 Complete the Verse</button>
           <button class="chip" data-sub="lightning" onclick="pickSetupSub(this,'lightning')">⚡ Lightning</button>
-          <button class="chip" data-sub="team" id="chip-team" style="display:none;" onclick="pickSetupSub(this,'team')">👥 Team Mode</button>
         </div>
       </div>
       <div>
@@ -46453,7 +46463,7 @@ function mkEmpty(icon,title,sub){
    STATE
 ══════════════════════════════════════════════════ */
 const G={
-  mode:'online', sub:'mix',
+  mode:'online', sub:'mix', teamMode:false,
   profile:null, uid:null,
   players:[], pool:[], qi:0, pi:0,
   seen:new Set(), // Tracks IDs or questions to prevent repeats
@@ -47184,7 +47194,6 @@ function applyModeSubAvailability(){
   const lightChip=document.querySelector('#sub-chips .chip[data-sub="lightning"]');
   if(lightChip) lightChip.style.display=localMode?'none':'';
   if(localMode&&G.sub==='lightning') G.sub='classic';
-  if(G.sub==='team') G.sub='classic';
   syncSubChipSelection();
 }
 const MODE_STYLE_DESCS={
@@ -47252,6 +47261,12 @@ function buildSetup(seedPlayers){
       {name:'Player 2',avatar:AVATARS[1]||'🙂'}
     ];
   }
+  // Reset team mode when entering setup
+  G.teamMode=false;
+  const tmWrap=document.getElementById('team-mode-wrap');
+  if(tmWrap) tmWrap.style.display='block';
+  const tmBtn=document.getElementById('team-mode-toggle');
+  if(tmBtn){ tmBtn.textContent='OFF'; tmBtn.style.background='#ccc'; }
   renderSetup(); renderOpts(); renderSetupRoomModeChips();
   // Hide lightning for Pass & Play
   const lightChip=document.querySelector('#setup-room-sub-chips .chip[data-sub="lightning"]');
@@ -47265,6 +47280,10 @@ function buildModeSetup(kind,fromHomeSelection){
   document.getElementById('setup-list').style.display='none';
   document.getElementById('add-p-btn').style.display='none';
   document.getElementById('setup-room-mode-wrap').style.display='block';
+  // Team mode only for local pass & play
+  const tmWrap=document.getElementById('team-mode-wrap');
+  if(tmWrap) tmWrap.style.display='none';
+  G.teamMode=false;
   if(kind==='online'){
     document.getElementById('setup-eyebrow').textContent='Online';
     document.getElementById('setup-title').innerHTML='Game <em>Settings</em>';
@@ -47289,12 +47308,9 @@ function renderSetupRoomModeChips(){
   const subWrap=document.getElementById('setup-room-sub-chips');
   const diffWrap=document.getElementById('setup-room-diff-chips');
   if(subWrap){
-    const effectiveSub=(G.sub==='team')?'team':G.sub;
-    subWrap.querySelectorAll('.chip').forEach(c=>c.classList.toggle('sel',c.dataset.sub===effectiveSub));
+    subWrap.querySelectorAll('.chip').forEach(c=>c.classList.toggle('sel',c.dataset.sub===G.sub));
     const lightChip=subWrap.querySelector('.chip[data-sub="lightning"]');
-    if(lightChip) lightChip.style.display=(G.mode==='local')?'none':'';
-    const teamChip=document.getElementById('chip-team');
-    if(teamChip) teamChip.style.display=(G.mode==='local')?'':'none';
+    if(lightChip) lightChip.style.display=(G.mode==='local'||G.teamMode)?'none':'';
   }
   if(diffWrap){
     diffWrap.querySelectorAll('.diff-chip').forEach(c=>c.classList.toggle('sel',c.dataset.diff===G.diff));
@@ -47303,13 +47319,31 @@ function renderSetupRoomModeChips(){
 function pickSetupSub(el,s){
   sfx.tap(); haptic('tap');
   if(G.mode==='local'&&s==='lightning'){ toast('Lightning is not available in Pass & Play.'); return; }
-  if(s==='team'&&G.mode!=='local'){ toast('Team mode is for group play only (Pass & Play).'); return; }
   G.sub=s; G.seen.clear();
   if(s==='lightning') G.cfg.hearts=false;
-  if(s==='team') setupPs.forEach((p,i)=>{ p.team=(i%2===0)?'Team A':'Team B'; });
   document.querySelectorAll('#setup-room-sub-chips .chip').forEach(c=>c.classList.remove('sel'));
   el.classList.add('sel');
   renderOpts();
+}
+function toggleTeamMode(){
+  sfx.tap();
+  G.teamMode=!G.teamMode;
+  const btn=document.getElementById('team-mode-toggle');
+  if(btn){
+    btn.textContent=G.teamMode?'ON':'OFF';
+    btn.style.background=G.teamMode?'#C4842A':'#ccc';
+  }
+  if(G.teamMode){
+    setupPs.forEach((p,i)=>{ if(!p.team) p.team=(i%2===0)?'Team A':'Team B'; });
+    // Hide lightning when team mode is on
+    const lc=document.querySelector('#setup-room-sub-chips .chip[data-sub="lightning"]');
+    if(lc) lc.style.display='none';
+    if(G.sub==='lightning'){ G.sub='classic'; renderSetupRoomModeChips(); }
+  } else {
+    // Restore lightning visibility (only for non-local)
+    const lc=document.querySelector('#setup-room-sub-chips .chip[data-sub="lightning"]');
+    if(lc) lc.style.display=(G.mode==='local')?'none':'';
+  }
   renderTeamPicker();
 }
 function pickSetupDiff(el,d){
@@ -47339,7 +47373,7 @@ function renderSetup(){
 function renderTeamPicker(){
   const el=document.getElementById('team-picker');
   if(!el) return;
-  if(G.sub!=='team'){ el.style.display='none'; return; }
+  if(!G.teamMode){ el.style.display='none'; return; }
   // Initialize teams if not set
   setupPs.forEach((p,i)=>{ if(!p.team) p.team=(i%2===0)?'Team A':'Team B'; });
   const teamA=setupPs.map((p,i)=>({p,i})).filter(({p})=>p.team==='Team A');
@@ -47392,7 +47426,7 @@ function removeP(i){
   if(setupPs.length<=2){ toast('Need at least 2 players'); return; }
   sfx.tap(); setupPs.splice(i,1);
   // Re-balance teams if in team mode so no team ends up empty
-  if(G.sub==='team'){
+  if(G.teamMode){
     const hasA=setupPs.some(p=>p.team==='Team A'), hasB=setupPs.some(p=>p.team==='Team B');
     if(!hasA||!hasB) setupPs.forEach((p,idx)=>{ p.team=(idx%2===0)?'Team A':'Team B'; });
   }
@@ -47591,7 +47625,7 @@ function beginGame(){
   G.scores={}; G.hearts={}; G.streaks={};
   G.players.forEach(p=>{ G.scores[p.name]=0; G.hearts[p.name]=3; G.streaks[p.name]=0; });
 
-  if (G.sub === 'team') {
+  if(G.teamMode){
     const hasA=setupPs.some(p=>p.team==='Team A'), hasB=setupPs.some(p=>p.team==='Team B');
     if(!hasA||!hasB){ toast('Each team needs at least one player.'); return; }
     G.teamScores = { 'Team A': 0, 'Team B': 0 };
@@ -47609,7 +47643,6 @@ function beginGame(){
 function startPracticeGame(){
   if(!G.profile){ go('auth'); buildAvGrid(); return; }
   G.mode='practice';
-  if(G.sub==='team') G.sub='classic';
   G.cfg.winScore=clampRounds(G.cfg.winScore);
   syncSubChipSelection();
   G.players=[{name:G.profile.name,avatar:G.profile.avatar,photo:G.profile.photo||''}];
@@ -47711,7 +47744,7 @@ function renderQ(){
 
   // Team scores UI
   const tsEl = document.getElementById('g-team-scores');
-  if(G.sub === 'team') {
+  if(G.teamMode) {
     tsEl.style.display = 'flex';
     const teamKeys=Object.keys(G.teamScores||{'Team A':0,'Team B':0});
     document.getElementById('g-t1-score').textContent = G.teamScores[teamKeys[0]]||0;
@@ -47821,7 +47854,7 @@ function answerQ(btn,isOk,q,order){
     if(G.streaks[p.name]>=3) showStreak(G.streaks[p.name]);
 
     // Check win condition
-    if (G.sub === 'team') {
+    if (G.teamMode) {
       if (G.teamScores[p.team] >= G.cfg.winScore) { setTimeout(endGame, 1100); return; }
     } else {
       if(G.scores[p.name]>=G.cfg.winScore){
@@ -48355,7 +48388,7 @@ function endGame(){
     if(G._resultTimeout){clearTimeout(G._resultTimeout);G._resultTimeout=null;}
     let win, iWon = false, topWinners=[];
     
-    if (G.sub === 'team') {
+    if (G.teamMode) {
       const teams=Object.keys(G.teamScores||{'Team A':0,'Team B':0});
       const scores=teams.map(t=>({t,s:G.teamScores[t]||0}));
       scores.sort((a,b)=>b.s-a.s);
@@ -48449,14 +48482,14 @@ function endGame(){
     }
     saveMatchResult(win, G.players);
     const v=nextWinVerse();
-    const isTie=(G.sub!=='team'&&topWinners.length>1)||(G.sub==='team'&&win.name==='Tie');
+    const isTie=(!G.teamMode&&topWinners.length>1)||(G.teamMode&&win.name==='Tie');
     const wAv=document.getElementById('w-av');
     const wName=document.getElementById('w-name');
     const wPts=document.getElementById('w-pts');
     const wXp=document.getElementById('w-xp-txt');
     const wasSeasonal = G._seasonalMode || (G.pool && G.pool[0] && G.pool[0].season);
 
-    if(G.sub==='team'){
+    if(G.teamMode){
       if(isTie){
         if(wAv) wAv.innerHTML='🤝';
         if(wName) wName.textContent="It's a Tie!";
