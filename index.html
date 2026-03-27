@@ -46340,7 +46340,7 @@ function mkEmpty(icon,title,sub){
    STATE
 ══════════════════════════════════════════════════ */
 const G={
-  mode:'online', sub:'classic',
+  mode:'online', sub:'mix',
   profile:null, uid:null,
   players:[], pool:[], qi:0, pi:0,
   seen:new Set(), // Tracks IDs or questions to prevent repeats
@@ -47163,6 +47163,7 @@ function buildModeSetup(kind,fromHomeSelection){
     document.getElementById('setup-title').innerHTML='Practice <em>Settings</em>';
     document.getElementById('setup-subtitle').textContent='Single-player with selected game mode and rules.';
     document.getElementById('setup-go-btn').innerHTML='<span class="btn-icon">🎓</span> Start Practice';
+    if(!fromHomeSelection) G.sub='mix';
   }
   renderOpts();
   renderSetupRoomModeChips();
