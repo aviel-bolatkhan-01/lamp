@@ -1,41 +1,43 @@
-# Shared Context — Lamp: Bible Trivia Online
-# Auto-updated each session. All AI tools read this before working.
+# Lamp — Shared AI Context
+# Auto-updated each session. Gemini, Codex, Groq, and Claude all read this.
 
 ## Project
-- Name: Lamp — Bible Trivia Online
-- Live: https://thelampgame.com
-- Stack: Single HTML file (index.html, ~52k lines), Firebase Realtime DB, vanilla JS
+- App: Lamp Bible Trivia Online — https://thelampgame.com
+- Stack: index.html (~52k lines, single file), Firebase Realtime DB, vanilla JS
 - Path: /Users/abzal.bolatkhan.01/AI projects/Lamp - Bible Trivia Online
+- Firebase project: bible-game-night | GitHub: github.com/aviel-bolatkhan-01/lamp (backup only)
 
-## Current Status
+## Current State
 - Last deploy: 2026-03-28
-- What's live: SEO-optimized index.html, 19 trivia category pages (/trivia/), daily streak share card, PWA
+- Live: SEO-optimized index.html, 19 trivia category pages (/trivia/*), daily streak share card on win screen, PWA with service worker
 - In progress: nothing
-- Up next: onboarding flow, email capture, push notification timing improvement
+- Up next: onboarding flow, email capture, push notification timing, seasonal pages (Easter/Christmas), "Hard Bible Trivia" landing page
 
-## Architecture Rules (follow exactly)
-- Global state: `G = {}` object — never redeclare
-- Screen navigation: `show(id)` / `hide(id)` / `go('screen-name')`
-- `buildPool()` filters questions by difficulty
-- Difficulty values MUST be lowercase: "easy" "medium" "hard" — never capitalized
-- Validate JS after every edit: extract <script> → node --check /tmp/game_script.js
-- `];` not `]];` — never double-bracket question arrays
+## Code Rules (non-negotiable)
+- Global state: `G = {}` — never redeclare
+- Navigation: `go('screen-id')` | show/hide: `show(id)` / `hide(id)`
+- Difficulty: always lowercase — `"easy"` `"medium"` `"hard"` never capitalized
+- After every JS edit: run `node --check /tmp/game_script.js`
+- Arrays: `];` never `]];`
+- Question format MCQ: `{"q":"...","o":[...],"a":0,"e":"...","d":"easy"}`
+- Question format TF: `{q:"...",a:true,d:"easy"}`
+- Question format Verse: `{"b":"...","blank":"...","a":"...","r":"...","o":[...],"d":"easy"}`
 
 ## Question Banks
-- QB (Classic MCQ): 3,012 questions, 19 categories
-- TF_Q (True/False): 3,219 questions
-- VERSE_Q (Fill-in-Verse): 3,000 questions
-- Total: 9,231 questions
+- QB (MCQ): 3,012 — 19 categories: Genesis, Exodus, Judges, Kings, Psalms, Prophets, Gospels, Parables, Acts, Epistles, Revelation, Miracles, Women of the Bible, Animals in the Bible, Bible Geography, Numbers & Dates, Old Testament Law, Worship & Music, Who Am I?
+- TF_Q (True/False): 3,219 | VERSE_Q (Fill-in-Verse): 3,000 | Total: 9,231
 
 ## Brand
-- Primary accent: gold #E0A860 / #C4842A — NOT green
-- Dark bg: #1A1A20 | Card: #242430 | Text: #EDEDEC
-- Buttons: class .btn + modifier (btn-gold, btn-ruby, btn-blue, btn-ghost)
-- 4 themes: Dark (default), Green, Warmth, Light
+- Accent: gold #E0A860 / #C4842A — never green
+- BG: #1A1A20 | Card: #242430 | Text: #EDEDEC / #A8A8A4 / #737373
+- Buttons: `.btn` + modifier: `btn-gold` `btn-ruby` `btn-blue` `btn-ghost`
+- Themes: Dark (default), Green, Warmth, Light
 
-## Deploy Sequence
-git add <files> && git commit -m "Description — YYYY-MM-DD HH:MM"
+## Deploy
+```
+git add <files> && git commit -m "What — YYYY-MM-DD HH:MM"
 git push origin dev
 git checkout main && git merge dev && git push origin main
 firebase deploy --only hosting
 git checkout dev
+```
