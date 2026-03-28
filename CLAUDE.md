@@ -1,6 +1,9 @@
 # Lamp — Bible Trivia Online
 ## Project Rules for Claude Code
 
+@STATUS.md
+@CONTEXT.md
+
 ### First Thing Every Session
 1. Read `STATUS.md` — know what's in progress
 2. Read `MEMORY.md` at `~/.claude/projects/-Users-abzal-bolatkhan-01/memory/`
@@ -45,10 +48,10 @@ Never use Claude tokens for work a free tool can do.
 
 | Tool | Use for |
 |------|---------|
-| **Gemini** (`gemini -p "..."`) | Research, content generation, bulk text, Bible knowledge |
+| **Gemini** (`~/.claude/bin/gmn "..."`) | Research, content generation, bulk text, Bible knowledge |
 | **Groq** (curl API) | Fast lookups, short generation, simple formatting |
 | **Mistral** (Python SDK) | Marketing copy, customer-facing content |
-| **Codex** (`codex exec --skip-git-repo-check "..."`) | All code writing and fixes |
+| **Codex** (`~/.claude/bin/cdx "..."`) | All code writing and fixes |
 | **Claude** | Planning, judgment, orchestration only |
 
 - Run Gemini/Codex/Groq in background (`run_in_background: true`) whenever independent
