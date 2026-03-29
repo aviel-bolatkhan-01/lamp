@@ -3342,6 +3342,42 @@ html.feat-gameHeader .g-nm { font-weight: 800 !important; max-width: 100px; over
 
 <div id="app">
 
+<!-- ████████  ONBOARDING  ████████ -->
+<div class="screen" id="s-onboarding" style="z-index:9999;background:var(--bg);display:none;flex-direction:column;justify-content:center;align-items:center;padding:40px 24px;text-align:center;">
+  <div id="onboard-step-1" class="onboard-step" style="display:flex;flex-direction:column;align-items:center;gap:24px;animation:fadeIn 0.6s ease-out;">
+    <div style="width:80px;height:80px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 40px rgba(224,168,96,0.3);">
+      <span style="font-size:40px;">✨</span>
+    </div>
+    <div>
+      <h2 style="font-family:'Cinzel',serif;color:var(--gold);font-size:28px;margin-bottom:12px;letter-spacing:0.1em;">Illuminate Your Faith</h2>
+      <p style="color:var(--ink2);line-height:1.6;font-size:16px;">Step into the light. Your journey begins here.</p>
+    </div>
+    <button class="btn btn-gold" onclick="nextOnboard(2)" style="width:200px;">Next →</button>
+  </div>
+
+  <div id="onboard-step-2" class="onboard-step" style="display:none;flex-direction:column;align-items:center;gap:24px;">
+    <div style="width:80px;height:80px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 40px rgba(224,168,96,0.3);">
+      <span style="font-size:40px;">📖</span>
+    </div>
+    <div>
+      <h2 style="font-family:'Cinzel',serif;color:var(--gold);font-size:28px;margin-bottom:12px;letter-spacing:0.1em;">9,200+ Questions</h2>
+      <p style="color:var(--ink2);line-height:1.6;font-size:16px;">From Genesis to Revelation—dive deep into Scripture’s greatest stories.</p>
+    </div>
+    <button class="btn btn-gold" onclick="nextOnboard(3)" style="width:200px;">Next →</button>
+  </div>
+
+  <div id="onboard-step-3" class="onboard-step" style="display:none;flex-direction:column;align-items:center;gap:24px;">
+    <div style="width:80px;height:80px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 40px rgba(224,168,96,0.3);">
+      <span style="font-size:40px;">🕊️</span>
+    </div>
+    <div>
+      <h2 style="font-family:'Cinzel',serif;color:var(--gold);font-size:28px;margin-bottom:12px;letter-spacing:0.1em;">Start Your Journey</h2>
+      <p style="color:var(--ink2);line-height:1.6;font-size:16px;">Claim your path. The Word awaits.</p>
+    </div>
+    <button class="btn btn-gold" onclick="finishOnboard()" style="width:200px;">Get Started</button>
+  </div>
+</div>
+
 <!-- ████████  HOME  ████████ -->
 <div class="screen active" id="s-home">
   <div style="padding:14px 0 10px;flex-shrink:0;display:flex;align-items:center;gap:10px;">
@@ -4348,6 +4384,21 @@ html.feat-gameHeader .g-nm { font-weight: 800 !important; max-width: 100px; over
   </div>
 </div>
 
+<!-- ── MODAL: Push Notifications ── -->
+<div class="ov" id="ov-notif" onclick="bgClose(event,'ov-notif')">
+  <div class="mbox" style="text-align:center;padding:30px 20px;">
+    <div style="width:64px;height:64px;background:rgba(224,168,96,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+      <span style="font-size:32px;">🔔</span>
+    </div>
+    <div class="mtitle" style="margin-bottom:8px;">Don't Miss a Streak!</div>
+    <div style="font-size:14px;color:var(--ink2);line-height:1.6;margin-bottom:24px;">Enable notifications to get daily verses and reminders for your Bible trivia streak.</div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <button class="btn btn-gold" style="width:100%;" onclick="requestNotificationPermission()">Enable Notifications</button>
+      <button class="btn btn-ghost btn-sm" style="width:100%;" onclick="closeNotifPrompt()">Maybe Later</button>
+    </div>
+  </div>
+</div>
+
 <!-- ── MODAL: Delete Profile ── -->
 <div class="ov" id="ov-delete-profile" onclick="bgClose(event,'ov-delete-profile')">
   <div class="mbox">
@@ -4896,7 +4947,8 @@ function renderWeeklyTournament(){
   }
 
   const {week,category}=getWeeklyTournamentInfo();
-  const done=G.profile.tournamentWeek===week;
+  const _todayWTRender=new Date().toISOString().split('T')[0];
+  const done=G.profile.lastWeeklyDate===_todayWTRender;
   const icon=WT_ICONS[category]||'🏟️';
   const msLeft=msToNextSundayUTC();
   const streak=G.profile.tournamentStreak||0;
@@ -5003,7 +5055,8 @@ function wtShare(){
 function startWeeklyTournament(){
   if(!G.profile){ go('auth'); buildAvGrid(); return; }
   const week=getWTWeekKey();
-  if(G.profile.tournamentWeek===week){ toast('You already played this week! Come back next Sunday. 🏆'); return; }
+  const _todayWT=new Date().toISOString().split('T')[0];
+  if(G.profile.lastWeeklyDate===_todayWT){ toast('You already played today — come back tomorrow! 🏆'); return; }
   sfx.tap();
   const pool=getWeeklyTournamentPool();
   if(!pool.length){ toast('No questions available for this category'); return; }
@@ -5028,6 +5081,7 @@ function finishWeeklyTournament(score,total){
   const wasStreaking=G.profile.tournamentWeek===prevWeek;
   G.profile.tournamentStreak=wasStreaking?(G.profile.tournamentStreak||0)+1:1;
   G.profile.tournamentWeek=week;
+  G.profile.lastWeeklyDate=new Date().toISOString().split('T')[0];
   G.profile.tournamentScore=score;
   saveProfile();
   if(G.fbOk&&G.uid){
@@ -43594,7 +43648,7 @@ const VERSE_Q=[
   {"b": "A gentle answer turns away ", "blank": "wrath", "a": ", but a harsh word stirs up anger.", "r": "Proverbs 15:1", "o": ["wrath", "anger", "fury", "strife"], "d": "easy"},
   {"b": "Hope deferred makes the heart ", "blank": "sick", "a": ", but a longing fulfilled is a tree of life.", "r": "Proverbs 13:12", "o": ["sick", "sad", "weak", "faint"], "d": "easy"},
   {"b": "Hear, O Israel: The LORD our God, the LORD is ", "blank": "one", "a": ".", "r": "Deuteronomy 6:4", "o": ["one", "Lord", "God", "true"], "d": "easy"},
-  {"b": "You shall not murder.", "blank": "You", "a": " shall not murder.", "r": "Exodus 20:13", "o": ["You", "Do", "Thou", "One"], "d": "easy"},
+  {"b": "", "blank": "You", "a": " shall not murder.", "r": "Exodus 20:13", "o": ["You", "Do", "Thou", "One"], "d": "easy"},
   {"b": "Do not be overcome by ", "blank": "evil", "a": ", but overcome evil with good.", "r": "Romans 12:21", "o": ["evil", "sin", "wrong", "hate"], "d": "easy"},
   {"b": "For I am not ashamed of the ", "blank": "gospel", "a": ", because it is the power of God that brings salvation.", "r": "Romans 1:16", "o": ["gospel", "cross", "truth", "Lord"], "d": "easy"},
   {"b": "In everything I showed you that by working hard in this way you must help the ", "blank": "weak", "a": " and remember the words of the Lord Jesus.", "r": "Acts 20:35", "o": ["weak", "poor", "needy", "least"], "d": "easy"},
@@ -46759,8 +46813,10 @@ function loadProfile(){
     renderHomeBar();
     // Apply saved theme on load
     if(typeof initTheme==='function') initTheme();
+    if(!checkOnboarding()) go('home');
   } else {
     // Guests land on home — auth triggers when they try to play
+    if(!checkOnboarding()) go('home');
     buildAvGrid();
   }
 }
@@ -47106,7 +47162,7 @@ function renderHomeBar(){
 /* ══════════════════════════════════════════════════
    NAVIGATION
 ══════════════════════════════════════════════════ */
-const GAME_SCREENS=['game','lightning','tf','auth','setup','winner','scores','chat'];
+const GAME_SCREENS=['onboarding','game','lightning','tf','auth','setup','winner','scores','chat'];
 function go(id){
   stopTimers();
   if(id!=='chat' && typeof cleanupChat==='function') cleanupChat();
@@ -47119,7 +47175,7 @@ function go(id){
   const sc=el&&el.querySelector('.scroller');
   if(sc) sc.scrollTop=0;
   // hooks
-  if(id==='home'){ initGreeting(); renderDailyMeta(); renderLastPlayed(); renderWeeklyTournament(); }
+  if(id==='home'){ initGreeting(); renderDailyMeta(); renderLastPlayed(); renderWeeklyTournament(); renderSeasonalBanner(); }
   if(id==='community') communityTab('rankings');
   if(id==='profile') renderProfile();
   if(id==='lobby') renderLobby();
@@ -47128,6 +47184,32 @@ function go(id){
 function setNb(btn){
   document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
+}
+
+/* ══════════════════════════════════════════════════
+   ONBOARDING LOGIC
+══════════════════════════════════════════════════ */
+function checkOnboarding(){
+  if(!localStorage.getItem('bgn_onboarded')){
+    go('onboarding');
+    return true;
+  }
+  return false;
+}
+function nextOnboard(step){
+  sfx.tap();
+  document.querySelectorAll('.onboard-step').forEach(s=>s.style.display='none');
+  const next = document.getElementById('onboard-step-'+step);
+  if(next) {
+    next.style.display='flex';
+    next.style.animation='fadeIn 0.5s ease-out';
+  }
+}
+function finishOnboard(){
+  sfx.tap();
+  localStorage.setItem('bgn_onboarded', 'true');
+  go('home');
+  toast('Welcome to Lamp! ✦');
 }
 function communityTab(tab){
   // Update tab buttons
@@ -47636,7 +47718,8 @@ function beginGame(){
   G._xpAtGameStart=G.profile?(G.profile.xp||0):0;
   G._correctAtGameStart=G.profile?(G.profile.correct||0):0;
 
-  G.pool=buildPool().slice(0,currentRounds()); G.qi=0; G.pi=0; G.done=false; G.onlineGame=false;
+  const _totalPoolSize = G.players.length > 1 ? currentRounds() * G.players.length : currentRounds();
+  G.pool=buildPool().slice(0,_totalPoolSize); G.qi=0; G.pi=0; G.done=false; G.onlineGame=false;
   G.scores={}; G.hearts={}; G.streaks={};
   G.players.forEach(p=>{ G.scores[p.name]=0; G.hearts[p.name]=3; G.streaks[p.name]=0; });
 
@@ -47750,7 +47833,7 @@ function renderQ(){
   scoreEl.textContent=G.scores[p.name];
   const totalRounds=Math.max(1,G.pool.length||currentRounds());
   const rndEl=document.getElementById('g-round');
-  if(G.sub==='lightning'){ rndEl.textContent=''; } else { rndEl.textContent=`Round ${Math.min(G.qi+1,totalRounds)}/${totalRounds}`; }
+  if(G.sub==='lightning'){ rndEl.textContent=''; } else { const _perPlayerRound = G.players.length > 1 ? Math.floor(G.qi / G.players.length) + 1 : G.qi + 1; const _perPlayerTotal = G.players.length > 1 ? currentRounds() : totalRounds; rndEl.textContent=`Round ${Math.min(_perPlayerRound,_perPlayerTotal)}/${_perPlayerTotal}`; }
   renderHearts('g-hearts',G.hearts[p.name]);
   document.getElementById('g-fb').style.display='none';
   document.getElementById('g-next-row').style.display='none';
@@ -48486,6 +48569,11 @@ function endGame(){
         if((G.hearts[pName]||0)>=3) G.profile.noHeartLoss=true;
       }
 
+      // Prompt for notifications after first win
+      if(iWon && G.profile.wins === 1 && !G.profile.notifPrompted) {
+        setTimeout(showNotifPrompt, 1500);
+      }
+
       saveProfile(); if(G.fbOk)pushProfile();
       if(isXpDisabledMode(G.mode) && !wasSeasonal){
         const xpEl=document.getElementById('w-xp-txt');
@@ -48513,7 +48601,7 @@ function endGame(){
     const wName=document.getElementById('w-name');
     const wPts=document.getElementById('w-pts');
     const wXp=document.getElementById('w-xp-txt');
-    const wasSeasonal = G._seasonalMode || (G.pool && G.pool[0] && G.pool[0].season);
+    const wasSeasonal = G._seasonalMode || (G.pool && G.pool.some(q => q && q.season));
 
     if(G.sub==='team'){
       if(isTie){
@@ -50652,12 +50740,31 @@ function requestNotificationPermission(){
     return;
   }
   Notification.requestPermission().then(permission => {
-    if (permission === 'granted') {
-      toast('Notifications enabled! 🔔');
-      if (G.profile) { G.profile.notifications = true; saveProfile(); }
-      buildSettingsList();
+    if(G.profile){
+      G.profile.notifPrompted = true;
+      if (permission === 'granted') {
+        G.profile.notifications = true;
+        toast('Notifications enabled! 🔔');
+      }
+      saveProfile(); if(G.fbOk) pushProfile();
     }
+    closeOv('ov-notif');
+    buildSettingsList();
   });
+}
+
+function showNotifPrompt(){
+  if (Notification.permission === 'default' && (!G.profile || !G.profile.notifPrompted)) {
+    openOv('ov-notif');
+  }
+}
+
+function closeNotifPrompt(){
+  if(G.profile){
+    G.profile.notifPrompted = true;
+    saveProfile(); if(G.fbOk) pushProfile();
+  }
+  closeOv('ov-notif');
 }
 
 function buildSettingsList(){
