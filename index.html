@@ -4896,7 +4896,7 @@ function renderWeeklyTournament(){
   }
 
   const {week,category}=getWeeklyTournamentInfo();
-  const done=G.profile.tournamentWeek===week;
+  const done=G.profile.lastWeeklyDate===new Date().toISOString().split('T')[0];
   const icon=WT_ICONS[category]||'🏟️';
   const msLeft=msToNextSundayUTC();
   const streak=G.profile.tournamentStreak||0;
@@ -5003,7 +5003,7 @@ function wtShare(){
 function startWeeklyTournament(){
   if(!G.profile){ go('auth'); buildAvGrid(); return; }
   const week=getWTWeekKey();
-  if(G.profile.tournamentWeek===week){ toast('You already played this week! Come back next Sunday. 🏆'); return; }
+  if(G.profile.lastWeeklyDate===new Date().toISOString().split('T')[0]){ toast('You already played today — come back tomorrow! 🏆'); return; }
   sfx.tap();
   const pool=getWeeklyTournamentPool();
   if(!pool.length){ toast('No questions available for this category'); return; }
@@ -5028,6 +5028,7 @@ function finishWeeklyTournament(score,total){
   const wasStreaking=G.profile.tournamentWeek===prevWeek;
   G.profile.tournamentStreak=wasStreaking?(G.profile.tournamentStreak||0)+1:1;
   G.profile.tournamentWeek=week;
+  G.profile.lastWeeklyDate=new Date().toISOString().split('T')[0];
   G.profile.tournamentScore=score;
   saveProfile();
   if(G.fbOk&&G.uid){
@@ -43594,7 +43595,7 @@ const VERSE_Q=[
   {"b": "A gentle answer turns away ", "blank": "wrath", "a": ", but a harsh word stirs up anger.", "r": "Proverbs 15:1", "o": ["wrath", "anger", "fury", "strife"], "d": "easy"},
   {"b": "Hope deferred makes the heart ", "blank": "sick", "a": ", but a longing fulfilled is a tree of life.", "r": "Proverbs 13:12", "o": ["sick", "sad", "weak", "faint"], "d": "easy"},
   {"b": "Hear, O Israel: The LORD our God, the LORD is ", "blank": "one", "a": ".", "r": "Deuteronomy 6:4", "o": ["one", "Lord", "God", "true"], "d": "easy"},
-  {"b": "You shall not murder.", "blank": "You", "a": " shall not murder.", "r": "Exodus 20:13", "o": ["You", "Do", "Thou", "One"], "d": "easy"},
+  {"b": "", "blank": "You", "a": " shall not murder.", "r": "Exodus 20:13", "o": ["You", "Do", "Thou", "One"], "d": "easy"},
   {"b": "Do not be overcome by ", "blank": "evil", "a": ", but overcome evil with good.", "r": "Romans 12:21", "o": ["evil", "sin", "wrong", "hate"], "d": "easy"},
   {"b": "For I am not ashamed of the ", "blank": "gospel", "a": ", because it is the power of God that brings salvation.", "r": "Romans 1:16", "o": ["gospel", "cross", "truth", "Lord"], "d": "easy"},
   {"b": "In everything I showed you that by working hard in this way you must help the ", "blank": "weak", "a": " and remember the words of the Lord Jesus.", "r": "Acts 20:35", "o": ["weak", "poor", "needy", "least"], "d": "easy"},
@@ -47119,7 +47120,7 @@ function go(id){
   const sc=el&&el.querySelector('.scroller');
   if(sc) sc.scrollTop=0;
   // hooks
-  if(id==='home'){ initGreeting(); renderDailyMeta(); renderLastPlayed(); renderWeeklyTournament(); }
+  if(id==='home'){ initGreeting(); renderDailyMeta(); renderLastPlayed(); renderWeeklyTournament(); renderSeasonalBanner(); }
   if(id==='community') communityTab('rankings');
   if(id==='profile') renderProfile();
   if(id==='lobby') renderLobby();
@@ -47636,7 +47637,8 @@ function beginGame(){
   G._xpAtGameStart=G.profile?(G.profile.xp||0):0;
   G._correctAtGameStart=G.profile?(G.profile.correct||0):0;
 
-  G.pool=buildPool().slice(0,currentRounds()); G.qi=0; G.pi=0; G.done=false; G.onlineGame=false;
+  const _poolSize = G.players.length > 1 ? currentRounds() * G.players.length : currentRounds();
+  G.pool=buildPool().slice(0,_poolSize); G.qi=0; G.pi=0; G.done=false; G.onlineGame=false;
   G.scores={}; G.hearts={}; G.streaks={};
   G.players.forEach(p=>{ G.scores[p.name]=0; G.hearts[p.name]=3; G.streaks[p.name]=0; });
 
@@ -47750,7 +47752,7 @@ function renderQ(){
   scoreEl.textContent=G.scores[p.name];
   const totalRounds=Math.max(1,G.pool.length||currentRounds());
   const rndEl=document.getElementById('g-round');
-  if(G.sub==='lightning'){ rndEl.textContent=''; } else { rndEl.textContent=`Round ${Math.min(G.qi+1,totalRounds)}/${totalRounds}`; }
+  if(G.sub==='lightning'){ rndEl.textContent=''; } else { const _rn=G.players.length>1?Math.floor(G.qi/G.players.length)+1:G.qi+1; const _rt=G.players.length>1?currentRounds():totalRounds; rndEl.textContent=`Round ${Math.min(_rn,_rt)}/${_rt}`; }
   renderHearts('g-hearts',G.hearts[p.name]);
   document.getElementById('g-fb').style.display='none';
   document.getElementById('g-next-row').style.display='none';
@@ -48513,7 +48515,7 @@ function endGame(){
     const wName=document.getElementById('w-name');
     const wPts=document.getElementById('w-pts');
     const wXp=document.getElementById('w-xp-txt');
-    const wasSeasonal = G._seasonalMode || (G.pool && G.pool[0] && G.pool[0].season);
+    const wasSeasonal = G._seasonalMode || (G.pool && G.pool.some(q => q && q.season));
 
     if(G.sub==='team'){
       if(isTie){
