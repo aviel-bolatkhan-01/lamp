@@ -48959,6 +48959,26 @@ function toOnlineQuestion(q,sub){
       r:q.r||''
     };
   }
+  if(q.type==='verse'||q.b||q.blank!=null){
+    const opts=Array.isArray(q.o)?q.o.slice(0,4):[];
+    const normVerse=(s)=>String(s||'').toLowerCase().replace(/[^a-z0-9']/g,'').trim();
+    const correctWord=(q.blank||'').trim();
+    let correctIdx=opts.findIndex(opt=>normVerse(opt)===normVerse(correctWord));
+    if(correctIdx===-1&&correctWord){opts.unshift(correctWord);while(opts.length>4)opts.pop();correctIdx=0;}
+    return {
+      kind:'verse',
+      q:'Complete the verse:',
+      b:q.b||'',
+      aSuffix:q.a||'',
+      o:opts,
+      a:correctIdx>-1?correctIdx:0,
+      d:q.d||'',
+      cat:q.cat||q.r||'',
+      e:q.r?`${q.r} — "${(q.b||'')}${correctWord}${q.a||''}"`:'',
+      r:q.r||'',
+      blank:correctWord
+    };
+  }
   return {
     kind:'mcq',
     q:q.q||'',
