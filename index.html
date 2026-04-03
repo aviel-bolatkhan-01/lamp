@@ -48947,6 +48947,18 @@ function toOnlineQuestion(q,sub){
       blank:correctWord
     };
   }
+  if(typeof q.a==='boolean'||(!q.o||!q.o.length)){
+    return {
+      kind:'truefalse',
+      q:q.q||'',
+      o:[],
+      a:(q.a===true||q.a===1)?1:0,
+      d:q.d||'',
+      cat:q.cat||q.r||'',
+      e:q.e||'',
+      r:q.r||''
+    };
+  }
   return {
     kind:'mcq',
     q:q.q||'',
