@@ -1,5 +1,76 @@
 # STATUS.md — Lamp: Bible Trivia Online
 
+## Session 2026-07-18 (part 2): iOS Crash Fix + Rename ✅ (commit 8985e7f on jules-test — NOT yet deployed)
+
+1. **ROOT CAUSE of broken mobile (iPhone) experience** — `buildSettingsList()` referenced `Notification.permission` unguarded. iOS Safari has no `Notification` API in browser tabs → ReferenceError at startup (line ~11083) killed everything after it: `loadProfile()`, `initFB()` (Firebase!), daily verse, greeting, URL params, service worker. Also made the Settings modal open empty ("settings disappear"). Fixed with `typeof Notification!=='undefined'` guards in 3 places (buildSettingsList, togNotif, first-win prompt). `requestNotificationPermission` was already guarded.
+2. **Rename**: "Host a Room" → "Play with Friends" (home hero, sub: "Create a room & share the code"); all "Host"/"Host Room" buttons → "Create Room" (home hero, Join tab, online-settings modal, setup screen).
+3. **SW cache bumped lamp-v5 → lamp-v6** to force fresh delivery.
+
+Deploy: `git checkout main && git merge jules-test && git push origin main && firebase deploy --only hosting,database` (database needed for the earlier security rules).
+
+## Session 2026-07-18: Security Audit + Hardening ✅ (committed 0a6ec08 on branch jules-test — NOT yet deployed)
+
+### Security fixes
+1. **Stored XSS in multiplayer screens** — `p.name`/`p.avatar` from Firebase were injected into `innerHTML` unescaped in ~13 places (lobby, elimination messages, TF vote rows, scoreboard, verse podium, group vote chips, avatar/clan badge emoji). All now wrapped in `escHtml()`. Attack path was: attacker writes a malicious name directly to Firebase (bypassing the client username filter) → script runs in every other player's browser.
+2. **Firebase rules — chats** — was: ANY signed-in user could read/write ANY chat. Now: `$pair.contains(auth.uid)` required, plus message validation (`from` must equal sender uid, text 1–500 chars). Chat input capped at 500 chars to match.
+3. **Firebase rules — friends** — was: ANY signed-in user could rewrite anyone's friends list. Now: writes to `friends/$uid/$fid` allowed only if you are `$uid` or `$fid` (accept/unfriend both-sides writes still work).
+
+### Bug review
+- **JULES_BUG_REPORT.md "critical" sound bug = FALSE ALARM** — `osc()`, `bell()`, `noiseBurst()` all check `G.cfg.sound` internally, so `tap`/`correct`/`streak` are already guarded. No fix needed.
+- **Ghost mode `&&false` dead code** — removed from `buildGhostPool` (truefalse was already handled correctly in its own branch; no behavior change).
+- **Team Mode online** — feature gap, not a bug; still pending (see Branch 7 notes below).
+
+### Known remaining risks (documented, not fixed — would need restructuring)
+- `players` root is readable by any signed-in user (full profiles: church, friends list, stats). Can't lock down yet — username-uniqueness check (line ~5655) and clan leaderboard (line ~8941) query the whole `players` node. Future fix: separate `usernames/` index + server-side clan aggregates.
+- `rooms/$roomId` is writable by any signed-in user — a griefer could tamper with an active room. Fixing requires per-player path rules; deferred.
+- XP validation allows +1000 per write — a cheater can still inflate XP in steps; acceptable for now.
+
+### Deploy — IMPORTANT
+`firebase deploy --only hosting` does NOT push database rules. To ship this session's fixes:
+```
+firebase deploy --only hosting,database
+```
+
+## Session 2026-04-12: 9,231-Question Accuracy Review ✅ (deployed — commit 598aaef)
+
+### Summary
+Groq Llama-3.3-70b reviewed all 9,231 questions overnight. 58 flags raised, 2 confirmed bugs fixed.
+
+### Fixes
+1. **TF "Peter's vision happened twice"** — `a:true` → `a:false` (Acts 10:16 confirms it happened 3 times)
+2. **TF "Temple dedicated with 100 bulls and 200 rams"** — `a:false` → `a:true` (Ezra 6:17 confirms it)
+
+### Verdict
+- MCQ: 29 flags, all Groq false positives — current answers verified correct
+- Verse: 25 flags, all translation-style differences (NIV vs KJV) — blanks accurate
+- Overall quality: excellent. Only 2 answer-key errors in 9,231 questions.
+
+---
+
+## Session 2026-04-11: Verse Fix + Friends Fix ✅ (deployed — commit 12caffb)
+
+### Fixes Applied
+1. **361 broken verse questions fixed** — `b` field contained full verse text including the blank word, causing doubled text on screen. Python script truncated `b` to just before the blank word (word-boundary match). `verse.js` updated with all 361 fixes.
+2. **Friends list: deleted accounts auto-removed** — `renderFriends()` now calls `_doRemoveFriend(uid)` when Firebase leaderboard entry doesn't exist (account deleted), instead of showing "Friend" with 0 XP.
+3. **Friends list: test/meh usernames auto-removed** — Same `renderFriends()` loop checks if `name.includes('test')` or `name==='meh'` and silently unfriends them.
+
+### Currently Live
+- **Last deploy**: 2026-04-11 16:39 — commit 12caffb
+- **URL**: https://thelampgame.com
+
+---
+
+## Session 2026-04-11: Lobby Reorder + 3-Bug Fix Batch ✅ (deployed — commits 0892e05, 09016b3)
+
+### Fixes Applied
+1. **Rooms permission_denied on Join tab** — Race condition: `init()` had a `pending_room` sessionStorage check that called `joinRoomByCode()` 400ms after load, before `signInAnonymously()` completed. Firebase rules require `auth != null` for `/rooms`. Fix: removed the 2-line `pendingRoom` block from `init()` (already handled in `onAuthStateChanged`). Also added `if(!G.uid){ toast('Connecting — try again in a moment'); return; }` guard to `joinRoomByCode()`.
+
+2. **Blank win screen (crown shows, name/avatar empty)** — `endGame()` calls `sorted[0]` on `G.players`; if empty, `win` is `undefined`. Later `win.avatar` throws TypeError, caught by `try/catch` which calls `go('winner')` without setting any content. Fix: added `if(!win) win={name:G.profile?.name||'Player',avatar:G.profile?.avatar||'😊',photo:G.profile?.photo||''}` after `win=sorted[0]`.
+
+3. **Friend request "Could not send — try again"** — `sendFriendRequestToUid()` read `friendRequests/{targetUid}/incoming/{myUid}` to check if already sent. Firebase rules: `$uid === auth.uid` — you can only read YOUR own path, not the target's. Permission denied → generic error toast. Fix: changed read to `friendRequests/{myUid}/sent/{targetUid}` — your own sent folder, which you have access to.
+
+---
+
 ## Session 2026-04-10: 10-Bug Fix Batch ✅ (deployed — commit 21a8c8b)
 
 ### Fixes Applied

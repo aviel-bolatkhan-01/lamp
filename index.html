@@ -3583,9 +3583,9 @@ html.feat-gameHeader .g-nm { font-weight: 800 !important; max-width: 100px; over
       </svg>
       <div style="position:relative;z-index:1;">
         <div class="card-eyebrow mp-eyebrow">Multiplayer</div>
-        <div class="mp-title card-title">Host a Room</div>
-        <div class="mp-sub card-subtitle">Share code to invite friends</div>
-        <div class="btn btn-gold btn-sm" style="display:inline-flex;width:auto;padding:8px 32px;">Host</div>
+        <div class="mp-title card-title">Play with Friends</div>
+        <div class="mp-sub card-subtitle">Create a room & share the code</div>
+        <div class="btn btn-gold btn-sm" style="display:inline-flex;width:auto;padding:8px 32px;">Create Room</div>
       </div>
     </div>
 
@@ -3748,7 +3748,7 @@ html.feat-gameHeader .g-nm { font-weight: 800 !important; max-width: 100px; over
   </div>
   <div class="chat-msgs" id="chat-msgs"></div>
   <div class="chat-input-row">
-    <input class="chat-inp" id="chat-inp" placeholder="Message…" autocomplete="off" onkeydown="if(event.key==='Enter')sendMessage()">
+    <input class="chat-inp" id="chat-inp" placeholder="Message…" autocomplete="off" maxlength="500" onkeydown="if(event.key==='Enter')sendMessage()">
     <button class="chat-send" onclick="sendMessage()">➤</button>
   </div>
 </div>
@@ -3813,7 +3813,7 @@ html.feat-gameHeader .g-nm { font-weight: 800 !important; max-width: 100px; over
   </div>
   <div class="scroller">
     <div class="grid2" style="margin-bottom:12px;">
-      <button class="btn btn-blue btn-sm" onclick="go('setup');buildModeSetup('online')"><span class="btn-icon">➕</span>Host Room</button>
+      <button class="btn btn-blue btn-sm" onclick="go('setup');buildModeSetup('online')"><span class="btn-icon">➕</span>Create Room</button>
       <button class="btn btn-ghost btn-sm" onclick="openOv('ov-join')"><span class="btn-icon">🔑</span>Join Room</button>
     </div>
     <div id="lobby-panel" style="display:none;">
@@ -4432,7 +4432,7 @@ html.feat-gameHeader .g-nm { font-weight: 800 !important; max-width: 100px; over
         <button class="step-btn" onclick="adjustOnlineQ(1)">+</button>
       </div>
     </div>
-    <button class="btn btn-gold" onclick="startOnlineMatch()" style="margin-bottom:8px;">▶ Host Room</button>
+    <button class="btn btn-gold" onclick="startOnlineMatch()" style="margin-bottom:8px;">▶ Create Room</button>
     <button class="btn btn-ghost btn-sm" onclick="closeOv('ov-online-settings')" style="width:100%;">Cancel</button>
   </div>
 </div>
@@ -5904,14 +5904,14 @@ function avatarMarkup(emoji,photo,sizeCls){
   if(hasPhoto){
     return `<span class="avatar-inline ${sizeCls||'md'}"><img class="avatar-photo" src="${escAttr(photo)}" alt="avatar"></span>`;
   }
-  return `<span>${emoji||'😊'}</span>`;
+  return `<span>${escHtml(emoji||'😊')}</span>`;
 }
 function clanBadgeMarkup(icon,photo,sizeCls){
   const hasPhoto=typeof photo==='string' && photo.trim().length>0;
   if(hasPhoto){
     return `<span class="clan-inline ${sizeCls||'md'}"><img class="avatar-photo" src="${escAttr(photo)}" alt="congregation"></span>`;
   }
-  return `<span>${icon||'⛪'}</span>`;
+  return `<span>${escHtml(icon||'⛪')}</span>`;
 }
 function uploadProfilePhoto(){
   if(!G.profile) return;
@@ -6421,7 +6421,7 @@ function buildModeSetup(kind,fromHomeSelection){
     document.getElementById('setup-eyebrow').textContent='Online';
     document.getElementById('setup-title').innerHTML='Game <em>Settings</em>';
     document.getElementById('setup-subtitle').textContent='Host picks rules; joiners receive them automatically.';
-    document.getElementById('setup-go-btn').innerHTML='<span class="btn-icon">🌐</span> Host Room';
+    document.getElementById('setup-go-btn').innerHTML='<span class="btn-icon">🌐</span> Create Room';
   } else {
     document.getElementById('setup-eyebrow').textContent='Practice';
     document.getElementById('setup-title').innerHTML='Practice <em>Settings</em>';
@@ -7009,7 +7009,7 @@ function answerQ(btn,isOk,q,order){
       G.hearts[p.name]=Math.max(0,(G.hearts[p.name]||0)-1);
       renderHearts('g-hearts',G.hearts[p.name]);
       if(G.hearts[p.name]===0){
-        fb.innerHTML += `<br><span style="color:#e08080;">${p.name} has been eliminated!</span>`;
+        fb.innerHTML += `<br><span style="color:#e08080;">${escHtml(p.name)} has been eliminated!</span>`;
         showElim(p.name);
         if (shouldEndByHearts()) {
           setTimeout(endGame, 1500);
@@ -7179,7 +7179,7 @@ function renderLQ(){
         G.hearts[cur.name]=Math.max(0,(G.hearts[cur.name]||0)-1);
         renderHearts('l-hearts',G.hearts[cur.name]||0);
         if(G.hearts[cur.name]===0){
-          fb.innerHTML += `<br><span style="color:#e08080;">${cur.name} has been eliminated!</span>`;
+          fb.innerHTML += `<br><span style="color:#e08080;">${escHtml(cur.name)} has been eliminated!</span>`;
           setTimeout(()=>endLightning(),700);
           return;
         }
@@ -7251,7 +7251,7 @@ function renderTF(){
   const activePlayers=alivePlayersNow();
   activePlayers.forEach((p, i)=>{
     const d=document.createElement('div'); d.className='voter' + (i===0 ? ' cur-voter' : ''); d.id='voter-'+slug(p.name);
-    d.innerHTML=`<span>${avatarMarkup(p.avatar,resolvePlayerPhoto(p),'sm')}</span><span>${p.name}</span><span>—</span>`;
+    d.innerHTML=`<span>${avatarMarkup(p.avatar,resolvePlayerPhoto(p),'sm')}</span><span>${escHtml(p.name)}</span><span>—</span>`;
     vt.appendChild(d);
   });
   // Set active players reference for voting
@@ -7276,7 +7276,7 @@ function updateTFIndicator(){
   const fb = document.getElementById('tf-fb');
   fb.style.display = 'block';
   fb.className = 'fb ok';
-  fb.innerHTML = `<strong>${avatarMarkup(p.avatar,resolvePlayerPhoto(p),'sm')} ${p.name}'s turn</strong> — Pick True or False`;
+  fb.innerHTML = `<strong>${avatarMarkup(p.avatar,resolvePlayerPhoto(p),'sm')} ${escHtml(p.name)}'s turn</strong> — Pick True or False`;
 }
 
 function answerTF(ans){
@@ -7287,7 +7287,7 @@ function answerTF(ans){
   G.tfVotes[voter.name] = ans;
   const el = document.getElementById('voter-'+slug(voter.name));
   if(el) {
-    el.innerHTML=`<span>${avatarMarkup(voter.avatar,resolvePlayerPhoto(voter),'sm')}</span><span>${voter.name}</span><span style="color:${ans?'#6dda9a':'#e08080'}">${ans?'✅':'❌'}</span>`;
+    el.innerHTML=`<span>${avatarMarkup(voter.avatar,resolvePlayerPhoto(voter),'sm')}</span><span>${escHtml(voter.name)}</span><span style="color:${ans?'#6dda9a':'#e08080'}">${ans?'✅':'❌'}</span>`;
     el.classList.add('voted');
     el.classList.remove('cur-voter');
   }
@@ -7329,12 +7329,12 @@ function revealTF(q){
       if(G.cfg.hearts){
         G.hearts[p.name]=Math.max(0,(G.hearts[p.name]||0)-1);
         if(G.hearts[p.name]===0){
-          elimMsg+=`<br><span style="color:#e08080;display:inline-flex;align-items:center;gap:6px;">${avatarMarkup(p.avatar,resolvePlayerPhoto(p),'sm')} ${p.name} has been eliminated!</span>`;
+          elimMsg+=`<br><span style="color:#e08080;display:inline-flex;align-items:center;gap:6px;">${avatarMarkup(p.avatar,resolvePlayerPhoto(p),'sm')} ${escHtml(p.name)} has been eliminated!</span>`;
         }
       }
     }
     const el=document.getElementById('voter-'+slug(p.name));
-    if(el) el.innerHTML=`<span>${avatarMarkup(p.avatar,resolvePlayerPhoto(p),'sm')}</span><span>${p.name}</span><span style="color:${ok?'#6dda9a':ans===undefined?'var(--ink3)':'#e08080'}">${ok?'✓':ans===undefined?'—':'✗'}</span>`;
+    if(el) el.innerHTML=`<span>${avatarMarkup(p.avatar,resolvePlayerPhoto(p),'sm')}</span><span>${escHtml(p.name)}</span><span style="color:${ok?'#6dda9a':ans===undefined?'var(--ink3)':'#e08080'}">${ok?'✓':ans===undefined?'—':'✗'}</span>`;
   });
   if(myStreak===0) resetComboUIForPlayer(G.profile&&G.profile.name);
   else if(myStreak!=null) updateComboUI(myStreak);
@@ -7387,7 +7387,7 @@ function showScores(isFinal){
     div.innerHTML=`
       <div class="sc-rank ${i===0?'g':''}">${i===0?'👑':i+1}</div>
       <div class="sc-av">${avatarMarkup(p.avatar,resolvePlayerPhoto(p),'md')}</div>
-      <div class="sc-nm">${p.name}</div>
+      <div class="sc-nm">${escHtml(p.name)}</div>
       <div style="display:flex;align-items:center;gap:9px;margin-left:auto;">
         <div>${h}</div>
         <div><span class="sc-pts">${G.scores[p.name]}</span><span class="sc-lbl">pts</span></div>
@@ -7585,7 +7585,7 @@ function endGame(){
       if (iWon) {
         G.profile.winStreak = (G.profile.winStreak || 0) + 1;
         // Android/iOS Engagement: Prompt for notifications after first win
-        if (G.profile.wins === 1 && !G.profile.notifications && Notification.permission !== 'granted') {
+        if (G.profile.wins === 1 && !G.profile.notifications && typeof Notification !== 'undefined' && Notification.permission !== 'granted') {
           setTimeout(() => {
             toast('🏆 First win! Tap to enable daily challenge alerts.', 7000, () => {
               requestNotificationPermission();
@@ -7676,7 +7676,7 @@ function endGame(){
         const isTopTie=isTie&&topWinners.some(w=>w.name===p.name);
         const d=document.createElement('div');
         d.style.cssText='background:rgba(255,255,255,.035);border:1px solid rgba(180,140,60,.1);border-radius:var(--r1);padding:8px 11px;text-align:center;min-width:60px;';
-        d.innerHTML=`<span style="font-size:18px;display:flex;justify-content:center;align-items:center;gap:4px;">${isTopTie?'<span>👑</span>':''}${avatarMarkup(p.avatar,resolvePlayerPhoto(p),'sm')}</span><span style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:.07em;color:var(--ink3);text-transform:uppercase;">${p.name}</span><span style="font-family:'Cinzel',serif;font-size:14px;font-weight:700;color:var(--gold1);display:block;">${G.scores[p.name]}</span>`;
+        d.innerHTML=`<span style="font-size:18px;display:flex;justify-content:center;align-items:center;gap:4px;">${isTopTie?'<span>👑</span>':''}${avatarMarkup(p.avatar,resolvePlayerPhoto(p),'sm')}</span><span style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:.07em;color:var(--ink3);text-transform:uppercase;">${escHtml(p.name)}</span><span style="font-family:'Cinzel',serif;font-size:14px;font-weight:700;color:var(--gold1);display:block;">${G.scores[p.name]}</span>`;
         oth.appendChild(d);
       });
     }
@@ -8167,7 +8167,7 @@ function updateLobbyUI(d){
   activeEntries.forEach(([uid,p])=>{
     const row=document.createElement('div'); row.className='lobby-row';
     const isHost=uid===hostUid, isMe=uid===G.uid;
-    row.innerHTML=`<span style="font-size:20px;display:flex;align-items:center;">${avatarMarkup(p.avatar,resolvePlayerPhoto(p),'sm')}</span><span style="font-family:'Poppins',sans-serif;font-size:14px;flex:1;">${p.name}${isMe?' (You)':''}</span><span class="l-badge ${isHost?'host':p.ready?'ready':'wait'}">${isHost?'Host':p.ready?'Ready':'Waiting'}</span>`;
+    row.innerHTML=`<span style="font-size:20px;display:flex;align-items:center;">${avatarMarkup(p.avatar,resolvePlayerPhoto(p),'sm')}</span><span style="font-family:'Poppins',sans-serif;font-size:14px;flex:1;">${escHtml(p.name)}${isMe?' (You)':''}</span><span class="l-badge ${isHost?'host':p.ready?'ready':'wait'}">${isHost?'Host':p.ready?'Ready':'Waiting'}</span>`;
     list.appendChild(row);
   });
   const startBtn=document.getElementById('start-btn');
@@ -8515,7 +8515,7 @@ function showOnlineResult(gs){
   G.players.forEach(p=>{
     const pVote=votes[p.uid];
     const pOk=(pVote===gs.correctA);
-    html+=`<span style="background:rgba(255,255,255,.06);border-radius:8px;padding:4px 8px;font-size:12px;color:${pVote===undefined?'var(--ink3)':pOk?'#6dda9a':'#e08080'}">${p.avatar} ${p.name} ${pVote===undefined?'—':pOk?'✓':'✗'}</span>`;
+    html+=`<span style="background:rgba(255,255,255,.06);border-radius:8px;padding:4px 8px;font-size:12px;color:${pVote===undefined?'var(--ink3)':pOk?'#6dda9a':'#e08080'}">${escHtml(p.avatar)} ${escHtml(p.name)} ${pVote===undefined?'—':pOk?'✓':'✗'}</span>`;
   });
   html+=`</div>`;
   const fb=document.getElementById('g-fb');
@@ -9028,7 +9028,7 @@ function seededShuffle(arr,seed){
 }
 function buildGhostPool(mode,category,difficulty,seed,count){
   let src=[];
-  if(mode==='classic'||mode==='lightning'||mode==='truefalse'&&false){
+  if(mode==='classic'||mode==='lightning'){
     if(!category||category==='all'){
       src=Object.entries(QB).flatMap(([cat,qs])=>qs.filter(q=>q&&(difficulty==='all'||!difficulty||q.d===difficulty)).map(q=>({...q,cat})));
       if(!src.length) src=Object.entries(QB).flatMap(([cat,qs])=>qs.map(q=>({...q,cat})));
@@ -9955,7 +9955,7 @@ function buildSettingsList(){
 
   // ── Notifications ──
   sec('Notifications');
-  const nEnabled=!!(G.profile&&G.profile.notifications&&Notification.permission==='granted');
+  const nEnabled=!!(G.profile&&G.profile.notifications&&typeof Notification!=='undefined'&&Notification.permission==='granted');
   row('📲 Push Notifications',`<button class="toggle-btn ${nEnabled?'on':'off'}" id="stog-notif" onclick="togNotif()">${nEnabled?'ON':'OFF'}</button>`);
 
   // ── Theme ──
@@ -9981,7 +9981,7 @@ function togSound(){
   if(b){ b.textContent=G.cfg.sound?'ON':'OFF'; b.className='toggle-btn '+(G.cfg.sound?'on':'off'); }
 }
 function togNotif(){
-  if(G.profile&&G.profile.notifications&&Notification.permission==='granted'){
+  if(G.profile&&G.profile.notifications&&typeof Notification!=='undefined'&&Notification.permission==='granted'){
     G.profile.notifications=false; saveProfile();
     const b=document.getElementById('stog-notif');
     if(b){ b.textContent='OFF'; b.className='toggle-btn off'; }
@@ -11984,7 +11984,7 @@ function loadChat(uid){
 }
 function sendMessage(){
   const inp=document.getElementById('chat-inp');
-  const text=(inp.value||'').trim();
+  const text=(inp.value||'').trim().slice(0,500);
   if(!text||!_chatUid) return;
   if(!G.fbOk||!G.uid){
     const msgs=document.getElementById('chat-msgs');

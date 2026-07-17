@@ -113,14 +113,21 @@
     "friends": {
       "$uid": {
         ".read": "auth != null",
-        ".write": "auth != null"
+        "$fid": {
+          ".write": "auth != null && ($uid === auth.uid || $fid === auth.uid)"
+        }
       }
     },
 
     "chats": {
       "$pair": {
-        ".read": "auth != null",
-        ".write": "auth != null"
+        ".read": "auth != null && $pair.contains(auth.uid)",
+        ".write": "auth != null && $pair.contains(auth.uid)",
+        "messages": {
+          "$msgId": {
+            ".validate": "newData.child('from').val() === auth.uid && newData.child('text').isString() && newData.child('text').val().length > 0 && newData.child('text').val().length <= 500"
+          }
+        }
       }
     }
 
