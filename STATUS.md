@@ -6,7 +6,7 @@
 2. **Rename**: "Host a Room" → "Play with Friends" (home hero, sub: "Create a room & share the code"); all "Host"/"Host Room" buttons → "Create Room" (home hero, Join tab, online-settings modal, setup screen).
 3. **SW cache bumped lamp-v5 → lamp-v6** to force fresh delivery.
 
-Deploy: `git checkout main && git merge jules-test && git push origin main && firebase deploy --only hosting,database` (database needed for the earlier security rules).
+**DEPLOYED 2026-07-18** — pushed to main as commit 7e2a254 (site auto-deploys via GitHub Pages from main root — the old `firebase deploy --only hosting` workflow is obsolete). Database rules released via `npx -y firebase-tools deploy --only database` ✔. Note: `jules-test` has unrelated git history — files were copied onto main, not merged. Never merge jules-test.
 
 ## Session 2026-07-18: Security Audit + Hardening ✅ (committed 0a6ec08 on branch jules-test — NOT yet deployed)
 

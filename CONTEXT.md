@@ -35,6 +35,9 @@
 git add <files> && git commit -m "What — YYYY-MM-DD HH:MM"
 git push origin dev
 git checkout main && git merge dev && git push origin main
-firebase deploy --only hosting
+# Site auto-deploys via GitHub Pages from main root (CNAME = thelampgame.com).
+# firebase deploy is NOT needed for the site — ONLY for database rules:
+npx -y firebase-tools deploy --only database   # required whenever database.rules.json changes
 git checkout dev
 ```
+⚠️ Do NOT merge branch `jules-test` — it has unrelated git history (snapshot, no merge-base with main). Copy files onto main instead (done 2026-07-18, commit 7e2a254).
