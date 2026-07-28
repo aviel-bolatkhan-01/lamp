@@ -1,5 +1,73 @@
 # STATUS.md — Lamp: Bible Trivia Online
 
+## Session 2026-07-28 (part 2): +7 new sounds, 8 → 15 ✅ (SW bumped lamp-v6 → lamp-v7)
+
+User: *"add more sounds to make the game feel sound rich. also push changes to github and deploy to firebase."*
+
+Audited the app for **silent moments** rather than inventing sounds nobody hears. Added 7,
+each wired to a real event (7 new call sites, all asserted at patch time):
+
+| sound | fires on | why it was needed |
+|---|---|---|
+| `notify` | `toast()` (~191 call sites) | biggest silent surface in the app |
+| `whoosh` | `go()` — every screen change | navigation had zero audio feedback |
+| `achieve` | achievement unlock in `checkAchs()` | only showed a toast before |
+| `message` | incoming chat, `child_added` | silent |
+| `challenge` | incoming duel | silent — flagship multiplayer moment |
+| `timeUp` | `timeOut()` | was reusing `sfx.wrong()`; running out of time ≠ being wrong |
+| `select` | `answerTF()` | was a generic `sfx.tap()` |
+
+**Chat gotcha handled:** Firebase `child_added` replays the last 80 messages when a chat
+opens, which would have machine-gunned `message`. Guarded with
+`m.from!==G.uid && m.ts && Date.now()-m.ts < 10000`.
+
+**TDZ guard:** `toast()` and `go()` are both defined *earlier in the file* than `const sfx`,
+so their calls are wrapped in `try{}catch(e){}` in case either fires during initial script
+execution.
+
+**Measured level tiering (peak, OfflineAudioContext) — nothing clips:**
+- ambient, fires constantly: `tap` .007 / `whoosh` .006 / `tick` .005
+- light feedback: `select` .039 / `notify` .051 / `message` .056
+- consequential: `wrong` .122 / `challenge` .155 / `elim` .172 / `timeUp` .297
+- celebration: `win` .396 / `achieve` .417 / `correct` .482 / `streak` .548 / `levelUp` .667
+
+**Verified:** `node --check` passes; real page headless = 15/15 methods present, 15/15 fire,
+0 console errors, ctx running @48 kHz.
+
+## Session 2026-07-28: Sound Engine v2 → v3 ✅
+
+Rewrote the whole SFX engine in `index.html` (lines ~10190–10608). Public API unchanged:
+`sfx.tap/correct/wrong/streak/elim/win/tick/levelUp` plus helpers `bell/noiseBurst/osc`.
+All `G.cfg.sound` guards preserved on every entry point. **No other code touched.**
+
+**Why it sounded robotic (root causes, not guesses):**
+1. Zero variation — every trigger was byte-identical. 55 `sfx.tap()` call sites meant the
+   same waveform hundreds of times per session. Nothing acoustic repeats exactly.
+2. Bell partials were perfectly tuned pure sines sharing one 3 ms attack. Real bells shimmer
+   from near-identical partials *beating*, and high partials speak faster / die sooner.
+3. Reverb was applied **only to bells** — taps, brass, trombone were bone dry, so the app
+   sounded like two different rooms. IR was flat white noise (fizzy, cheap-90s-digital).
+4. Brass used a *static* bandpass. Real brass brightness blooms on attack then darkens.
+5. Musical timing ran on `setTimeout` (4–15 ms jitter under load) instead of the audio clock.
+
+**Measured findings (OfflineAudioContext render, v2 vs v3, peak amplitude):**
+- My clipping hypothesis was **WRONG** — v2 never clipped (win peaked 0.171).
+- Real defect found instead: **`wrong` was the loudest sound in the game at 0.558 peak —
+  3.3× the victory fanfare.** Getting an answer wrong shouted at you. v3: 0.129.
+- v3 celebration sounds now sit in a consistent 0.034–0.046 RMS band. Nothing clips.
+- Caught + fixed a regression mid-work: first v3 `tick` was 5× quieter than v2 (would have
+  been inaudible on a phone). Volumes raised, re-measured, now level with `tap`.
+
+**Deliberate design change (flag for user):** `wrong` was a distorted slapstick trombone
+wa-wa. Replaced with a soft descending minor third — cartoonish punishment is off-brand for
+a reverent app and harsh negative feedback drives churn. Different *character*, not just
+different tone.
+
+**Verified:** `node --check` passes. Loaded the real page headless — 0 console errors, all
+8 sounds fire, AudioContext running @48 kHz. Same test on v2 for baseline comparison.
+
+**Outcome:** user accepted the direction and asked for more sounds + deploy — see part 2 above.
+
 ## Session 2026-07-18 (part 2): iOS Crash Fix + Rename ✅ (commit 8985e7f on jules-test — NOT yet deployed)
 
 1. **ROOT CAUSE of broken mobile (iPhone) experience** — `buildSettingsList()` referenced `Notification.permission` unguarded. iOS Safari has no `Notification` API in browser tabs → ReferenceError at startup (line ~11083) killed everything after it: `loadProfile()`, `initFB()` (Firebase!), daily verse, greeting, URL params, service worker. Also made the Settings modal open empty ("settings disappear"). Fixed with `typeof Notification!=='undefined'` guards in 3 places (buildSettingsList, togNotif, first-win prompt). `requestNotificationPermission` was already guarded.

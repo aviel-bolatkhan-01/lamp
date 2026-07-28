@@ -6210,6 +6210,7 @@ function renderHomeBar(){
 ══════════════════════════════════════════════════ */
 const GAME_SCREENS=['game','lightning','tf','auth','setup','winner','scores','chat'];
 function go(id){
+  try{ sfx.whoosh(); }catch(e){}
   stopTimers();
   if(id!=='chat' && typeof cleanupChat==='function') cleanupChat();
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -7047,7 +7048,7 @@ function timeOut(q,pfx){
   resetComboUIForPlayer(p.name);
   const fb=document.getElementById(`${pfx}-fb`); fb.style.display='block';
   fb.className='fb to'; fb.innerHTML=`<strong>⏰ Time's up!</strong> ${q.e||''}`;
-  sfx.wrong(); haptic('wrong');
+  sfx.timeUp(); haptic('wrong');
   if(G.cfg.hearts){
     G.hearts[p.name]=Math.max(0,(G.hearts[p.name]||0)-1);
     renderHearts(`${pfx}-hearts`,G.hearts[p.name]);
@@ -7282,7 +7283,7 @@ function updateTFIndicator(){
 function answerTF(ans){
   const activePlayers=G._tfActivePlayers||G.players;
   if(G.tfVoterIdx >= activePlayers.length) return;
-  sfx.tap();
+  sfx.select();
   const voter = activePlayers[G.tfVoterIdx];
   G.tfVotes[voter.name] = ans;
   const el = document.getElementById('voter-'+slug(voter.name));
@@ -9778,7 +9779,7 @@ function checkAchs(){
         G.profile.achs.push(a.id); 
         saveProfile(); 
         if(G.fbOk) pushProfile();
-        setTimeout(()=>toast('🏆 Achievement: '+a.t+'!'), 2200);
+        setTimeout(()=>{ sfx.achieve(); toast('🏆 Achievement: '+a.t+'!'); }, 2200);
       }
     });
   } catch(e) { console.error("checkAchs error:", e); }
@@ -10156,6 +10157,7 @@ function buildClanIcons(){
 ══════════════════════════════════════════════════ */
 let _toastTimer=null;
 function toast(msg, dur = 2800, cb = null){
+  try{ sfx.notify(); }catch(e){}
   const old=document.querySelector('.toast'); if(old) old.remove(); clearTimeout(_toastTimer);
   const el=document.createElement('div'); el.className='toast'; el.textContent=msg;
   if(cb){ el.style.cursor='pointer'; el.onclick=cb; }
@@ -10187,80 +10189,176 @@ function openDonate(){
 }
 
 /* ══════════════════════════════════════════════════
-   SOUND ENGINE v2 — Natural church-inspired audio
-   Church bells · Trombone · Harp · Reverb · Brass
+   SOUND ENGINE v3 — Natural church-inspired audio
+   Master limiter · Damped stone-church reverb
+   Beating bell partials · Brass filter envelopes
+   Per-trigger humanisation — no two hits identical
 ══════════════════════════════════════════════════ */
-let _ac = null;
+let _ac = null, _master = null, _revIn = null, _irBuf = null, _tock = false;
+
+/* Nothing in nature repeats byte-for-byte. Every trigger
+   jitters pitch/level/timing slightly so 55 taps a session
+   never sound machine-stamped. */
+const _rnd   = (a, b) => a + Math.random() * (b - a);
+const _cents = (f, c) => f * Math.pow(2, c / 1200);
+
 function getAC(){
-  if(!_ac) _ac = new(window.AudioContext || window.webkitAudioContext)();
+  if(!_ac){
+    _ac = new(window.AudioContext || window.webkitAudioContext)();
+    buildBuses();
+  }
   if(_ac.state === 'suspended') _ac.resume();
   return _ac;
 }
 
-/* ── Programmatic church reverb impulse response ── */
-let _revBuf = null;
-function getRevBuf(){
-  if(_revBuf) return _revBuf;
-  const ac = getAC();
-  const dur = 2.2, sr = ac.sampleRate, len = sr * dur;
-  _revBuf = ac.createBuffer(2, len, sr);
-  for(let ch = 0; ch < 2; ch++){
-    const d = _revBuf.getChannelData(ch);
-    for(let i = 0; i < len; i++){
-      const t = i / sr;
-      // Exponential decay with pre-delay and early reflections
-      d[i] = (Math.random() * 2 - 1) * Math.exp(-t * 3.2);
-      if(i === Math.floor(0.018 * sr)) d[i] += 0.35;  // early reflect 1
-      if(i === Math.floor(0.032 * sr)) d[i] += 0.18;  // early reflect 2
-      if(i === Math.floor(0.055 * sr)) d[i] += 0.09;  // early reflect 3
-    }
-  }
-  return _revBuf;
+/* ── Master bus.
+   v2 sent every voice straight to destination: the win
+   fanfare stacked 25+ oscillators and clipped, and digital
+   clipping is exactly what the ear reads as "harsh/robotic".
+   A limiter fixes that in one node. ── */
+function buildBuses(){
+  const ac = _ac;
+  _master = ac.createGain();
+  _master.gain.value = 0.85;
+
+  const lim = ac.createDynamicsCompressor();
+  lim.threshold.value = -8;
+  lim.knee.value      = 8;
+  lim.ratio.value     = 12;
+  lim.attack.value    = 0.004;
+  lim.release.value   = 0.20;
+  _master.connect(lim);
+  lim.connect(ac.destination);
+
+  /* One shared room. v2 reverbed only the bells, so bells sounded
+     like a cathedral and taps/brass sounded like a laptop. */
+  const conv = ac.createConvolver();
+  conv.buffer = churchIR(ac, 2.6);
+  const tone = ac.createBiquadFilter();
+  tone.type = 'lowpass';
+  tone.frequency.value = 3400;
+  const ret = ac.createGain();
+  ret.gain.value = 0.9;
+
+  _revIn = ac.createGain();
+  _revIn.gain.value = 1;
+  _revIn.connect(conv); conv.connect(tone); tone.connect(ret); ret.connect(_master);
 }
 
-/* ── Church bell — inharmonic partials with real reverb ── */
+/* ── Stone-church impulse response.
+   The realism trick: highs must die faster than lows (air and
+   stone absorb treble). A one-pole lowpass whose cutoff glides
+   down across the tail does exactly that. v2 used flat white
+   noise, which is why it sounded fizzy and synthetic. ── */
+function churchIR(ac, dur){
+  if(_irBuf) return _irBuf;
+  const sr  = ac.sampleRate;
+  const len = Math.floor(sr * dur);
+  const pre = Math.floor(sr * 0.012);
+  _irBuf = ac.createBuffer(2, len, sr);
+
+  const early = [
+    [0.0170, 0.42, 0], [0.0230, 0.31, 1], [0.0295, 0.26, 1],
+    [0.0380, 0.22, 0], [0.0510, 0.17, 1], [0.0665, 0.13, 0],
+    [0.0840, 0.10, 1],
+  ];
+
+  for(let ch = 0; ch < 2; ch++){
+    const d  = _irBuf.getChannelData(ch);
+    const rt = ch ? 3.05 : 3.25;
+    let lp = 0;
+    for(let i = pre; i < len; i++){
+      const t  = (i - pre) / sr;
+      const fc = 7000 * Math.pow(420 / 7000, t / dur);
+      const a  = 1 - Math.exp(-2 * Math.PI * fc / sr);
+      const x  = (Math.random() * 2 - 1) * Math.exp(-t * rt);
+      lp += a * (x - lp);
+      d[i] = lp;
+    }
+    early.forEach(function(er){
+      const idx = pre + Math.floor(er[0] * sr);
+      if(idx >= len) return;
+      const amp = er[2] === ch ? er[1] : er[1] * 0.55;
+      d[idx] += ch ? -amp : amp;
+    });
+    let peak = 0;
+    for(let i = 0; i < len; i++){ const v = Math.abs(d[i]); if(v > peak) peak = v; }
+    if(peak > 0) for(let i = 0; i < len; i++) d[i] /= peak;
+  }
+  return _irBuf;
+}
+
+/* ── Voice output: dry to master, wet to the shared church. ── */
+function vout(node, wet, pan){
+  const ac = getAC();
+  let tail = node;
+  if(ac.createStereoPanner && pan){
+    const p = ac.createStereoPanner();
+    p.pan.value = Math.max(-1, Math.min(1, pan));
+    node.connect(p);
+    tail = p;
+  } else {
+    tail = node;
+  }
+  tail.connect(_master);
+  if(wet > 0){
+    const w = ac.createGain();
+    w.gain.value = wet;
+    tail.connect(w);
+    w.connect(_revIn);
+  }
+}
+
+/* ── Struck bell.
+   Real bells shimmer because near-identical partials beat
+   against each other, and because high partials speak faster
+   and die sooner than low ones. v2 had neither — all partials
+   shared one 3 ms attack and perfect tuning, which is the
+   textbook "synth bell" sound. ── */
 function bell(freq, dur, vol = 0.16, startOffset = 0){
   if(!G.cfg.sound) return;
   try {
-    const ac = getAC();
-    const now = ac.currentTime + startOffset;
-    // Real bell partials: inharmonic series (2 = hum, 5 = strike, 3 = third, etc.)
+    const ac  = getAC();
+    const now = ac.currentTime + startOffset + _rnd(0, 0.006);
+    const v   = vol * _rnd(0.90, 1.10);
+    const f0  = _cents(freq, _rnd(-7, 7));
+    const pan = _rnd(-0.35, 0.35);
+
     const partials = [
-      { m:1,     v:1.0,  dec:dur * 0.9  },
-      { m:2.756, v:0.55, dec:dur * 0.5  },
-      { m:5.404, v:0.22, dec:dur * 0.3  },
-      { m:8.933, v:0.09, dec:dur * 0.2  },
-      { m:13.34, v:0.04, dec:dur * 0.15 },
+      { m:1,     v:1.00, dec:0.95, atk:0.010, beat:0.5 },
+      { m:2.756, v:0.50, dec:0.52, atk:0.006, beat:0.8 },
+      { m:5.404, v:0.20, dec:0.30, atk:0.003, beat:1.3 },
+      { m:8.933, v:0.08, dec:0.18, atk:0.002, beat:0   },
+      { m:13.34, v:0.03, dec:0.12, atk:0.001, beat:0   },
     ];
 
-    // Dry signal bus
-    const dryG = ac.createGain(); dryG.gain.value = 0.75; dryG.connect(ac.destination);
-    // Wet reverb bus
-    const conv = ac.createConvolver(); conv.buffer = getRevBuf();
-    const wetG = ac.createGain(); wetG.gain.value = 0.35;
-    conv.connect(wetG); wetG.connect(ac.destination);
-
-    partials.forEach(p => {
-      const osc = ac.createOscillator();
-      const g   = ac.createGain();
-      osc.type = 'sine';
-      osc.frequency.value = freq * p.m;
-      g.gain.setValueAtTime(0, now);
-      g.gain.linearRampToValueAtTime(vol * p.v, now + 0.003);
-      g.gain.exponentialRampToValueAtTime(0.0001, now + p.dec);
-      osc.connect(g);
-      g.connect(dryG);
-      g.connect(conv);
-      osc.start(now); osc.stop(now + p.dec + 0.1);
+    partials.forEach(function(p){
+      const twins = p.beat ? [0, p.beat] : [0];
+      twins.forEach(function(off, ti){
+        const o = ac.createOscillator();
+        const g = ac.createGain();
+        const f = f0 * p.m + off;
+        const end = now + dur * p.dec;
+        o.type = 'sine';
+        o.frequency.setValueAtTime(f, now);
+        o.frequency.linearRampToValueAtTime(f * 0.9985, end);
+        const amp = Math.max(v * p.v * (ti ? 0.7 : 1), 0.0002);
+        g.gain.setValueAtTime(0.0001, now);
+        g.gain.exponentialRampToValueAtTime(amp, now + p.atk);
+        g.gain.exponentialRampToValueAtTime(0.0001, end);
+        o.connect(g);
+        vout(g, 0.30, pan + (ti ? 0.12 : -0.05));
+        o.start(now); o.stop(end + 0.08);
+      });
     });
   } catch(e){}
 }
 
 /* ── Filtered noise burst (clicks, taps, percussion) ── */
-function noiseBurst(dur, {freq=1000, q=1, vol=0.15, atk=0.001, type='bandpass', start=0} = {}){
+function noiseBurst(dur, {freq=1000, q=1, vol=0.15, atk=0.001, type='bandpass', start=0, wet=0.12, pan=0} = {}){
   if(!G.cfg.sound) return;
   try {
-    const ac = getAC();
+    const ac  = getAC();
     const now = ac.currentTime + start;
     const len = Math.ceil(ac.sampleRate * (dur + 0.02));
     const buf = ac.createBuffer(1, len, ac.sampleRate);
@@ -10268,174 +10366,352 @@ function noiseBurst(dur, {freq=1000, q=1, vol=0.15, atk=0.001, type='bandpass', 
     for(let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
     const src  = ac.createBufferSource(); src.buffer = buf;
     const filt = ac.createBiquadFilter();
-    filt.type = type; filt.frequency.value = freq; filt.Q.value = q;
+    filt.type = type;
+    filt.frequency.value = freq * _rnd(0.94, 1.06);
+    filt.Q.value = q;
     const g = ac.createGain();
     g.gain.setValueAtTime(0, now);
-    g.gain.linearRampToValueAtTime(vol, now + atk);
+    g.gain.linearRampToValueAtTime(vol * _rnd(0.9, 1.1), now + atk);
     g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
-    src.connect(filt); filt.connect(g); g.connect(ac.destination);
+    src.connect(filt); filt.connect(g);
+    vout(g, wet, pan);
     src.start(now); src.stop(now + dur + 0.05);
   } catch(e){}
 }
 
 /* ── Generic ADSR oscillator ── */
-function osc(freq, dur, {type='sine', vol=0.14, atk=0.008, dec=0.1, sus=0.8, rel=0.2, start=0, dest=null} = {}){
+function osc(freq, dur, {type='sine', vol=0.14, atk=0.008, dec=0.1, sus=0.8, rel=0.2, start=0, wet=0.18, pan=0} = {}){
   if(!G.cfg.sound) return null;
   try {
     const ac  = getAC();
     const now = ac.currentTime + start;
-    const out = dest || ac.destination;
     const o   = ac.createOscillator();
     const g   = ac.createGain();
     o.type = type; o.frequency.value = freq;
     g.gain.setValueAtTime(0, now);
     g.gain.linearRampToValueAtTime(vol, now + atk);
     g.gain.linearRampToValueAtTime(vol * sus, now + atk + dec);
-    g.gain.setValueAtTime(vol * sus, now + dur - rel);
+    g.gain.setValueAtTime(vol * sus, now + Math.max(dur - rel, atk + dec + 0.001));
     g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
-    o.connect(g); g.connect(out);
+    o.connect(g);
+    vout(g, wet, pan);
     o.start(now); o.stop(now + dur + 0.05);
     return { o, g };
   } catch(e){ return null; }
 }
 
+/* ── Brass voice.
+   What separates real brass from a sawtooth buzz is that
+   brightness BLOOMS on the attack then darkens as the note
+   settles, plus a small pitch scoop into the note. v2 used a
+   fixed bandpass, so every stab was tonally frozen. ── */
+function brass(freq, dur, vol, when, pan){
+  const ac = getAC();
+  const now = when;
+  const f   = _cents(freq, _rnd(-6, 6));
+  const g   = ac.createGain();
+  const lp  = ac.createBiquadFilter();
+  lp.type = 'lowpass'; lp.Q.value = 1.4;
+  lp.frequency.setValueAtTime(f * 1.6, now);
+  lp.frequency.linearRampToValueAtTime(f * 7.5, now + 0.055);
+  lp.frequency.exponentialRampToValueAtTime(f * 2.2, now + dur);
+
+  g.gain.setValueAtTime(0.0001, now);
+  g.gain.exponentialRampToValueAtTime(vol, now + 0.03);
+  g.gain.setValueAtTime(vol * 0.85, now + dur * 0.45);
+  g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+
+  [[0, 1], [_rnd(4, 9), 0.6]].forEach(function(pair){
+    const o  = ac.createOscillator();
+    const ff = _cents(f, pair[0]);
+    o.type = 'sawtooth';
+    o.frequency.setValueAtTime(ff * 0.98, now);
+    o.frequency.exponentialRampToValueAtTime(ff, now + 0.05);
+    const vg = ac.createGain(); vg.gain.value = pair[1];
+    o.connect(vg); vg.connect(lp);
+    o.start(now); o.stop(now + dur + 0.06);
+  });
+  lp.connect(g);
+  vout(g, 0.26, pan);
+}
+
 const sfx = {
 
-  /* ── Wooden button tap ── */
+  /* ── Soft felt/wood tap.
+     Pure noise reads as static; a tiny pitched body reads as a
+     physical object being pressed. ── */
   tap: ()=>{
-    noiseBurst(0.022, {freq:2400, q:10, vol:0.07, type:'bandpass'});
-    noiseBurst(0.010, {freq:600,  q:2,  vol:0.03, type:'lowpass', start:0.004});
-  },
-
-  /* ── Church bells — C major arpeggio with real reverb ── */
-  correct: ()=>{
-    [523, 659, 784, 1047].forEach((f, i) => bell(f, 1.6 + i * 0.2, 0.14, i * 0.095));
-    // Soft sustained choir "aah" underneath (sine formant)
-    setTimeout(()=>{
-      [523, 659, 784].forEach((f, i) => osc(f, 0.7, {type:'sine', vol:0.025 - i*0.006, atk:0.09, rel:0.35}));
-    }, 180);
-  },
-
-  /* ── Trombone wa-wa descending glissando ── */
-  wrong: ()=>{
     if(!G.cfg.sound) return;
     try {
-      const ac = getAC(), now = ac.currentTime;
-      // Waveshaper distortion for brass grit
-      const ws = ac.createWaveShaper();
-      const curve = new Float32Array(256);
-      for(let i=0;i<256;i++){ const x=i*2/256-1; curve[i]=x<0?-Math.pow(-x,0.65):Math.pow(x,0.65); }
-      ws.curve = curve;
-      ws.connect(ac.destination);
-      // Two detuned sawtooth voices (trombone chorus)
-      [[380,376],[190,188]].forEach(([f1,f2])=>{
-        [f1,f2].forEach(freq=>{
-          const o = ac.createOscillator(), g = ac.createGain();
-          o.type = 'sawtooth';
-          o.frequency.setValueAtTime(freq, now);
-          o.frequency.exponentialRampToValueAtTime(freq * 0.38, now + 0.55);
-          g.gain.setValueAtTime(0, now);
-          g.gain.linearRampToValueAtTime(freq===380||freq===376?0.09:0.04, now + 0.025);
-          g.gain.exponentialRampToValueAtTime(0.0001, now + 0.6);
-          o.connect(g); g.connect(ws);
-          o.start(now); o.stop(now + 0.65);
-        });
+      const ac  = getAC();
+      const now = ac.currentTime;
+      const pan = _rnd(-0.12, 0.12);
+      noiseBurst(_rnd(0.014, 0.020), {
+        freq: _rnd(1700, 2500), q: 6, vol: _rnd(0.045, 0.065),
+        type: 'bandpass', wet: 0.10, pan: pan
       });
-      // Sub thud
-      const sub = ac.createOscillator(), sg = ac.createGain();
-      sub.type='sine'; sub.frequency.setValueAtTime(95,now); sub.frequency.exponentialRampToValueAtTime(38,now+0.28);
-      sg.gain.setValueAtTime(0.18,now+0.001); sg.gain.exponentialRampToValueAtTime(0.0001,now+0.3);
-      sub.connect(sg); sg.connect(ac.destination);
-      sub.start(now); sub.stop(now+0.35);
-      // Clunk at start
-      noiseBurst(0.06, {freq:180, q:1, vol:0.1, type:'lowpass'});
+      const f  = _rnd(168, 226);
+      const o  = ac.createOscillator();
+      const g  = ac.createGain();
+      const lp = ac.createBiquadFilter();
+      o.type = 'triangle';
+      o.frequency.setValueAtTime(f, now);
+      o.frequency.exponentialRampToValueAtTime(f * 0.86, now + 0.05);
+      lp.type = 'lowpass'; lp.frequency.value = 1400;
+      g.gain.setValueAtTime(0.0001, now);
+      g.gain.exponentialRampToValueAtTime(_rnd(0.030, 0.045), now + 0.004);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.055);
+      o.connect(lp); lp.connect(g);
+      vout(g, 0.10, pan);
+      o.start(now); o.stop(now + 0.09);
     } catch(e){}
   },
 
-  /* ── Ascending harp-bell run ── */
-  streak: ()=>{
-    const scale = [523,587,659,698,784,880,988,1047];
-    scale.forEach((f,i) => bell(f, 0.9 + i*0.08, 0.10 + i*0.006, i * 0.065));
-    // Shimmer sparkle at the top
-    setTimeout(()=> noiseBurst(0.12, {freq:7000, q:20, vol:0.05, type:'bandpass'}), 560);
+  /* ── Church bells, C major up to the octave.
+     Rubato + an accent on the first note; a metronomic grid is
+     the fastest way to sound like a machine. ── */
+  correct: ()=>{
+    if(!G.cfg.sound) return;
+    const notes = [523.25, 659.25, 783.99, 1046.50];
+    let t = 0;
+    notes.forEach(function(f, i){
+      bell(f, 1.7 + i * 0.18, (i === 0 ? 0.155 : 0.125) * _rnd(0.92, 1.08), t);
+      t += _rnd(0.082, 0.108);
+    });
+    [261.63, 392.00, 523.25].forEach(function(f, i){
+      osc(f, 1.1, { type:'sine', vol: 0.030 - i * 0.007, atk: 0.16, dec: 0.2,
+                    sus: 0.7, rel: 0.5, start: 0.16, wet: 0.45, pan: _rnd(-0.3, 0.3) });
+    });
   },
 
-  /* ── Dramatic minor organ collapse ── */
+  /* ── Gentle descending minor third.
+     v2 was a distorted slapstick trombone — cartoonish against a
+     reverent brand, and harsh negative feedback drives churn.
+     Still clearly "no", but warm and never mocking. ── */
+  wrong: ()=>{
+    if(!G.cfg.sound) return;
+    try {
+      const ac = getAC(), t0 = ac.currentTime;
+      [[196.00, 0, 0.085], [164.81, 0.13, 0.075]].forEach(function(n){
+        const t  = t0 + n[1];
+        const lp = ac.createBiquadFilter();
+        lp.type = 'lowpass';
+        lp.frequency.setValueAtTime(1500, t);
+        lp.frequency.exponentialRampToValueAtTime(420, t + 0.5);
+        const g = ac.createGain();
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.exponentialRampToValueAtTime(n[2], t + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + 0.62);
+        [[0, 'triangle', 1], [_rnd(5, 11), 'sine', 0.8]].forEach(function(v){
+          const o = ac.createOscillator();
+          o.type = v[1];
+          o.frequency.value = _cents(n[0], v[0]);
+          const vg = ac.createGain(); vg.gain.value = v[2];
+          o.connect(vg); vg.connect(lp);
+          o.start(t); o.stop(t + 0.7);
+        });
+        lp.connect(g);
+        vout(g, 0.34, _rnd(-0.15, 0.15));
+      });
+      noiseBurst(0.10, { freq: 210, q: 1.2, vol: 0.05, type:'lowpass', atk: 0.006, wet: 0.20 });
+    } catch(e){}
+  },
+
+  /* ── Ascending harp run. Real glissandi accelerate. ── */
+  streak: ()=>{
+    if(!G.cfg.sound) return;
+    const scale = [523.25, 587.33, 659.25, 698.46, 783.99, 880.00, 987.77, 1046.50];
+    let t = 0, gap = 0.075;
+    scale.forEach(function(f, i){
+      bell(f, 0.85 + i * 0.07, (0.085 + i * 0.007) * _rnd(0.9, 1.1), t);
+      t += gap * _rnd(0.9, 1.1);
+      gap *= 0.94;
+    });
+    noiseBurst(0.16, { freq: 6200, q: 12, vol: 0.030, type:'bandpass', start: t + 0.02, wet: 0.50 });
+  },
+
+  /* ── Solemn minor swell. Triangles + a slow filter close
+     instead of v2's buzzy raw sawtooths. ── */
   elim: ()=>{
     if(!G.cfg.sound) return;
     try {
       const ac = getAC(), now = ac.currentTime;
-      // A minor chord: A + C + E, each with sub-octave
-      [[220,1.0],[261.6,0.7],[329.6,0.5]].forEach(([f, amp])=>{
-        [f, f*0.5].forEach((freq, oct)=>{
-          const o = ac.createOscillator(), g = ac.createGain();
-          const filt = ac.createBiquadFilter();
-          o.type = 'sawtooth';
-          o.frequency.setValueAtTime(freq, now);
-          o.frequency.exponentialRampToValueAtTime(freq * 0.82, now + 0.9);
-          filt.type = 'lowpass'; filt.frequency.value = 900;
-          g.gain.setValueAtTime(0, now);
-          g.gain.linearRampToValueAtTime(0.09 * amp / (oct+1), now + 0.025);
-          g.gain.exponentialRampToValueAtTime(0.0001, now + 1.0);
-          o.connect(filt); filt.connect(g); g.connect(ac.destination);
-          o.start(now); o.stop(now + 1.1);
+      [[220.00, 1.00], [261.63, 0.72], [329.63, 0.50]].forEach(function(ch, i){
+        [[ch[0], 'triangle', 1], [ch[0] * 0.5, 'sine', 0.85],
+         [_cents(ch[0], _rnd(6, 13)), 'triangle', 0.5]].forEach(function(v){
+          const o  = ac.createOscillator();
+          const g  = ac.createGain();
+          const lp = ac.createBiquadFilter();
+          o.type = v[1];
+          o.frequency.setValueAtTime(v[0], now);
+          o.frequency.exponentialRampToValueAtTime(v[0] * 0.84, now + 1.1);
+          lp.type = 'lowpass';
+          lp.frequency.setValueAtTime(1800, now);
+          lp.frequency.exponentialRampToValueAtTime(300, now + 1.15);
+          g.gain.setValueAtTime(0.0001, now);
+          g.gain.exponentialRampToValueAtTime(0.075 * ch[1] * v[2], now + 0.05);
+          g.gain.exponentialRampToValueAtTime(0.0001, now + 1.2);
+          o.connect(lp); lp.connect(g);
+          vout(g, 0.42, _rnd(-0.4, 0.4) * i);
+          o.start(now); o.stop(now + 1.3);
         });
       });
-      // Dark low rumble
-      noiseBurst(0.5, {freq:70, q:1, vol:0.13, type:'lowpass', atk:0.01});
+      noiseBurst(0.60, { freq: 90, q: 1, vol: 0.07, type:'lowpass', atk: 0.05, wet: 0.35 });
     } catch(e){}
   },
 
-  /* ── Full trumpet fanfare + bell sustain ── */
+  /* ── Trumpet fanfare into a bell tail.
+     Timing runs on the audio clock; v2 used setTimeout, which
+     jitters 4–15 ms under load and smears the rhythm. ── */
   win: ()=>{
     if(!G.cfg.sound) return;
     try {
-      const ac = getAC();
-      // Brass stabs: sawtooth + bandpass filter = trumpet character
+      const ac = getAC(), t0 = ac.currentTime + 0.02;
       const stabs = [
-        [523,0],[659,0.14],[784,0.28],[1047,0.44],
-        [1319,0.62],[1047,0.82],[784,0.94],[1047,1.06],
+        [523.25, 0.000, 0.30], [659.25, 0.145, 0.28],
+        [783.99, 0.290, 0.28], [1046.50, 0.445, 0.34],
+        [1318.51, 0.625, 0.30], [1046.50, 0.825, 0.24],
+        [783.99, 0.945, 0.22], [1046.50, 1.065, 0.55],
       ];
-      stabs.forEach(([f,t])=>{
-        const now = ac.currentTime + t;
-        const o = ac.createOscillator(), g = ac.createGain();
-        const bp = ac.createBiquadFilter();
-        o.type='sawtooth'; o.frequency.value=f;
-        bp.type='bandpass'; bp.frequency.value=f*1.8; bp.Q.value=0.9;
-        g.gain.setValueAtTime(0,now);
-        g.gain.linearRampToValueAtTime(0.15,now+0.025);
-        g.gain.setValueAtTime(0.13,now+0.10);
-        g.gain.exponentialRampToValueAtTime(0.0001,now+0.38);
-        o.connect(bp); bp.connect(g); g.connect(ac.destination);
-        o.start(now); o.stop(now+0.42);
-        // Second detuned voice for fullness
-        const o2=ac.createOscillator(), g2=ac.createGain();
-        o2.type='sawtooth'; o2.frequency.value=f*1.004;
-        g2.gain.setValueAtTime(0,now); g2.gain.linearRampToValueAtTime(0.06,now+0.025);
-        g2.gain.exponentialRampToValueAtTime(0.0001,now+0.38);
-        o2.connect(g2); g2.connect(ac.destination);
-        o2.start(now); o2.stop(now+0.42);
+      stabs.forEach(function(s, i){
+        brass(s[0], s[2], (i === 3 || i === 7) ? 0.115 : 0.092,
+              t0 + s[1] + _rnd(-0.008, 0.008), _rnd(-0.30, 0.30));
       });
-      // Kick drums on beats
-      [0,150,300,450].forEach(ms => setTimeout(()=>{
-        noiseBurst(0.09, {freq:100, q:1, vol:0.18, type:'lowpass'});
-      }, ms));
-      // Church bells sustain chord at the end
-      setTimeout(()=>{
-        [523,659,784,1047,1319].forEach((f,i) => bell(f, 2.8, 0.11 - i*0.012, i*0.07));
-      }, 1300);
+      [0, 0.30, 0.60, 0.90].forEach(function(t){
+        noiseBurst(0.11, { freq: 95, q: 1.1, vol: 0.10, type:'lowpass',
+                           atk: 0.004, start: 0.02 + t, wet: 0.25 });
+      });
+      [523.25, 659.25, 783.99, 1046.50, 1318.51].forEach(function(f, i){
+        bell(f, 2.9, 0.095 - i * 0.010, 1.32 + i * 0.075);
+      });
     } catch(e){}
   },
 
-  /* ── Dry mechanical clock tick ── */
+  /* ── Clock escapement.
+     Real clocks alternate tick/tock; one repeated pitch is the
+     "digital alarm" tell. Also dropped from v2's piercing 4.5 kHz
+     into the woodier range, and it tightens as time runs out. ── */
   tick: ()=>{
-    noiseBurst(0.016, {freq:4500, q:22, vol:0.08, type:'bandpass'});
-    noiseBurst(0.010, {freq:200,  q:2,  vol:0.04, type:'lowpass', start:0.003});
+    if(!G.cfg.sound) return;
+    _tock = !_tock;
+    const urg = G.timLeft <= 2 ? 1.25 : G.timLeft <= 3 ? 1.10 : 1;
+    noiseBurst(0.020, {
+      freq: (_tock ? 1150 : 880) * _rnd(0.97, 1.03), q: 9,
+      vol: 0.28 * urg, type:'bandpass', wet: 0.16, pan: _tock ? 0.10 : -0.10
+    });
+    noiseBurst(0.030, {
+      freq: _tock ? 250 : 205, q: 1.4, vol: 0.15 * urg,
+      type:'lowpass', atk: 0.002, start: 0.004, wet: 0.10
+    });
   },
 
   /* ── Harp glissando ── */
   levelUp: ()=>{
-    [261.6,329.6,392,523,659,784,1047,1319,1568].forEach((f,i) => bell(f, 1.4, 0.11, i*0.048));
+    if(!G.cfg.sound) return;
+    const run = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99, 1046.50, 1318.51, 1567.98];
+    let t = 0, gap = 0.058;
+    run.forEach(function(f, i){
+      bell(f, 1.5, (0.095 + (i > 5 ? 0.02 : 0)) * _rnd(0.92, 1.08), t);
+      t += gap * _rnd(0.88, 1.12);
+      gap *= 0.965;
+    });
+  },
+
+  /* ── Toast blip. Rides on all ~191 toast() calls, so it has to sit
+     right at the edge of hearing: presence, not attention. ── */
+  notify: ()=>{
+    if(!G.cfg.sound) return;
+    bell(1318.51, 0.55, 0.028, 0);
+    bell(1567.98, 0.45, 0.020, 0.055);
+  },
+
+  /* ── Achievement unlock. Deliberately unlike levelUp's long harp run:
+     a warm swell blooming into a bright triad, then shimmer. ── */
+  achieve: ()=>{
+    if(!G.cfg.sound) return;
+    osc(261.63, 0.9, { type:'sine', vol:0.045, atk:0.22, dec:0.15,
+                       sus:0.75, rel:0.4, wet:0.50, pan:-0.15 });
+    [659.25, 830.61, 987.77].forEach(function(f, i){
+      bell(f, 1.9, 0.105 - i * 0.012, 0.22 + i * 0.085);
+    });
+    noiseBurst(0.22, { freq:7200, q:14, vol:0.028, type:'bandpass', start:0.50, wet:0.55 });
+  },
+
+  /* ── Incoming chat: gentle marimba two-note rise. ── */
+  message: ()=>{
+    if(!G.cfg.sound) return;
+    try {
+      const ac = getAC(), t0 = ac.currentTime;
+      [[523.25, 0, 0.075], [783.99, 0.085, 0.065]].forEach(function(n){
+        const t  = t0 + n[1];
+        const o  = ac.createOscillator();
+        const g  = ac.createGain();
+        const lp = ac.createBiquadFilter();
+        o.type = 'triangle';
+        o.frequency.value = _cents(n[0], _rnd(-5, 5));
+        lp.type = 'lowpass'; lp.frequency.value = 2600;
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.exponentialRampToValueAtTime(n[2], t + 0.006);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + 0.34);
+        o.connect(lp); lp.connect(g);
+        vout(g, 0.32, _rnd(-0.2, 0.2));
+        o.start(t); o.stop(t + 0.40);
+      });
+    } catch(e){}
+  },
+
+  /* ── Incoming duel: a short horn call. Confident, not alarming. ── */
+  challenge: ()=>{
+    if(!G.cfg.sound) return;
+    try {
+      const t0 = getAC().currentTime + 0.02;
+      brass(392.00, 0.26, 0.085, t0, -0.15);
+      brass(587.33, 0.42, 0.095, t0 + 0.20, 0.15);
+      bell(1174.66, 1.5, 0.055, 0.45);
+    } catch(e){}
+  },
+
+  /* ── Timer expired: a low, resigned gong. Running out of time is not
+     the same event as being wrong, so it should not share that sound. ── */
+  timeUp: ()=>{
+    if(!G.cfg.sound) return;
+    bell(196.00, 2.2, 0.135, 0);
+    bell(233.08, 1.8, 0.075, 0.045);
+    noiseBurst(0.42, { freq:150, q:1, vol:0.06, type:'lowpass', atk:0.02, wet:0.40 });
+  },
+
+  /* ── Answer committed, in flows where the verdict comes later. ── */
+  select: ()=>{
+    if(!G.cfg.sound) return;
+    noiseBurst(0.016, { freq:_rnd(2600, 3200), q:8, vol:0.05, type:'bandpass', wet:0.12 });
+    bell(_rnd(880, 932), 0.42, 0.055, 0.004);
+  },
+
+  /* ── Screen transition: a breath of filtered air beneath the tap.
+     go() fires on every navigation, so this stays near-subliminal. ── */
+  whoosh: ()=>{
+    if(!G.cfg.sound) return;
+    try {
+      const ac  = getAC();
+      const now = ac.currentTime;
+      const len = Math.ceil(ac.sampleRate * 0.34);
+      const buf = ac.createBuffer(1, len, ac.sampleRate);
+      const d   = buf.getChannelData(0);
+      for(let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+      const src = ac.createBufferSource(); src.buffer = buf;
+      const bp  = ac.createBiquadFilter();
+      bp.type = 'bandpass'; bp.Q.value = 1.6;
+      bp.frequency.setValueAtTime(320, now);
+      bp.frequency.exponentialRampToValueAtTime(2100, now + 0.16);
+      bp.frequency.exponentialRampToValueAtTime(520, now + 0.32);
+      const g = ac.createGain();
+      g.gain.setValueAtTime(0.0001, now);
+      g.gain.exponentialRampToValueAtTime(0.030, now + 0.07);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.32);
+      src.connect(bp); bp.connect(g);
+      vout(g, 0.28, 0);
+      src.start(now); src.stop(now + 0.36);
+    } catch(e){}
   },
 };
 
@@ -11821,6 +12097,7 @@ function listenForChallenges(){
     }
 
     _pendingChallenge={...ch, key:snap.key, ref:snap.ref};
+    sfx.challenge();
     showChallengeNotif(ch);
   });
 
@@ -11970,6 +12247,9 @@ function loadChat(uid){
   _chatListener=_chatQuery.on('child_added',snap=>{
     const m=snap.val();
     if(!m) return;
+    // only chime for genuinely new incoming messages - child_added also
+    // replays the last 80 on open, which would machine-gun the sound
+    if(m.from!==G.uid && m.ts && Date.now()-m.ts < 10000) sfx.message();
     const msgs=document.getElementById('chat-msgs');
     if(!msgs) return;
     const bubble=document.createElement('div');
