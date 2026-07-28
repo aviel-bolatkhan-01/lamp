@@ -1,5 +1,56 @@
 # STATUS.md — Lamp: Bible Trivia Online
 
+## Session 2026-07-28 (part 3): Challenges → Disciple only + richer synthesis ✅ (sw lamp-v8)
+
+### 1. Daily + Weekly challenges forced to Disciple (easy)
+User: *"Make all the daily and weekly challenges have questions from the disciple level, because it's too difficult"*
+
+"Disciple" is the **UI label for `easy`** (`chDiffLabel`: easy→🌿 Disciple, medium→📖 Apostle,
+hard→⚔️ Scholar). It is also a rank name in `LEVELS`, which is a red herring — difficulty
+values in code stay lowercase `easy`/`medium`/`hard`.
+
+- **Daily** (`startDailyChallenge`): was `xp>=2000?'hard':xp>=700?'medium':'easy'`. At high XP
+  you got `hard`, and the `hard` branch of `byDiff` returns `q.d==='medium'||q.d==='hard'` —
+  it **excluded easy questions entirely**. Now hardcoded `dailyDiff='easy'`. Timer follows
+  automatically (12s→20s). Card label in the challenges list hardcoded to `'Disciple'` so it
+  stops advertising "Scholar level".
+- **Weekly** (`getWeeklyTournamentPool`): had **no difficulty filter at all** — it drew from
+  the whole category regardless of `d`. Added `easyOnly(arr, need)` to all three banks
+  (MCQ/TF/Verse) with a fallback to the full bank if easy is ever too thin.
+- **Verified against the real data**: all 19 QB categories have ≥17 easy MCQ (need 10; thinnest
+  is Old Testament Law at 17), TF_Q has 941 easy, VERSE_Q has 925. Simulated the pool for every
+  category — 0 fallbacks triggered, 100% easy.
+- Seasonal + Sunday Bowl deliberately left alone — user asked for daily and weekly only.
+
+### 2. Sound: new synthesis methods (user: *"it still sounds too generic"*)
+Root cause of "generic" is structural: everything was built from basic oscillators, which has a
+hard ceiling. Added two genuinely different synthesis engines rather than more of the same:
+- **`pluck()` — Karplus-Strong physical modelling.** Excites a delay line one wave-period long
+  with filtered noise, then feeds it back through a 2-tap averaging lowpass. Models an actual
+  vibrating string. Now drives `streak` and `levelUp`.
+- **`fmBell()` — FM synthesis.** Modulator at an inharmonic ratio drives carrier frequency with
+  a decaying modulation index (the DX7 bell algorithm). Layered into `correct`, `streak`, `levelUp`.
+- **`tap` is now a 3-way round robin** (wood / felt / click), like sample-based games rotate
+  variants — pitch jitter alone still reads as one sound repeating.
+- **New `pageTurn`** wired into `renderQ()` — fills the longest silence in actual gameplay and
+  is thematically right for a Bible app. Total sounds now **16**.
+- Fixed a real pluck bug: sustained amplitude goes as `sqrt(2/N)`, so **high notes rang out
+  louder than low ones**. Excitation is now filtered and normalised per note.
+
+### ⚠️ Known remaining imbalance (honest)
+`streak` (.17 peak) and `levelUp` (.19) sit ~2x below `correct` (.41) / `win` (.45). The master
+limiter saturates on dense plucked runs — raising the pluck gain from 1.55 → 4.2 changed the
+measured output by **nothing**. Reverted to sane gains rather than ship a number that does
+nothing offline but might be loud on other hardware. Fixing properly needs either a per-sound
+send bus that bypasses the shared limiter, or real recorded samples.
+
+**Measurement lesson:** earlier level comparisons were invalid — I rendered each sound in a
+different-length window, and RMS averages over the whole window, so longer windows read quieter.
+Always use a uniform window when comparing.
+
+**Verified:** `node --check` passes; real page headless = 16/16 sounds fire, 0 console errors,
+tap hammered 15x without throwing; nothing clips.
+
 ## Session 2026-07-28 (part 2): +7 new sounds, 8 → 15 ✅ (SW bumped lamp-v6 → lamp-v7)
 
 User: *"add more sounds to make the game feel sound rich. also push changes to github and deploy to firebase."*
