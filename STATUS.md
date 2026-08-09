@@ -1,6 +1,6 @@
 # STATUS.md — Lamp: Bible Trivia Online
 
-## Session 2026-08-09 (part 2): Design + sound polish pass — IN PROGRESS at this save
+## Session 2026-08-09 (part 2): Design + sound polish pass ✅ (sw lamp-v10, DEPLOYED — commit 254f476, tag release-2026-08-09-game-feel)
 User: *"improve the design and sound design... use best cases from other quiz games. add more
 animations... be creative and surprise me. make it like the most played/downloaded quiz games."*
 
@@ -29,7 +29,13 @@ to be merged into the LATER `html.feat-answerAnim .opt.correct` rule at ~line 33
 block sat earlier in the cascade and was overridden (lesson: when ADDING a competing rule,
 check for an existing same-specificity rule later in the file). SPEC B applied by cdx (diff
 verified: _steps ladder + f*_lift in correct, sparkle at st>=5, streak(n) tier lift, showStreak
-passes n) — awaiting final validation + 3-phase harness (pitch-lift a/b + DOM/sfx smoke c).
+passes n).
+
+**SHIPPED & VERIFIED:** node --check ✔; 3-phase harness: streak-0 chime zc=1021 → streak-8
+zc=2126 (**2.08× ≈ exactly +1 octave — the ladder measurably works**), peaks 0.246→0.302 (no
+clipping); 16/16 sounds fire with new signatures; 0 console errors; t7 overlay class, score-pop,
+.q-in all toggle. Live-verified: sw lamp-v10, answerRing ×3 + ladder markers ×11 in prod HTML.
+Rollback: tag release-2026-08-09-android = state before this pass.
 
 ## Session 2026-08-09: AI Study Insight + bug fixes + PWA + Android app ✅ (sw lamp-v9, DEPLOYED)
 
