@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.thelampgame.app",
+      "sha256_cert_fingerprints": [
+        "DE:49:4A:F4:B4:7B:7A:4B:96:90:30:8D:D9:91:AF:B9:18:86:52:56:BA:89:CB:2F:D1:89:A3:63:B7:80:A9:B3"
+      ]
+    }
+  }
+]

@@ -8,7 +8,21 @@
       "firebase.json",
       ".firebaserc",
       ".git/**",
-      "node_modules/**"
+      ".github/**",
+      ".claude/**",
+      "node_modules/**",
+      "android/**",
+      "**/*.md",
+      "database.rules.json",
+      "gen-landing-page.js",
+      "gen-seo-pages.js",
+      "eslint.config.js",
+      "package.json",
+      "package-lock.json",
+      "_*.py",
+      "_*.html",
+      "_res*.jsonl",
+      "_srv.log"
     ],
     "rewrites": [
       {

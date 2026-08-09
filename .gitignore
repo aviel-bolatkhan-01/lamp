@@ -8,3 +8,18 @@
 .claude/
 entities.json
 mempalace.yaml
+
+# Session test harness (transient)
+_*.py
+_*.html
+_res*.jsonl
+_srv.log
+
+# Android signing — NEVER commit keys or passwords
+android/*.keystore
+android/*.jks
+android/keystore*
+android/signing-info.txt
+android/build/
+android/app/build/
+android/.gradle/

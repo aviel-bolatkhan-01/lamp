@@ -1,5 +1,5 @@
-const CACHE = 'lamp-v8';
-const PRECACHE = ['/', '/index.html', '/icon.png', '/manifest.json', '/data/mcq.js', '/data/tf.js', '/data/verse.js'];
+const CACHE = 'lamp-v9';
+const PRECACHE = ['/', '/index.html', '/icon.png', '/icon-192.png', '/icon-maskable.png', '/manifest.json', '/data/mcq.js', '/data/tf.js', '/data/verse.js', '/assets/img/home-bg-texture.png'];
 
 self.addEventListener('install', event => {
   event.waitUntil(

@@ -1,0 +1,39 @@
+{
+  "packageId": "com.thelampgame.app",
+  "host": "thelampgame.com",
+  "name": "Lamp: Bible Trivia",
+  "launcherName": "Lamp",
+  "display": "standalone",
+  "themeColor": "#0D0906",
+  "themeColorDark": "#0D0906",
+  "navigationColor": "#0D0906",
+  "navigationColorDark": "#0D0906",
+  "navigationDividerColor": "#0D0906",
+  "navigationDividerColorDark": "#0D0906",
+  "backgroundColor": "#0D0906",
+  "enableNotifications": true,
+  "startUrl": "/",
+  "iconUrl": "https://thelampgame.com/icon-512.png",
+  "maskableIconUrl": "https://thelampgame.com/icon-maskable.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "./android.keystore",
+    "alias": "lamp"
+  },
+  "appVersionName": "1.0.0",
+  "appVersionCode": 1,
+  "shortcuts": [],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://thelampgame.com/manifest.json",
+  "fallbackType": "customtabs",
+  "features": {},
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "fullScopeUrl": "https://thelampgame.com/",
+  "minSdkVersion": 21,
+  "orientation": "portrait"
+}

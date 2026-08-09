@@ -3971,6 +3971,10 @@ html.feat-gameHeader .g-nm { font-weight: 800 !important; max-width: 100px; over
       </svg>
     </div>
     <div id="w-verse" style="background:rgba(201,145,13,.06);border:1px solid rgba(201,145,13,.18);border-radius:var(--r2);padding:16px 18px;margin-bottom:14px;font-style:italic;font-family:'Cormorant Garamond',serif;font-size:16px;line-height:1.8;text-align:center;color:var(--ink2);"></div>
+    <div id="w-ai-summary" style="display:none;background:rgba(201,145,13,.06);border:1px solid rgba(201,145,13,.18);border-radius:var(--r2);padding:14px 16px;margin-bottom:14px;text-align:left;">
+      <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;margin-bottom:6px;">✨ Study Insight</div>
+      <div id="w-ai-summary-txt" style="font-family:'Cormorant Garamond',serif;font-size:15px;line-height:1.65;color:var(--ink2);"></div>
+    </div>
     <div id="w-others" style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:16px;"></div>
     <button class="btn btn-gold" id="w-play-again" onclick="playAgain()" style="margin-bottom:8px;">🔄 Play Again</button>
     <!-- Daily streak banner — only shown after daily challenge -->
@@ -6820,7 +6824,7 @@ function renderTFQ(q){
 function renderQ(){
   try{ sfx.pageTurn(); }catch(e){}
   G.done=false; stopTimers(); clearAutoAdvance();
-  if(G.qi===0) G._wrongCount=0;
+  if(G.qi===0){ G._wrongCount=0; G._alog=[]; }
   document.getElementById('s-game').classList.toggle('lightning-mode', FEATURES.lightningVibe&&G.sub==='lightning');
   const p=G.players[G.pi];
   // End game if all questions in pool exhausted
@@ -6843,6 +6847,7 @@ function renderQ(){
     }
   }
   G.seen.add(questionKey(q));
+  G._curQ=q;
 
   document.getElementById('g-av').innerHTML=avatarMarkup(p.avatar,resolvePlayerPhoto(p),'sm');
   document.getElementById('g-nm').textContent=p.name + (p.team ? ` (${p.team})` : '');
@@ -6954,6 +6959,7 @@ function answerQ(btn,isOk,q,order){
     btn.classList.add('correct');
     G.scores[p.name]++;
     G.streaks[p.name]++;
+    try{ if(G.players.length===1){(G._alog=G._alog||[]).push({t:(G._curQ&&(G._curQ.q||G._curQ.b)||'').slice(0,90),ok:true});} }catch(e){}
     if (p.team) {
       G.teamScores[p.team]++;
       const teamKeys=Object.keys(G.teamScores||{});
@@ -7002,6 +7008,7 @@ function answerQ(btn,isOk,q,order){
       });
     }
     G.streaks[p.name]=0; G._wrongCount=(G._wrongCount||0)+1;
+    try{ if(G.players.length===1){(G._alog=G._alog||[]).push({t:(G._curQ&&(G._curQ.q||G._curQ.b)||'').slice(0,90),ok:false});} }catch(e){}
     resetComboUIForPlayer(p.name);
     const _wrongRef=(FEATURES.verseRef&&q.r)?`<span class="fb-ref">— ${q.r}</span>`:'';
     if(typeof q.a==='boolean'){
@@ -7049,6 +7056,7 @@ function timeOut(q,pfx){
   document.querySelectorAll(`#${pfx}-opts .opt`).forEach(b=>b.disabled=true);
   const p=G.players[G.pi];
   G.streaks[p.name]=0;
+  try{ if(G.players.length===1){(G._alog=G._alog||[]).push({t:(G._curQ&&(G._curQ.q||G._curQ.b)||'').slice(0,90),ok:false});} }catch(e){}
   resetComboUIForPlayer(p.name);
   const fb=document.getElementById(`${pfx}-fb`); fb.style.display='block';
   fb.className='fb to'; fb.innerHTML=`<strong>⏰ Time's up!</strong> ${q.e||''}`;
@@ -7517,6 +7525,40 @@ function toggleMatchDetail(card) {
   if (detail) detail.style.display = detail.style.display === 'none' ? 'block' : 'none';
 }
 
+function renderAISummary(){
+  const box=document.getElementById('w-ai-summary'), txt=document.getElementById('w-ai-summary-txt');
+  if(!box||!txt) return;
+  box.style.display='none';
+  try{
+    const log=G._alog||[];
+    if(G.players.length!==1 || log.length<3) return;
+    const right=log.filter(a=>a.ok).length, total=log.length;
+    const missed=log.filter(a=>!a.ok).slice(0,3).map(a=>a.t).filter(Boolean);
+    const pct=Math.round(right/total*100);
+    let local;
+    if(pct===100){
+      local='Flawless — '+right+' of '+total+'. Your diligence in the Word shows. Try a harder difficulty for your next challenge.';
+    }else if(missed.length){
+      local='You answered '+right+' of '+total+' ('+pct+'%). Worth revisiting: '+missed.map(m=>'“'+m+'”').join(' · ')+'. A short study on these will make your next run stronger.';
+    }else{
+      local='You answered '+right+' of '+total+' ('+pct+'%). Strong effort — keep building your streak.';
+    }
+    txt.textContent=local;
+    box.style.display='block';
+    const prompt='You are an encouraging Bible study coach inside a trivia game. A player finished a quiz: '+right+' of '+total+' correct.'+(missed.length?' They missed questions about: '+missed.join(' | ')+'.':' They had a perfect game.')+' In 2-3 warm sentences: assess their performance and recommend ONE specific Bible passage to study next, with a brief reason. Plain text only, no markdown, no greeting, under 75 words.';
+    // Key is referrer-locked to thelampgame.com and restricted to the Gemini API only —
+    // safe in public code by design. On any failure the local summary above stays.
+    const ctl=new AbortController(); const timer=setTimeout(()=>ctl.abort(),12000);
+    fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent?key=AIzaSyCXhzwrVC44tRnX3Y4ibnoWgTLMvO0M_K8',{
+      method:'POST', headers:{'Content-Type':'application/json'}, signal:ctl.signal,
+      body:JSON.stringify({contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{maxOutputTokens:220,temperature:0.7}})
+    })
+      .then(r=>{ if(!r.ok) throw new Error('bad status'); return r.json(); })
+      .then(j=>{ clearTimeout(timer); const c=j&&j.candidates&&j.candidates[0]; const s=((c&&c.content&&c.content.parts)||[]).map(p=>p.text||'').join(' ').trim(); if(s.length<20||s.length>900) return; txt.textContent=s; })
+      .catch(()=>{ clearTimeout(timer); });
+  }catch(e){}
+}
+
 function endGame(){
   try {
     stopTimers();
@@ -7692,6 +7734,7 @@ function endGame(){
     const shareBtn=document.getElementById('w-share-btn');
     if(shareBtn) shareBtn.style.display=(G.mode==='practice'||G.players.length<=1)?'none':'';
     if(G.mode==='async_challenge'){ finishGhostRace(); return; }
+    try{ renderAISummary(); }catch(e){}
     go('winner'); sfx.win(); haptic('win'); confetti(); checkAchs();
   } catch(e) {
     console.error("endGame Error:", e);
