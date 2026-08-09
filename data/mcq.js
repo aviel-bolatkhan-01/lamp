@@ -25278,7 +25278,7 @@ const QB={
         "John",
         "James"
       ],
-      "a": "Mary Magdalene",
+      "a": 0,
       "e": "John 20:14-18 records Jesus appearing first to Mary Magdalene at the tomb.",
       "d": "easy"
     },
@@ -25290,7 +25290,7 @@ const QB={
         "Walking on water",
         "Raising Lazarus"
       ],
-      "a": "Turning water into wine",
+      "a": 0,
       "e": "Jesus turned water into wine at the wedding in Cana, as recorded in John 2:1-11.",
       "d": "easy"
     },
@@ -25302,7 +25302,7 @@ const QB={
         "Jeremiah",
         "Isaiah"
       ],
-      "a": "Elijah",
+      "a": 0,
       "e": "God commanded ravens to bring Elijah bread and meat in the morning and evening (1 Kings 17:4-6).",
       "d": "medium"
     },
@@ -25314,7 +25314,7 @@ const QB={
         "2",
         "12"
       ],
-      "a": "5",
+      "a": 0,
       "e": "Jesus used five loaves and two fish to feed the 5,000 (Matthew 14:17).",
       "d": "easy"
     },
@@ -25326,7 +25326,7 @@ const QB={
         "A dead man was raised",
         "A demon was cast out"
       ],
-      "a": "A lame man was healed",
+      "a": 0,
       "e": "Peter said, 'Silver or gold I do not have, but what I do have I give you,' and the man was healed (Acts 3:1-10).",
       "d": "medium"
     },
@@ -25338,7 +25338,7 @@ const QB={
         "The widow's son",
         "Tabitha"
       ],
-      "a": "Lazarus",
+      "a": 0,
       "e": "Jesus called Lazarus from the tomb four days after his death (John 11:1-44).",
       "d": "easy"
     },
@@ -25350,7 +25350,7 @@ const QB={
         "The miraculous catch of fish",
         "Jesus' first miracle"
       ],
-      "a": "Paying the temple tax",
+      "a": 0,
       "e": "Jesus told Peter to find a four-drachma coin in the first fish he caught to pay their taxes (Matthew 17:24-27).",
       "d": "hard"
     },
@@ -25362,7 +25362,7 @@ const QB={
         "The daughter of Jairus",
         "The Samaritan woman"
       ],
-      "a": "A woman with a discharge of blood",
+      "a": 0,
       "e": "She had suffered for 12 years and was healed by touching His cloak (Matthew 9:20-22).",
       "d": "easy"
     },
@@ -25374,7 +25374,7 @@ const QB={
         "It moved backward",
         "It shone twice as bright"
       ],
-      "a": "It stood still",
+      "a": 0,
       "e": "Joshua 10:12-13 says the sun stood still and the moon stopped until the nation took vengeance.",
       "d": "medium"
     },
@@ -25386,7 +25386,7 @@ const QB={
         "Jeremiah",
         "Hosea"
       ],
-      "a": "Ezekiel",
+      "a": 0,
       "e": "Ezekiel 37 describes the vision of the dry bones being restored to life by God's Spirit.",
       "d": "medium"
     },
@@ -25398,7 +25398,7 @@ const QB={
         "5",
         "7"
       ],
-      "a": "0",
+      "a": 0,
       "e": "The fish were all used, though 12 baskets of fragments remained (Matthew 14:20).",
       "d": "medium"
     },
@@ -25410,7 +25410,7 @@ const QB={
         "Bringing frogs upon Egypt",
         "All of the above"
       ],
-      "a": "All of the above",
+      "a": 3,
       "e": "Exodus 7-12 details the signs and plagues Moses performed before Pharaoh.",
       "d": "easy"
     },
@@ -25422,7 +25422,7 @@ const QB={
         "Darius",
         "Cyrus"
       ],
-      "a": "Belshazzar",
+      "a": 0,
       "e": "Daniel 5 tells of the writing on the wall during Belshazzar's feast.",
       "d": "medium"
     },
@@ -25434,7 +25434,7 @@ const QB={
         "Meshach",
         "Abednego"
       ],
-      "a": "Daniel",
+      "a": 0,
       "e": "God shut the mouths of the lions for Daniel (Daniel 6).",
       "d": "easy"
     },
@@ -25446,7 +25446,7 @@ const QB={
         "He made it sharp again",
         "He used it to split the Jordan"
       ],
-      "a": "He made it float",
+      "a": 0,
       "e": "Elisha threw a stick into the water and the iron axe head floated (2 Kings 6:1-7).",
       "d": "hard"
     },
@@ -25458,7 +25458,7 @@ const QB={
         "Gibeon",
         "Hazor"
       ],
-      "a": "Jericho",
+      "a": 0,
       "e": "The walls fell after the people shouted on the seventh day (Joshua 6:20).",
       "d": "easy"
     },
@@ -25470,7 +25470,7 @@ const QB={
         "Three times",
         "Seven times"
       ],
-      "a": "Once",
+      "a": 0,
       "e": "James 5:17 says he prayed earnestly that it would not rain, and it didn't for 3.5 years.",
       "d": "medium"
     },
@@ -25482,7 +25482,7 @@ const QB={
         "Water from the Jordan",
         "Oil"
       ],
-      "a": "Mud and saliva",
+      "a": 0,
       "e": "Jesus spit on the ground, made mud, and anointed the man's eyes (John 9:6).",
       "d": "medium"
     },
@@ -25494,7 +25494,7 @@ const QB={
         "Healed his blindness",
         "Cast out a demon"
       ],
-      "a": "Healed him of paralysis",
+      "a": 0,
       "e": "Acts 9:32-35 says Peter told Aeneas to get up, and he was healed instantly.",
       "d": "hard"
     },
@@ -25506,7 +25506,7 @@ const QB={
         "Shone with light",
         "Grew into a tree"
       ],
-      "a": "Budded, blossomed, and produced almonds",
+      "a": 0,
       "e": "Numbers 17:8 records this miracle to confirm Aaron's priesthood.",
       "d": "medium"
     },
@@ -25518,7 +25518,7 @@ const QB={
         "Jesus'",
         "Stephen's"
       ],
-      "a": "Peter's",
+      "a": 0,
       "e": "Acts 5:15 says people brought the sick so that Peter's shadow might fall on them.",
       "d": "medium"
     },
@@ -25530,7 +25530,7 @@ const QB={
         "Jesus walked on the water",
         "The water turned to wine"
       ],
-      "a": "Jesus healed a man who had been invalid for 38 years",
+      "a": 0,
       "e": "John 5:1-9 records this miracle on the Sabbath.",
       "d": "medium"
     },
@@ -25542,7 +25542,7 @@ const QB={
         "Stephen",
         "Barnabas"
       ],
-      "a": "Saul (Paul)",
+      "a": 0,
       "e": "Saul was blinded by a great light from heaven (Acts 9:1-9).",
       "d": "easy"
     },
@@ -25554,7 +25554,7 @@ const QB={
         "Stirred it with his staff",
         "Prayed over it"
       ],
-      "a": "Threw a piece of wood into it",
+      "a": 0,
       "e": "Exodus 15:25 says the Lord showed him a piece of wood, which he threw into the water.",
       "d": "hard"
     },
@@ -25566,7 +25566,7 @@ const QB={
         "3,000 men",
         "10,000 total"
       ],
-      "a": "4,000 men plus women and children",
+      "a": 0,
       "e": "Matthew 15:32-38 describes the feeding of the 4,000.",
       "d": "medium"
     },
@@ -25578,7 +25578,7 @@ const QB={
         "They were all healed by Elisha",
         "They were all healed by Moses"
       ],
-      "a": "Jesus healed all 10, but only one returned to thank Him",
+      "a": 0,
       "e": "Luke 17:11-19 tells of the one thankful Samaritan leper.",
       "d": "easy"
     },
@@ -25590,7 +25590,7 @@ const QB={
         "They were turned into salt",
         "They got lost in the desert"
       ],
-      "a": "They drowned as the waters returned",
+      "a": 0,
       "e": "Exodus 14:26-28 says the water covered the entire army.",
       "d": "easy"
     },
@@ -25602,7 +25602,7 @@ const QB={
         "He cut it down",
         "He watered it and it grew"
       ],
-      "a": "He cursed it and it withered",
+      "a": 0,
       "e": "Matthew 21:18-22 and Mark 11:12-14 record this event.",
       "d": "medium"
     },
@@ -25614,7 +25614,7 @@ const QB={
         "Moses",
         "Abraham"
       ],
-      "a": "Elijah",
+      "a": 0,
       "e": "2 Kings 2:11 records Elijah's departure from the earth.",
       "d": "easy"
     },
@@ -25626,7 +25626,7 @@ const QB={
         "A bridge appeared",
         "They walked on top of the water"
       ],
-      "a": "The water stopped flowing upstream",
+      "a": 0,
       "e": "Joshua 3:15-17 says the water piled up in a heap far away at Adam.",
       "d": "medium"
     },
@@ -25638,7 +25638,7 @@ const QB={
         "Judas",
         "Caiaphas"
       ],
-      "a": "Malchus",
+      "a": 0,
       "e": "Jesus touched Malchus' ear and healed him (Luke 22:50-51).",
       "d": "medium"
     },
@@ -25650,7 +25650,7 @@ const QB={
         "They were turned into gold",
         "They were rescued by an army of angels"
       ],
-      "a": "They were unharmed by a fiery furnace",
+      "a": 0,
       "e": "Daniel 3 tells how they survived the furnace with a fourth person 'like a son of the gods'.",
       "d": "easy"
     },
@@ -25662,7 +25662,7 @@ const QB={
         "James",
         "Andrew"
       ],
-      "a": "Peter",
+      "a": 0,
       "e": "Peter walked on the water toward Jesus before he became afraid and began to sink (Matthew 14:28-31).",
       "d": "easy"
     },
@@ -25674,7 +25674,7 @@ const QB={
         "Added oil",
         "Added honey"
       ],
-      "a": "Added flour",
+      "a": 0,
       "e": "2 Kings 4:38-41 says Elisha put flour into the pot and the poison was gone.",
       "d": "hard"
     },
@@ -25686,7 +25686,7 @@ const QB={
         "Uzziah",
         "Miriam"
       ],
-      "a": "Naaman",
+      "a": 0,
       "e": "2 Kings 5:1-14 tells the story of the Syrian commander Naaman.",
       "d": "easy"
     },
@@ -25698,7 +25698,7 @@ const QB={
         "Blinded Elymas the sorcerer",
         "Healed Publius' father"
       ],
-      "a": "Healed a man crippled from birth",
+      "a": 0,
       "e": "Acts 14:8-10 says Paul saw the man had faith and told him to stand up.",
       "d": "medium"
     },
@@ -25710,7 +25710,7 @@ const QB={
         "It turned into gold",
         "It vanished"
       ],
-      "a": "It kept flowing until all jars were full",
+      "a": 0,
       "e": "2 Kings 4:1-7 describes this miracle to pay the widow's debts.",
       "d": "medium"
     },
@@ -25722,7 +25722,7 @@ const QB={
         "Rhoda",
         "Priscilla"
       ],
-      "a": "Tabitha (Dorcas)",
+      "a": 0,
       "e": "Acts 9:36-42 says Peter knelt and prayed, then Tabitha opened her eyes.",
       "d": "medium"
     },
@@ -25734,7 +25734,7 @@ const QB={
         "The ground opened up",
         "The builders were turned into stone"
       ],
-      "a": "God confused the languages",
+      "a": 0,
       "e": "Genesis 11:1-9 explains why the people were scattered across the earth.",
       "d": "easy"
     },
@@ -25746,7 +25746,7 @@ const QB={
         "They found a well",
         "They turned salt water sweet"
       ],
-      "a": "Moses struck a rock",
+      "a": 0,
       "e": "Exodus 17:1-7 says water came out of the rock at Horeb.",
       "d": "easy"
     },
@@ -25758,7 +25758,7 @@ const QB={
         "Manna fell from heaven",
         "Jesus multiplied her bread"
       ],
-      "a": "Her jar of flour and jug of oil did not run dry",
+      "a": 0,
       "e": "1 Kings 17:8-16 records this miracle performed through Elijah.",
       "d": "medium"
     },
@@ -25770,7 +25770,7 @@ const QB={
         "He rowed the boat to shore",
         "He threw His cloak into the water"
       ],
-      "a": "He rebuked the wind and said 'Peace, be still!'",
+      "a": 0,
       "e": "Mark 4:35-41 records this display of Jesus' authority over nature.",
       "d": "easy"
     },
@@ -25782,7 +25782,7 @@ const QB={
         "Gave him a potion",
         "Raised him from the dead"
       ],
-      "a": "Healed him from a distance",
+      "a": 0,
       "e": "Matthew 8:5-13 highlights the Centurion's great faith.",
       "d": "medium"
     },
@@ -25794,7 +25794,7 @@ const QB={
         "It disappeared",
         "It moved forward quickly"
       ],
-      "a": "It went backward ten steps",
+      "a": 0,
       "e": "2 Kings 20:8-11 records this sign given through Isaiah.",
       "d": "hard"
     },
@@ -25806,7 +25806,7 @@ const QB={
         "They found wild sheep",
         "They hunted lions"
       ],
-      "a": "He sent quail",
+      "a": 0,
       "e": "Exodus 16:13 and Numbers 11:31-32 describe the wind bringing quail.",
       "d": "medium"
     },
@@ -25818,7 +25818,7 @@ const QB={
         "He was given the gift of tongues",
         "He was healed of his sleep disorder"
       ],
-      "a": "He healed him after falling three stories",
+      "a": 0,
       "e": "Acts 20:7-12 says Paul went down and threw himself on the young man, and life returned to him.",
       "d": "medium"
     },
@@ -25830,7 +25830,7 @@ const QB={
         "Jesus was baptized there",
         "The water turned to wine"
       ],
-      "a": "A man born blind washed there and saw",
+      "a": 0,
       "e": "John 9:7 records Jesus' command to 'Go, wash in the Pool of Siloam'.",
       "d": "medium"
     },
@@ -25842,7 +25842,7 @@ const QB={
         "The demons vanished into the air",
         "The man was struck dumb"
       ],
-      "a": "They entered a herd of pigs which drowned",
+      "a": 0,
       "e": "Mark 5:1-20 describes this powerful deliverance.",
       "d": "easy"
     },
@@ -25854,7 +25854,7 @@ const QB={
         "An angel appeared",
         "She was healed of a disease"
       ],
-      "a": "None, it was a tragedy",
+      "a": 0,
       "e": "1 Samuel 4:19-22 says Phinehas' wife died after giving birth and named the child Ichabod.",
       "d": "hard"
     },
@@ -25866,7 +25866,7 @@ const QB={
         "Moses'",
         "David's"
       ],
-      "a": "Elisha's",
+      "a": 0,
       "e": "2 Kings 13:21 says a man's body touched Elisha's bones and he came to life.",
       "d": "hard"
     },
@@ -25878,7 +25878,7 @@ const QB={
         "It flew into the sky",
         "It disappeared"
       ],
-      "a": "It spoke to him",
+      "a": 0,
       "e": "Numbers 22:21-39 records the Lord opening the donkey's mouth.",
       "d": "easy"
     },
@@ -25890,7 +25890,7 @@ const QB={
         "12 loaves",
         "A jar of flour"
       ],
-      "a": "7 loaves and a few small fish",
+      "a": 0,
       "e": "Matthew 15:34-36 specifies the amount of food for the 4,000.",
       "d": "medium"
     },
@@ -25902,7 +25902,7 @@ const QB={
         "5",
         "3"
       ],
-      "a": "7",
+      "a": 0,
       "e": "Matthew 15:37 says they picked up seven basketfuls of broken pieces.",
       "d": "medium"
     },
@@ -25914,7 +25914,7 @@ const QB={
         "Zipporah",
         "Korah"
       ],
-      "a": "Miriam",
+      "a": 0,
       "e": "Numbers 12:1-15 says Miriam was struck with leprosy for seven days.",
       "d": "medium"
     },
@@ -25926,7 +25926,7 @@ const QB={
         "Raised her from the dead",
         "Healed her blindness"
       ],
-      "a": "Casted out a demon from a distance",
+      "a": 0,
       "e": "Mark 7:24-30 highlights the woman's persistent faith.",
       "d": "hard"
     },
@@ -25938,7 +25938,7 @@ const QB={
         "The water became ice",
         "The water vanished"
       ],
-      "a": "The water stood in a heap",
+      "a": 0,
       "e": "Joshua 3:15-17 says the waters stood and rose up in a heap.",
       "d": "medium"
     },
@@ -25950,7 +25950,7 @@ const QB={
         "A leper",
         "A woman with a spirit of infirmity"
       ],
-      "a": "A man lame from birth",
+      "a": 0,
       "e": "Acts 3:1-10 is the famous miracle 'Silver and gold have I none'.",
       "d": "easy"
     },
@@ -25962,7 +25962,7 @@ const QB={
         "Survived a viper bite",
         "All of the above"
       ],
-      "a": "All of the above",
+      "a": 3,
       "e": "Acts 28 describes Paul's survival and healing of the sick on Malta.",
       "d": "medium"
     },
@@ -25974,7 +25974,7 @@ const QB={
         "He was turned into a pillar of salt",
         "He was fed by ravens"
       ],
-      "a": "He was swallowed by a large fish and survived",
+      "a": 0,
       "e": "Jonah 1-2 tells the story of Jonah's three days in the fish.",
       "d": "easy"
     },
@@ -25986,7 +25986,7 @@ const QB={
         "Turned water into wine",
         "Walked on water"
       ],
-      "a": "Healed a man who had been invalid for 38 years",
+      "a": 0,
       "e": "This occurred at the Pool of Bethesda (John 5:1-9).",
       "d": "medium"
     },
@@ -25998,7 +25998,7 @@ const QB={
         "Bread",
         "Fruit"
       ],
-      "a": "Manna",
+      "a": 0,
       "e": "Exodus 16:35 says they ate manna until they reached the border of Canaan.",
       "d": "easy"
     },
@@ -26010,7 +26010,7 @@ const QB={
         "The transfiguration",
         "Turning water into wine"
       ],
-      "a": "The transfiguration",
+      "a": 2,
       "e": "The transfiguration is in Matthew, Mark, and Luke, but not John.",
       "d": "hard"
     },
@@ -26022,7 +26022,7 @@ const QB={
         "Lazarus",
         "Peter's mother-in-law"
       ],
-      "a": "A widow's son",
+      "a": 0,
       "e": "Luke 7:11-17 records Jesus stopping the funeral procession.",
       "d": "medium"
     },
@@ -26034,7 +26034,7 @@ const QB={
         "He was turned into a tree",
         "He vanished"
       ],
-      "a": "He was eaten by worms and died",
+      "a": 0,
       "e": "Acts 12:21-23 says an angel of the Lord struck him down.",
       "d": "medium"
     },
@@ -26046,7 +26046,7 @@ const QB={
         "Fire came from a rock",
         "All of the above"
       ],
-      "a": "All of the above",
+      "a": 3,
       "e": "Judges 6:17-40 details the signs given to Gideon.",
       "d": "medium"
     },
@@ -26058,7 +26058,7 @@ const QB={
         "Made the boat fly",
         "Both A and B"
       ],
-      "a": "Both A and B",
+      "a": 3,
       "e": "Jesus both calmed the storm (Mark 4) and walked on water (Mark 6).",
       "d": "medium"
     },
@@ -26070,7 +26070,7 @@ const QB={
         "It turned red as blood",
         "There was an eclipse for 3 minutes"
       ],
-      "a": "Darkness came over the whole land",
+      "a": 0,
       "e": "Matthew 27:45 says darkness lasted from the sixth to the ninth hour.",
       "d": "easy"
     },
@@ -26082,7 +26082,7 @@ const QB={
         "Stephen's",
         "James'"
       ],
-      "a": "Paul's",
+      "a": 0,
       "e": "Acts 19:11-12 says God did extraordinary miracles through Paul.",
       "d": "medium"
     },
@@ -26094,7 +26094,7 @@ const QB={
         "The fish were sold for much gold",
         "Jesus fed the 5,000 with them"
       ],
-      "a": "The net did not break",
+      "a": 0,
       "e": "John 21:11 says even with so many, the net was not torn.",
       "d": "hard"
     },
@@ -26106,7 +26106,7 @@ const QB={
         "Lazarus",
         "Tabitha"
       ],
-      "a": "The widow's son at Nain",
+      "a": 0,
       "e": "Luke 7:11-17 is generally considered the first chronological resurrection in Jesus' ministry.",
       "d": "hard"
     },
@@ -26118,7 +26118,7 @@ const QB={
         "Manna fell into the sea",
         "Jesus walked on it"
       ],
-      "a": "The waters were parted",
+      "a": 0,
       "e": "Exodus 14 records the crossing of the Red Sea.",
       "d": "easy"
     },
@@ -26130,7 +26130,7 @@ const QB={
         "Healed her of leprosy",
         "Restored her sight"
       ],
-      "a": "Healed her of a fever",
+      "a": 0,
       "e": "Matthew 8:14-15 says He touched her hand and the fever left her.",
       "d": "medium"
     },
@@ -26142,7 +26142,7 @@ const QB={
         "Gerasene",
         "Gadarene"
       ],
-      "a": "The Bible doesn't name him",
+      "a": 0,
       "e": "The demons were called Legion, but the man is unnamed (Mark 5).",
       "d": "medium"
     },
@@ -26154,7 +26154,7 @@ const QB={
         "It spoke to the people",
         "It led them to the Promised Land"
       ],
-      "a": "Anyone who looked at it was healed of snake bites",
+      "a": 0,
       "e": "Numbers 21:4-9 describes this provision by God.",
       "d": "medium"
     },
@@ -26166,7 +26166,7 @@ const QB={
         "Raised her husband",
         "Found her a job"
       ],
-      "a": "Multiplied her oil",
+      "a": 0,
       "e": "2 Kings 4:1-7 — Elisha multiplied a widow's small jar of oil to fill many vessels so she could pay her debts.",
       "d": "easy"
     },
@@ -26178,7 +26178,7 @@ const QB={
         "A coin was in a fish's mouth",
         "Peter walked on water"
       ],
-      "a": "The disciples caught so many fish their nets began to break",
+      "a": 0,
       "e": "Luke 5:1-11 records this call of the first disciples.",
       "d": "medium"
     },
@@ -26190,7 +26190,7 @@ const QB={
         "The Israelites found hidden stores of food",
         "Jesus multiplied loaves"
       ],
-      "a": "God provided edible flakes on the ground every morning",
+      "a": 0,
       "e": "Exod 16 — Manna was the bread from heaven that God provided daily to feed the Israelites in the wilderness.",
       "d": "easy"
     },
@@ -26202,7 +26202,7 @@ const QB={
         "Anointed him with oil",
         "Told him to go wash"
       ],
-      "a": "Put His fingers in his ears and spat and touched his tongue",
+      "a": 0,
       "e": "Mark 7:31-37 records this specific method.",
       "d": "hard"
     },
@@ -26214,7 +26214,7 @@ const QB={
         "It rained for three days",
         "A giant mountain rose up"
       ],
-      "a": "There was an earthquake and rocks were split",
+      "a": 0,
       "e": "Matthew 27:51-54 records the earthquake and the tearing of the temple curtain.",
       "d": "easy"
     },
@@ -26226,7 +26226,7 @@ const QB={
         "Uzziah",
         "Hezekiah"
       ],
-      "a": "Naaman",
+      "a": 0,
       "e": "2 Kings 5 records Naaman's healing and Gehazi's greed.",
       "d": "medium"
     },
@@ -26238,7 +26238,7 @@ const QB={
         "Casted out a demon",
         "Healed her blindness"
       ],
-      "a": "Raised her from the dead",
+      "a": 0,
       "e": "Mark 5:21-43 and Luke 8:40-56 record Jesus saying 'Talitha koum!'.",
       "d": "easy"
     },
@@ -26250,7 +26250,7 @@ const QB={
         "12",
         "3"
       ],
-      "a": "6",
+      "a": 0,
       "e": "John 2:6 says there were six stone water jars.",
       "d": "medium"
     },
@@ -26262,7 +26262,7 @@ const QB={
         "It was flooded",
         "It was turned into salt"
       ],
-      "a": "It was destroyed by fire and sulfur from heaven",
+      "a": 0,
       "e": "Genesis 19:24 records the destruction of Sodom and Gomorrah.",
       "d": "easy"
     },
@@ -26274,7 +26274,7 @@ const QB={
         "Malchus",
         "Zacchaeus"
       ],
-      "a": "Bartimaeus",
+      "a": 0,
       "e": "Mark 10:46-52 names the blind man as Bartimaeus.",
       "d": "easy"
     },
@@ -26286,7 +26286,7 @@ const QB={
         "It was found by a fish",
         "It dissolved"
       ],
-      "a": "It floated",
+      "a": 0,
       "e": "2 Kings 6:6 says Elisha made the iron float.",
       "d": "medium"
     },
@@ -26298,7 +26298,7 @@ const QB={
         "Anointed her with oil",
         "Raised her from the dead"
       ],
-      "a": "Healed her when she touched His cloak",
+      "a": 0,
       "e": "Matthew 9:20-22 records this healing of faith.",
       "d": "easy"
     },
@@ -26310,7 +26310,7 @@ const QB={
         "Stars shaped like a cross",
         "An angel"
       ],
-      "a": "A pillar of fire",
+      "a": 0,
       "e": "Exodus 13:21-22 says God led them by a pillar of cloud by day and fire by night.",
       "d": "easy"
     },
@@ -26322,7 +26322,7 @@ const QB={
         "40 days",
         "1 day"
       ],
-      "a": "3 days and 3 nights",
+      "a": 0,
       "e": "Jonah 1:17 and Matthew 12:40 confirm this duration.",
       "d": "easy"
     },
@@ -26334,7 +26334,7 @@ const QB={
         "She was turned into a stone",
         "She vanished"
       ],
-      "a": "She became a pillar of salt",
+      "a": 0,
       "e": "Gen 19:26 — Lot's wife looked back at Sodom during its destruction and was turned into a pillar of salt.",
       "d": "easy"
     },
@@ -26346,7 +26346,7 @@ const QB={
         "He used mud and spit",
         "They were healed from a distance"
       ],
-      "a": "He touched their eyes and they saw",
+      "a": 0,
       "e": "Matthew 9:27-31 says Jesus touched their eyes according to their faith.",
       "d": "hard"
     },
@@ -26358,7 +26358,7 @@ const QB={
         "The sea would part",
         "A star would appear"
       ],
-      "a": "A virgin would conceive and bear a son",
+      "a": 0,
       "e": "Isaiah 7:14 is the famous prophecy of Immanuel.",
       "d": "medium"
     },
@@ -26370,7 +26370,7 @@ const QB={
         "Jesus walked on water to escape the crowds",
         "Jesus walked on water at His baptism"
       ],
-      "a": "Jesus walked to the disciples' boat during a storm",
+      "a": 0,
       "e": "Matthew 14:22-33, Mark 6:45-52, and John 6:16-21.",
       "d": "easy"
     },
@@ -26382,7 +26382,7 @@ const QB={
         "Had them wash their hands",
         "Had them sing a hymn"
       ],
-      "a": "Had them sit down in groups",
+      "a": 0,
       "e": "Mark 6:39-40 says they sat in groups of hundreds and fifties.",
       "d": "medium"
     },
@@ -26394,7 +26394,7 @@ const QB={
         "Healed his leprosy",
         "Cast out a demon"
       ],
-      "a": "Raised him from the dead",
+      "a": 0,
       "e": "2 Kings 4:18-37 records this resurrection miracle.",
       "d": "medium"
     },
@@ -26406,7 +26406,7 @@ const QB={
         "It dried up",
         "It became bitter"
       ],
-      "a": "It turned to blood",
+      "a": 0,
       "e": "Exodus 7:17-21 records the first plague of Egypt.",
       "d": "easy"
     },
@@ -26418,7 +26418,7 @@ const QB={
         "12",
         "3"
       ],
-      "a": "7",
+      "a": 0,
       "e": "Joshua 6:4 says they marched seven times on the seventh day.",
       "d": "easy"
     },
@@ -26430,7 +26430,7 @@ const QB={
         "'Go and sin no more'",
         "'Your faith has made you well'"
       ],
-      "a": "'Your sins are forgiven' and 'Get up and walk'",
+      "a": 0,
       "e": "Mark 2:1-12 records this miracle and Jesus' authority to forgive sins.",
       "d": "medium"
     },
@@ -26442,7 +26442,7 @@ const QB={
         "It turned into gold",
         "It vanished"
       ],
-      "a": "It was covered in smoke and fire",
+      "a": 0,
       "e": "Exodus 19:18 says Mount Sinai was covered with smoke because the Lord descended on it in fire.",
       "d": "medium"
     },
@@ -26454,7 +26454,7 @@ const QB={
         "Turning water to wine",
         "Walking on water"
       ],
-      "a": "Many miracles including healing and casting out demons",
+      "a": 0,
       "e": "Acts 8:6-7 says crowds heard him and saw the signs he performed.",
       "d": "medium"
     },
@@ -26466,7 +26466,7 @@ const QB={
         "The man at the Beautiful Gate",
         "Aeneas"
       ],
-      "a": "Saul (Paul)",
+      "a": 0,
       "e": "Acts 9:17-18 records the restoration of Saul's sight.",
       "d": "easy"
     },
@@ -26478,7 +26478,7 @@ const QB={
         "The water became sweet",
         "It overflowed"
       ],
-      "a": "The first person to enter was healed",
+      "a": 0,
       "e": "John 5:4 (in some manuscripts) describes the belief about the stirred water.",
       "d": "medium"
     },
@@ -26490,7 +26490,7 @@ const QB={
         "He didn't heal it, He just rebuked Peter",
         "He told the servant to wash"
       ],
-      "a": "He touched it and healed it",
+      "a": 0,
       "e": "Luke 22:51 records this final healing miracle before the crucifixion.",
       "d": "medium"
     },
@@ -26502,7 +26502,7 @@ const QB={
         "The disciples were still hungry",
         "The food tasted like manna"
       ],
-      "a": "Everyone was satisfied and 12 baskets were left",
+      "a": 0,
       "e": "Matthew 14:20 says they all ate and were satisfied.",
       "d": "easy"
     },
@@ -26514,7 +26514,7 @@ const QB={
         "They moved backward",
         "They disappeared"
       ],
-      "a": "They stood still",
+      "a": 0,
       "e": "Josh 10:12-14 — The sun stood still and the moon stopped until the Israelites defeated their Amorite enemies.",
       "d": "easy"
     },
@@ -26526,7 +26526,7 @@ const QB={
         "A leper",
         "Lazarus"
       ],
-      "a": "A paralytic man",
+      "a": 0,
       "e": "Mark 2:1-12 — Friends lowered a paralyzed man through a roof, and Jesus healed him after seeing their faith.",
       "d": "easy"
     },
@@ -26538,7 +26538,7 @@ const QB={
         "Parted the water",
         "Made it flow backward"
       ],
-      "a": "Healed the water with salt",
+      "a": 0,
       "e": "2 Kings 2:19-22 says Elisha threw salt into the spring to heal it.",
       "d": "hard"
     },
@@ -26550,7 +26550,7 @@ const QB={
         "It didn't come until the second day",
         "It was extinguished by rain"
       ],
-      "a": "It consumed the sacrifice, wood, stones, soil, and water",
+      "a": 0,
       "e": "1 Kings 18:38 records the overwhelming power of God's fire.",
       "d": "medium"
     },
@@ -26562,7 +26562,7 @@ const QB={
         "12",
         "7"
       ],
-      "a": "10",
+      "a": 0,
       "e": "Luke 17:11-19 — Jesus healed ten lepers as they went to the priests, but only one returned to give God thanks.",
       "d": "easy"
     },
@@ -26574,7 +26574,7 @@ const QB={
         "Jesus walked on the Jordan",
         "An earthquake occurred"
       ],
-      "a": "The heavens opened and the Spirit descended as a dove",
+      "a": 0,
       "e": "Matthew 3:16-17 records this divine confirmation.",
       "d": "easy"
     },
@@ -26586,7 +26586,7 @@ const QB={
         "Slept through them",
         "Walked on them"
       ],
-      "a": "Rebuked them",
+      "a": 0,
       "e": "Mark 4:39 records Jesus saying 'Quiet! Be still!'.",
       "d": "easy"
     },
@@ -26960,7 +26960,7 @@ const QB={
         "Adah",
         "Zillah"
       ],
-      "a": "Eve",
+      "a": 0,
       "e": "Genesis 2:22-23 records the creation of the first woman from man's rib.",
       "d": "easy"
     },
@@ -26972,7 +26972,7 @@ const QB={
         "Milcah",
         "Iscah"
       ],
-      "a": "Lot's wife",
+      "a": 0,
       "e": "Genesis 19:26 says Lot's wife looked back and became a pillar of salt.",
       "d": "easy"
     },
@@ -26984,7 +26984,7 @@ const QB={
         "Rebekah",
         "Rachel"
       ],
-      "a": "Sarah",
+      "a": 0,
       "e": "Genesis 21:1-3 records Sarah giving birth to Isaac in her old age.",
       "d": "easy"
     },
@@ -26996,7 +26996,7 @@ const QB={
         "Keturah",
         "Milcah"
       ],
-      "a": "Hagar",
+      "a": 0,
       "e": "Genesis 16:15 records Hagar giving birth to Abram's son Ishmael.",
       "d": "easy"
     },
@@ -27008,7 +27008,7 @@ const QB={
         "Huldah",
         "Jael"
       ],
-      "a": "Deborah",
+      "a": 0,
       "e": "Judges 4:4 identifies Deborah as a prophetess and judge.",
       "d": "medium"
     },
@@ -27020,7 +27020,7 @@ const QB={
         "Rahab",
         "Delilah"
       ],
-      "a": "Jael",
+      "a": 0,
       "e": "Judges 4:21 describes Jael's act of killing Sisera.",
       "d": "medium"
     },
@@ -27032,7 +27032,7 @@ const QB={
         "Naomi",
         "Rahab"
       ],
-      "a": "Ruth",
+      "a": 0,
       "e": "The genealogy in Ruth 4:18-22 shows Ruth as the great-grandmother of David.",
       "d": "easy"
     },
@@ -27044,7 +27044,7 @@ const QB={
         "Sarah",
         "Rebekah"
       ],
-      "a": "Naomi",
+      "a": 0,
       "e": "Ruth 1:16 records Ruth's commitment to her mother-in-law Naomi.",
       "d": "easy"
     },
@@ -27056,7 +27056,7 @@ const QB={
         "Athaliah",
         "Jezebel"
       ],
-      "a": "Esther",
+      "a": 0,
       "e": "The book of Esther describes her courage in saving her people.",
       "d": "easy"
     },
@@ -27068,7 +27068,7 @@ const QB={
         "Jochebed",
         "Elisheba"
       ],
-      "a": "Miriam",
+      "a": 0,
       "e": "Numbers 26:59 names Miriam as the daughter of Amram and Jochebed.",
       "d": "medium"
     },
@@ -27080,7 +27080,7 @@ const QB={
         "Martha",
         "Joanna"
       ],
-      "a": "Mary",
+      "a": 0,
       "e": "The Gospels record Mary as the mother of the Messiah.",
       "d": "easy"
     },
@@ -27092,7 +27092,7 @@ const QB={
         "Anna",
         "Salome"
       ],
-      "a": "Elizabeth",
+      "a": 0,
       "e": "Luke 1:13 records the angel's promise to Zechariah about Elizabeth.",
       "d": "easy"
     },
@@ -27104,7 +27104,7 @@ const QB={
         "Lydia",
         "Phoebe"
       ],
-      "a": "Mary",
+      "a": 0,
       "e": "Luke 10:39 describes Mary sitting at the Lord's feet.",
       "d": "easy"
     },
@@ -27116,7 +27116,7 @@ const QB={
         "Rhoda",
         "Priscilla"
       ],
-      "a": "Martha",
+      "a": 0,
       "e": "Luke 10:38-42 and John 11 identify Martha as their sister.",
       "d": "easy"
     },
@@ -27128,7 +27128,7 @@ const QB={
         "John",
         "Salome"
       ],
-      "a": "Mary Magdalene",
+      "a": 0,
       "e": "John 20:14-16 records Jesus' appearance to Mary Magdalene.",
       "d": "easy"
     },
@@ -27140,7 +27140,7 @@ const QB={
         "Gomer",
         "Delilah"
       ],
-      "a": "Rahab",
+      "a": 0,
       "e": "Joshua 2 and 6 tell the story of Rahab's faith and help.",
       "d": "easy"
     },
@@ -27152,7 +27152,7 @@ const QB={
         "Leah",
         "Sarah"
       ],
-      "a": "Rebekah",
+      "a": 0,
       "e": "Genesis 24-25 records the story of Rebekah.",
       "d": "medium"
     },
@@ -27164,7 +27164,7 @@ const QB={
         "Bilhah",
         "Zilpah"
       ],
-      "a": "Rachel",
+      "a": 0,
       "e": "Genesis 29-30 and 35 record Rachel's story.",
       "d": "easy"
     },
@@ -27176,7 +27176,7 @@ const QB={
         "Zilpah",
         "Dinah"
       ],
-      "a": "Leah",
+      "a": 0,
       "e": "Genesis 29:23-25 describes how Leah became Jacob's first wife.",
       "d": "medium"
     },
@@ -27188,7 +27188,7 @@ const QB={
         "Elizabeth",
         "Anna"
       ],
-      "a": "Hannah",
+      "a": 0,
       "e": "1 Samuel 1 records Hannah's prayer and the birth of Samuel.",
       "d": "easy"
     },
@@ -27200,7 +27200,7 @@ const QB={
         "Mary",
         "Huldah"
       ],
-      "a": "Anna",
+      "a": 0,
       "e": "Luke 2:36-38 identifies Anna as a prophetess.",
       "d": "medium"
     },
@@ -27212,7 +27212,7 @@ const QB={
         "Sheba",
         "Maakah"
       ],
-      "a": "Athaliah",
+      "a": 0,
       "e": "2 Kings 11 — Queen Athaliah seized the throne of Judah and ruled for six years after killing the royal family.",
       "d": "hard"
     },
@@ -27224,7 +27224,7 @@ const QB={
         "Vashti",
         "Delilah"
       ],
-      "a": "Jezebel",
+      "a": 0,
       "e": "1 Kings 16:31 and 18-21 describe Jezebel's influence.",
       "d": "easy"
     },
@@ -27236,7 +27236,7 @@ const QB={
         "Jael",
         "Michal"
       ],
-      "a": "Delilah",
+      "a": 0,
       "e": "Judges 16:4-21 tells the story of Delilah's betrayal.",
       "d": "easy"
     },
@@ -27248,7 +27248,7 @@ const QB={
         "Bathsheba",
         "Maakah"
       ],
-      "a": "Michal",
+      "a": 0,
       "e": "1 Samuel 18:27 records Michal becoming David's wife.",
       "d": "medium"
     },
@@ -27260,7 +27260,7 @@ const QB={
         "Michal",
         "Ahinoam"
       ],
-      "a": "Abigail",
+      "a": 0,
       "e": "1 Samuel 25 describes Abigail's wisdom and marriage to David.",
       "d": "medium"
     },
@@ -27272,7 +27272,7 @@ const QB={
         "Abigail",
         "Haggith"
       ],
-      "a": "Bathsheba",
+      "a": 0,
       "e": "2 Samuel 12:24 records the birth of Solomon to Bathsheba.",
       "d": "easy"
     },
@@ -27284,7 +27284,7 @@ const QB={
         "Damaris",
         "Chloe"
       ],
-      "a": "Lydia",
+      "a": 0,
       "e": "Acts 16:14-15 records Lydia's conversion in Philippi.",
       "d": "medium"
     },
@@ -27296,7 +27296,7 @@ const QB={
         "Junia",
         "Tryphena"
       ],
-      "a": "Priscilla",
+      "a": 0,
       "e": "Acts 18:2-3 and Romans 16:3 mention Priscilla and Aquila.",
       "d": "medium"
     },
@@ -27308,7 +27308,7 @@ const QB={
         "Rachel",
         "Leah"
       ],
-      "a": "Dinah",
+      "a": 0,
       "e": "Genesis 30:21 names Dinah as the daughter of Leah.",
       "d": "hard"
     },
@@ -27320,7 +27320,7 @@ const QB={
         "Tamar",
         "Cozbi"
       ],
-      "a": "Gomer",
+      "a": 0,
       "e": "Hosea 1:3 identifies Gomer as Hosea's wife.",
       "d": "hard"
     },
@@ -27332,7 +27332,7 @@ const QB={
         "Lydia",
         "Dorcas"
       ],
-      "a": "Eunice",
+      "a": 0,
       "e": "2 Tim 1:5 — Eunice was Timothy's mother, who passed on her sincere faith to him from a young age.",
       "d": "hard"
     },
@@ -27344,7 +27344,7 @@ const QB={
         "Anna",
         "Elizabeth"
       ],
-      "a": "Lois",
+      "a": 0,
       "e": "2 Tim 1:5 — Lois was Timothy's grandmother, noted for the sincere faith that also lived in his mother and him.",
       "d": "hard"
     },
@@ -27356,7 +27356,7 @@ const QB={
         "Rhoda",
         "Priscilla"
       ],
-      "a": "Tabitha (Dorcas)",
+      "a": 0,
       "e": "Acts 9:36-41 records the raising of Tabitha.",
       "d": "medium"
     },
@@ -27368,7 +27368,7 @@ const QB={
         "Jochebed",
         "Elisheba"
       ],
-      "a": "Zipporah",
+      "a": 0,
       "e": "Exodus 2:21 records Moses marrying Zipporah.",
       "d": "medium"
     },
@@ -27380,7 +27380,7 @@ const QB={
         "Elisheba",
         "Miriam"
       ],
-      "a": "Jochebed",
+      "a": 0,
       "e": "Exod 6:20 — Jochebed was the mother of Aaron and Moses, and she hid Moses for three months to save his life.",
       "d": "hard"
     },
@@ -27392,7 +27392,7 @@ const QB={
         "Hannah",
         "Anna"
       ],
-      "a": "Sarah",
+      "a": 0,
       "e": "Gen 18:12 — Sarah laughed to herself when she heard she would have a child because she and Abraham were very old.",
       "d": "easy"
     },
@@ -27404,7 +27404,7 @@ const QB={
         "Martha",
         "Lydia"
       ],
-      "a": "The Samaritan woman",
+      "a": 0,
       "e": "John 4:7-26 records the conversation between Jesus and the woman.",
       "d": "easy"
     },
@@ -27416,7 +27416,7 @@ const QB={
         "The sinful woman",
         "All of the above (in different accounts)"
       ],
-      "a": "All of the above (in different accounts)",
+      "a": 3,
       "e": "Anointing accounts appear in all four Gospels (Matthew 26, Mark 14, Luke 7, John 12).",
       "d": "hard"
     },
@@ -27428,7 +27428,7 @@ const QB={
         "Queen Jezebel",
         "Queen Vashti"
       ],
-      "a": "The Queen of Sheba",
+      "a": 0,
       "e": "1 Kings 10 and 2 Chronicles 9 record her visit.",
       "d": "easy"
     },
@@ -27440,7 +27440,7 @@ const QB={
         "Bathsheba",
         "Maakah"
       ],
-      "a": "Michal",
+      "a": 0,
       "e": "2 Samuel 6:16-23 describes Michal's reaction.",
       "d": "medium"
     },
@@ -27452,7 +27452,7 @@ const QB={
         "Lydia",
         "Phoebe"
       ],
-      "a": "Drusilla",
+      "a": 0,
       "e": "Acts 24:24 mentions Felix's wife Drusilla, who was Jewish.",
       "d": "hard"
     },
@@ -27464,7 +27464,7 @@ const QB={
         "Bernice",
         "Drusilla"
       ],
-      "a": "Salome (traditionally)",
+      "a": 0,
       "e": "Matthew 14:6-11 and Mark 6:21-28 record the event; tradition names her Salome.",
       "d": "medium"
     },
@@ -27476,7 +27476,7 @@ const QB={
         "Bilhah",
         "Zilpah"
       ],
-      "a": "Leah",
+      "a": 0,
       "e": "Genesis 29:32-35 lists Leah's first four sons.",
       "d": "medium"
     },
@@ -27488,7 +27488,7 @@ const QB={
         "Tabitha",
         "Lydia"
       ],
-      "a": "Sapphira",
+      "a": 0,
       "e": "Acts 5:1-10 tells the story of Ananias and Sapphira.",
       "d": "easy"
     },
@@ -27500,7 +27500,7 @@ const QB={
         "Elizabeth",
         "Anna"
       ],
-      "a": "Hannah",
+      "a": 0,
       "e": "1 Sam 1:1-20 — Hannah prayed for a son at the tabernacle, and God answered her by giving her Samuel.",
       "d": "easy"
     },
@@ -27512,7 +27512,7 @@ const QB={
         "Sarah",
         "Leah"
       ],
-      "a": "Peninnah",
+      "a": 0,
       "e": "1 Sam 1:2-7 — Peninnah was Elkanah's other wife who provoked Hannah because the Lord had closed Hannah's womb.",
       "d": "medium"
     },
@@ -27524,7 +27524,7 @@ const QB={
         "Zilpah",
         "Bilhah"
       ],
-      "a": "Hagar",
+      "a": 0,
       "e": "Gen 16 — Hagar was Sarah's Egyptian servant who bore Ishmael to Abraham when Sarah remained childless.",
       "d": "easy"
     },
@@ -27536,7 +27536,7 @@ const QB={
         "Tamar",
         "Dinah"
       ],
-      "a": "Asenath",
+      "a": 0,
       "e": "Genesis 41:45 and 50 record Asenath as Joseph's wife.",
       "d": "hard"
     },
@@ -27548,7 +27548,7 @@ const QB={
         "Sitis",
         "Zush"
       ],
-      "a": "She is unnamed",
+      "a": 0,
       "e": "The book of Job mentions his wife but does not give her name.",
       "d": "medium"
     },
@@ -27560,7 +27560,7 @@ const QB={
         "Ruth",
         "Bathsheba"
       ],
-      "a": "Tamar",
+      "a": 0,
       "e": "Genesis 38 describes the story of Tamar and Judah.",
       "d": "medium"
     },
@@ -27572,7 +27572,7 @@ const QB={
         "Miriam",
         "Noadiah"
       ],
-      "a": "Huldah",
+      "a": 0,
       "e": "Huldah was consulted by King Josiah's officials.",
       "d": "hard"
     },
@@ -27584,7 +27584,7 @@ const QB={
         "Vashtea",
         "Vashtia"
       ],
-      "a": "Vashti",
+      "a": 0,
       "e": "Esther 1 describes Vashti's refusal to obey King Ahasuerus.",
       "d": "easy"
     },
@@ -27596,7 +27596,7 @@ const QB={
         "Martha",
         "Joanna"
       ],
-      "a": "Salome",
+      "a": 0,
       "e": "Matthew 27:56 and Mark 15:40 suggest Salome was the mother of Zebedee's sons.",
       "d": "hard"
     },
@@ -27608,7 +27608,7 @@ const QB={
         "Junia",
         "Chloe"
       ],
-      "a": "Phoebe",
+      "a": 0,
       "e": "Paul commends Phoebe as a servant (diakonos) of the church.",
       "d": "medium"
     },
@@ -27620,7 +27620,7 @@ const QB={
         "Phoebe",
         "Priscilla"
       ],
-      "a": "Junia",
+      "a": 0,
       "e": "Romans 16:7 mentions Andronicus and Junia.",
       "d": "hard"
     },
@@ -27632,7 +27632,7 @@ const QB={
         "Mary",
         "Salome"
       ],
-      "a": "Joanna",
+      "a": 0,
       "e": "Luke 8:3 mentions Joanna as one who helped support Jesus' ministry.",
       "d": "hard"
     },
@@ -27644,7 +27644,7 @@ const QB={
         "Lydia",
         "Elizabeth"
       ],
-      "a": "She is not mentioned",
+      "a": 0,
       "e": "The Gospels mention Peter's mother-in-law but not her mother.",
       "d": "medium"
     },
@@ -27656,7 +27656,7 @@ const QB={
         "Lydia",
         "Damaris"
       ],
-      "a": "Rhoda",
+      "a": 0,
       "e": "Acts 12:13-15 records Rhoda's reaction to Peter at the gate.",
       "d": "medium"
     },
@@ -27668,7 +27668,7 @@ const QB={
         "Michal",
         "Abigail"
       ],
-      "a": "Tamar",
+      "a": 0,
       "e": "2 Samuel 13 records the tragedy of Tamar.",
       "d": "medium"
     },
@@ -27680,7 +27680,7 @@ const QB={
         "Naomi",
         "Tamar"
       ],
-      "a": "Rahab",
+      "a": 0,
       "e": "Matthew 1:5 identifies Rahab as the mother of Boaz.",
       "d": "hard"
     },
@@ -27692,7 +27692,7 @@ const QB={
         "Rahab",
         "Tamar"
       ],
-      "a": "Ruth",
+      "a": 0,
       "e": "Ruth 4:17 says Ruth bore a son named Obed.",
       "d": "medium"
     },
@@ -27704,7 +27704,7 @@ const QB={
         "Jael",
         "Miriam"
       ],
-      "a": "She is unnamed",
+      "a": 0,
       "e": "Judges 11:34-40 records the story but not her name.",
       "d": "hard"
     },
@@ -27716,7 +27716,7 @@ const QB={
         "Bernice",
         "Drusilla"
       ],
-      "a": "Herodias",
+      "a": 0,
       "e": "Matt 14:3 — Herodias was the wife of Philip whom Herod Antipas married illegally, leading to John's protest.",
       "d": "medium"
     },
@@ -27728,7 +27728,7 @@ const QB={
         "Mary of Bethany",
         "The Samaritan woman"
       ],
-      "a": "She is unnamed",
+      "a": 0,
       "e": "John 8 — The woman caught in adultery is not named in the biblical text, though Jesus forgave her sins.",
       "d": "easy"
     },
@@ -27740,7 +27740,7 @@ const QB={
         "Lydia",
         "Phoebe"
       ],
-      "a": "Mary",
+      "a": 0,
       "e": "Acts 12:12 mentions the house of Mary the mother of John Mark.",
       "d": "hard"
     },
@@ -27752,7 +27752,7 @@ const QB={
         "Anna",
         "Salome"
       ],
-      "a": "Elizabeth",
+      "a": 0,
       "e": "Luke 1:5 — Elizabeth, a descendant of Aaron, was the wife of the priest Zechariah and mother of John the Baptist.",
       "d": "easy"
     },
@@ -27764,7 +27764,7 @@ const QB={
         "Lydia",
         "Mary"
       ],
-      "a": "The poor widow",
+      "a": 0,
       "e": "Mark 12:41-44 — A poor widow gave two small copper coins, which Jesus said was more than all the others gave.",
       "d": "easy"
     },
@@ -27776,7 +27776,7 @@ const QB={
         "Zipporah",
         "Elisheba"
       ],
-      "a": "Jochebed",
+      "a": 0,
       "e": "Exod 6:20 — Jochebed is recorded as the wife of Amram and the mother of both Aaron and Moses.",
       "d": "medium"
     },
@@ -27788,7 +27788,7 @@ const QB={
         "Nefertari",
         "Bithiah"
       ],
-      "a": "The Bible doesn't name her",
+      "a": 0,
       "e": "Exodus 2:5-10; tradition (and 1 Chron 4:18) suggests Bithiah.",
       "d": "hard"
     },
@@ -27800,7 +27800,7 @@ const QB={
         "Jochebed",
         "Miriam"
       ],
-      "a": "Elisheba",
+      "a": 0,
       "e": "Exod 6:23 — Elisheba was the daughter of Amminadab and the wife of Aaron, the first high priest of Israel.",
       "d": "hard"
     },
@@ -27812,7 +27812,7 @@ const QB={
         "Jochebed",
         "Elisheba"
       ],
-      "a": "Zipporah",
+      "a": 0,
       "e": "Exod 18:2-4 — Zipporah, the wife of Moses, was the mother of his two sons, Gershom and Eliezer.",
       "d": "hard"
     },
@@ -27824,7 +27824,7 @@ const QB={
         "Rahab",
         "Dinah"
       ],
-      "a": "The daughter of Shua",
+      "a": 0,
       "e": "Gen 38:2-12 — The daughter of Shua, a Canaanite woman, was the wife of Judah and mother of Er, Onan, and Shelah.",
       "d": "hard"
     },
@@ -27836,7 +27836,7 @@ const QB={
         "Vashti",
         "Delilah"
       ],
-      "a": "Jezebel",
+      "a": 0,
       "e": "1 Kings 16:31 — Jezebel, daughter of Ethbaal king of the Sidonians, was the wife of King Ahab of Israel.",
       "d": "medium"
     },
@@ -27848,7 +27848,7 @@ const QB={
         "Bathsheba",
         "Maakah"
       ],
-      "a": "Abijah",
+      "a": 0,
       "e": "2 Kings 18:2; her name is also given as Abi.",
       "d": "hard"
     },
@@ -27860,7 +27860,7 @@ const QB={
         "Abigail",
         "Haggith"
       ],
-      "a": "Maakah",
+      "a": 0,
       "e": "2 Samuel 3:3; she was the mother of Absalom.",
       "d": "hard"
     },
@@ -27872,7 +27872,7 @@ const QB={
         "Abital",
         "Eglah"
       ],
-      "a": "Haggith",
+      "a": 0,
       "e": "2 Sam 3:4 — Haggith was one of David's wives and the mother of Adonijah, who later tried to become king.",
       "d": "hard"
     },
@@ -27884,7 +27884,7 @@ const QB={
         "Maakah",
         "Haggith"
       ],
-      "a": "Ahinoam",
+      "a": 0,
       "e": "2 Sam 3:2 — Ahinoam of Jezreel was David's wife and the mother of his firstborn son, Amnon.",
       "d": "hard"
     },
@@ -27896,7 +27896,7 @@ const QB={
         "Maakah",
         "Haggith"
       ],
-      "a": "Abigail",
+      "a": 0,
       "e": "2 Sam 3:3 — Abigail, the widow of Nabal the Carmelite, was David's wife and the mother of his son Chileab.",
       "d": "hard"
     },
@@ -27908,7 +27908,7 @@ const QB={
         "Abijah",
         "Zebidah"
       ],
-      "a": "Jedidah",
+      "a": 0,
       "e": "2 Kings 22:1 — Jedidah, daughter of Adaiah of Bozkath, was the mother of the righteous King Josiah.",
       "d": "hard"
     },
@@ -27920,7 +27920,7 @@ const QB={
         "Shear-jashub",
         "Maher-shalal-hash-baz"
       ],
-      "a": "The prophetess",
+      "a": 0,
       "e": "Isaiah 8:3 refers to his wife as 'the prophetess'.",
       "d": "hard"
     },
@@ -27932,7 +27932,7 @@ const QB={
         "Bilhah",
         "Zilpah"
       ],
-      "a": "Rachel",
+      "a": 0,
       "e": "Gen 31:19 — Rachel stole her father Laban's household gods when Jacob fled from him to return to Canaan.",
       "d": "medium"
     },
@@ -27944,7 +27944,7 @@ const QB={
         "Deborah",
         "Miriam"
       ],
-      "a": "She is unnamed",
+      "a": 0,
       "e": "Judges 13 describes the angel appearing to Manoah's wife.",
       "d": "medium"
     },
@@ -27956,7 +27956,7 @@ const QB={
         "Leah",
         "Tamar"
       ],
-      "a": "Asenath",
+      "a": 0,
       "e": "Gen 41:50-52 — Asenath, daughter of Potiphera priest of On, was the mother of Joseph's sons Manasseh and Ephraim.",
       "d": "hard"
     },
@@ -27968,7 +27968,7 @@ const QB={
         "Hannah",
         "Peninnah"
       ],
-      "a": "The wife of Phinehas",
+      "a": 0,
       "e": "1 Sam 4:19-22 — Eli's daughter-in-law named her son Ichabod, meaning 'the glory has departed from Israel'.",
       "d": "hard"
     },
@@ -27980,7 +27980,7 @@ const QB={
         "Jezebel",
         "Maakah"
       ],
-      "a": "Athaliah",
+      "a": 0,
       "e": "2 Kings 8:26 — Athaliah was the daughter of King Ahab and the mother of King Ahaziah of Judah.",
       "d": "hard"
     },
@@ -27992,7 +27992,7 @@ const QB={
         "Tamar",
         "Bathsheba"
       ],
-      "a": "Maakah",
+      "a": 0,
       "e": "2 Chron 11:20 — Maakah, the daughter of Absalom, was the favorite wife of Rehoboam and mother of Abijah.",
       "d": "hard"
     },
@@ -28004,7 +28004,7 @@ const QB={
         "Elizabeth",
         "Martha"
       ],
-      "a": "Salome",
+      "a": 0,
       "e": "Mark 15:40 — Salome is mentioned as one of the women who followed Jesus and was the mother of James and John.",
       "d": "hard"
     },
@@ -28016,7 +28016,7 @@ const QB={
         "Herodias",
         "Salome"
       ],
-      "a": "Bernice",
+      "a": 0,
       "e": "Acts 25:13 mentions King Agrippa and Bernice.",
       "d": "hard"
     },
@@ -28028,7 +28028,7 @@ const QB={
         "Martha",
         "Joanna"
       ],
-      "a": "Salome",
+      "a": 0,
       "e": "Matt 20:20 — The mother of Zebedee's sons asked Jesus to let her sons sit at his right and left in his kingdom.",
       "d": "hard"
     },
@@ -28040,7 +28040,7 @@ const QB={
         "Salome",
         "Joanna"
       ],
-      "a": "They only had each other",
+      "a": 1,
       "e": "The Bible only mentions Mary and Martha as sisters (Luke 10:39).",
       "d": "medium"
     },
@@ -28052,7 +28052,7 @@ const QB={
         "Phoebe",
         "Junia"
       ],
-      "a": "Priscilla",
+      "a": 0,
       "e": "Acts 18:2 — Priscilla was the wife of Aquila; they were tentmakers who worked and traveled with the apostle Paul.",
       "d": "easy"
     },
@@ -28064,7 +28064,7 @@ const QB={
         "Leah",
         "Rachel"
       ],
-      "a": "Zilpah",
+      "a": 0,
       "e": "Genesis 30:10-13; Zilpah was Leah's servant.",
       "d": "hard"
     },
@@ -28076,7 +28076,7 @@ const QB={
         "Leah",
         "Rachel"
       ],
-      "a": "Bilhah",
+      "a": 0,
       "e": "Genesis 30:4-8; Bilhah was Rachel's servant.",
       "d": "hard"
     },
@@ -28088,7 +28088,7 @@ const QB={
         "Abigail",
         "Haggith"
       ],
-      "a": "Bathsheba",
+      "a": 0,
       "e": "2 Sam 12:24 — Bathsheba was the mother of Solomon, whom David comforted after the death of their first child.",
       "d": "easy"
     },
@@ -28100,7 +28100,7 @@ const QB={
         "Huldah",
         "Anna"
       ],
-      "a": "Miriam",
+      "a": 0,
       "e": "Exod 15:20 — Miriam, the sister of Aaron, took a tambourine and led the women in song as a prophetess.",
       "d": "medium"
     },
@@ -28112,7 +28112,7 @@ const QB={
         "Milcah",
         "Hagar"
       ],
-      "a": "The Bible doesn't name her",
+      "a": 0,
       "e": "Genesis mentions Terah as the father but not the mother.",
       "d": "hard"
     },
@@ -28124,7 +28124,7 @@ const QB={
         "Sarah",
         "Rebekah"
       ],
-      "a": "Milcah",
+      "a": 0,
       "e": "Gen 11:29 — Milkah was the daughter of Haran and the wife of Nahor, who was Abraham's brother.",
       "d": "hard"
     },
@@ -28136,7 +28136,7 @@ const QB={
         "Sarah",
         "Hagar"
       ],
-      "a": "Lot's daughters",
+      "a": 0,
       "e": "Gen 19:30-38 — Lot's two daughters became the mothers of the Moabites and Ammonites through their father.",
       "d": "medium"
     },
@@ -28148,7 +28148,7 @@ const QB={
         "Judith",
         "Adah"
       ],
-      "a": "Mahalath",
+      "a": 0,
       "e": "Genesis 28:9; her name is also Basemath in Gen 36:3.",
       "d": "hard"
     },
@@ -28160,7 +28160,7 @@ const QB={
         "Abijah",
         "Athaliah"
       ],
-      "a": "Hephzibah",
+      "a": 0,
       "e": "2 Kings 21:1 — Hephzibah was the wife of King Hezekiah and the mother of King Manasseh of Judah.",
       "d": "hard"
     },
@@ -28172,7 +28172,7 @@ const QB={
         "Jedidah",
         "Nehushta"
       ],
-      "a": "Hamutal",
+      "a": 0,
       "e": "2 Kings 24:18; she was the daughter of Jeremiah of Libnah.",
       "d": "hard"
     },
@@ -28184,7 +28184,7 @@ const QB={
         "Zebidah",
         "Jedidah"
       ],
-      "a": "Nehushta",
+      "a": 0,
       "e": "2 Kings 24:8 — Nehushta, daughter of Elnathan of Jerusalem, was the mother of King Jehoiachin.",
       "d": "hard"
     },
@@ -28196,7 +28196,7 @@ const QB={
         "Jedidah",
         "Nehushta"
       ],
-      "a": "Hamutal",
+      "a": 0,
       "e": "2 Kings 23:31 — Hamutal, daughter of Jeremiah of Libnah, was the mother of King Jehoahaz of Judah.",
       "d": "hard"
     },
@@ -28208,7 +28208,7 @@ const QB={
         "Jedidah",
         "Nehushta"
       ],
-      "a": "Zebidah",
+      "a": 0,
       "e": "2 Kings 23:36 — Zebidah, daughter of Pedaiah of Rumah, was the mother of King Jehoiakim of Judah.",
       "d": "hard"
     },
@@ -28220,7 +28220,7 @@ const QB={
         "Merab",
         "Rizpah"
       ],
-      "a": "Ahinoam",
+      "a": 0,
       "e": "1 Sam 14:50 — Ahinoam, daughter of Ahimaaz, was the wife of King Saul, the first king of Israel.",
       "d": "hard"
     },
@@ -28232,7 +28232,7 @@ const QB={
         "Michal",
         "Merab"
       ],
-      "a": "Rizpah",
+      "a": 0,
       "e": "2 Sam 21:8-11 — Rizpah was a concubine of Saul who protected the bodies of her executed sons from scavengers.",
       "d": "hard"
     },
@@ -28244,7 +28244,7 @@ const QB={
         "Ahinoam",
         "Rizpah"
       ],
-      "a": "Merab",
+      "a": 0,
       "e": "1 Sam 18:17-19 — Merab was Saul's oldest daughter who was promised to David but given to Adriel the Meholathite.",
       "d": "hard"
     },
@@ -28256,7 +28256,7 @@ const QB={
         "Both A and B",
         "Lydia"
       ],
-      "a": "Both A and B",
+      "a": 2,
       "e": "2 Tim 1:5 — Paul notes that the same sincere faith lived in Timothy, his mother Eunice, and grandmother Lois.",
       "d": "medium"
     },
@@ -28268,7 +28268,7 @@ const QB={
         "Ruth",
         "Bathsheba"
       ],
-      "a": "Tamar",
+      "a": 0,
       "e": "Matt 1:3 — Tamar is the first of four women mentioned in the genealogy of Jesus in the Gospel of Matthew.",
       "d": "hard"
     }
@@ -28282,7 +28282,7 @@ const QB={
         "Camel",
         "Sheep"
       ],
-      "a": "Donkey",
+      "a": 0,
       "e": "Numbers 22:28 records the Lord opening the donkey's mouth to speak to Balaam.",
       "d": "easy"
     },
@@ -28294,7 +28294,7 @@ const QB={
         "Wolf",
         "Scorpion"
       ],
-      "a": "Serpent",
+      "a": 0,
       "e": "Genesis 3 describes the serpent's deception of Eve.",
       "d": "easy"
     },
@@ -28306,7 +28306,7 @@ const QB={
         "Goat",
         "Bull"
       ],
-      "a": "Ram",
+      "a": 0,
       "e": "Genesis 22:13 says Abraham found a ram caught in a thicket by its horns.",
       "d": "easy"
     },
@@ -28318,7 +28318,7 @@ const QB={
         "Sparrow",
         "Eagle"
       ],
-      "a": "Raven",
+      "a": 0,
       "e": "Genesis 8:7 says Noah first sent out a raven.",
       "d": "medium"
     },
@@ -28330,7 +28330,7 @@ const QB={
         "Pigeon",
         "Swallow"
       ],
-      "a": "Dove",
+      "a": 0,
       "e": "Genesis 8:11 records the dove returning with an olive leaf.",
       "d": "easy"
     },
@@ -28342,7 +28342,7 @@ const QB={
         "Only fish",
         "Only insects"
       ],
-      "a": "All kinds of four-footed animals, reptiles, and birds",
+      "a": 0,
       "e": "Acts 10:12 describes the variety of creatures in the vision.",
       "d": "medium"
     },
@@ -28354,7 +28354,7 @@ const QB={
         "Wolves",
         "Leopards"
       ],
-      "a": "Lions",
+      "a": 0,
       "e": "Daniel 6 records Daniel in the lions' den.",
       "d": "easy"
     },
@@ -28366,7 +28366,7 @@ const QB={
         "Camel",
         "Mule"
       ],
-      "a": "Donkey",
+      "a": 0,
       "e": "Matthew 21:1-7 and Zechariah 9:9 describe Jesus riding a donkey.",
       "d": "easy"
     },
@@ -28378,7 +28378,7 @@ const QB={
         "Camel",
         "Lion"
       ],
-      "a": "Donkey",
+      "a": 0,
       "e": "Judges 15:15-16 says he used a fresh jawbone of a donkey.",
       "d": "medium"
     },
@@ -28390,7 +28390,7 @@ const QB={
         "Fish and water",
         "Manna"
       ],
-      "a": "Bread and meat",
+      "a": 0,
       "e": "1 Kings 17:6 says the ravens brought him bread and meat morning and evening.",
       "d": "medium"
     },
@@ -28402,7 +28402,7 @@ const QB={
         "A shark",
         "A sea monster"
       ],
-      "a": "A huge fish",
+      "a": 0,
       "e": "Jonah 1:17 specifies a 'huge fish', often interpreted as a whale.",
       "d": "easy"
     },
@@ -28414,7 +28414,7 @@ const QB={
         "Locusts",
         "Flies"
       ],
-      "a": "Frogs",
+      "a": 0,
       "e": "Exodus 8:1-15 describes the plague of frogs.",
       "d": "easy"
     },
@@ -28426,7 +28426,7 @@ const QB={
         "Goat",
         "Deer"
       ],
-      "a": "Young bull",
+      "a": 0,
       "e": "Exodus 32 describes the people making an idol in the shape of a calf.",
       "d": "easy"
     },
@@ -28438,7 +28438,7 @@ const QB={
         "Tiger",
         "Leopard"
       ],
-      "a": "Lion",
+      "a": 0,
       "e": "1 Samuel 17:34-36 records David killing both a lion and a bear.",
       "d": "easy"
     },
@@ -28450,7 +28450,7 @@ const QB={
         "Dragon",
         "Crocodile"
       ],
-      "a": "Leviathan",
+      "a": 0,
       "e": "Job 41 describes the fearsome power of Leviathan.",
       "d": "medium"
     },
@@ -28462,7 +28462,7 @@ const QB={
         "Spider",
         "Snail"
       ],
-      "a": "Ant",
+      "a": 0,
       "e": "Proverbs 6:6 commends the ant's industriousness.",
       "d": "easy"
     },
@@ -28474,7 +28474,7 @@ const QB={
         "Quail",
         "Fish"
       ],
-      "a": "Locusts",
+      "a": 0,
       "e": "Matthew 3:4 and Mark 1:6 record John's diet.",
       "d": "easy"
     },
@@ -28486,7 +28486,7 @@ const QB={
         "Goats",
         "Pigeons"
       ],
-      "a": "Quail",
+      "a": 0,
       "e": "Exodus 16:13 and Numbers 11:31 describe the arrival of quail.",
       "d": "medium"
     },
@@ -28498,7 +28498,7 @@ const QB={
         "The Church",
         "David"
       ],
-      "a": "Jesus",
+      "a": 0,
       "e": "John 1:29 refers to Jesus as the Lamb of God who takes away the sin of the world.",
       "d": "easy"
     },
@@ -28510,7 +28510,7 @@ const QB={
         "Lamb",
         "Goat"
       ],
-      "a": "Fish",
+      "a": 0,
       "e": "Matthew 17:27 records Jesus' instruction to find a coin in a fish's mouth.",
       "d": "easy"
     },
@@ -28522,7 +28522,7 @@ const QB={
         "Locusts",
         "Boils"
       ],
-      "a": "Frogs",
+      "a": 0,
       "e": "Exodus 8:7 says the magicians did the same by their secret arts.",
       "d": "medium"
     },
@@ -28534,7 +28534,7 @@ const QB={
         "Goat",
         "Dove"
       ],
-      "a": "Lamb",
+      "a": 0,
       "e": "Exodus 12:7-13 describes the blood of the Passover lamb.",
       "d": "easy"
     },
@@ -28546,7 +28546,7 @@ const QB={
         "10",
         "12"
       ],
-      "a": "100",
+      "a": 0,
       "e": "Luke 15:4 says the shepherd had a hundred sheep and lost one.",
       "d": "easy"
     },
@@ -28558,7 +28558,7 @@ const QB={
         "Ox",
         "Eagle"
       ],
-      "a": "Lion",
+      "a": 0,
       "e": "Genesis 49:9 refers to Judah as a 'lion's cub'.",
       "d": "medium"
     },
@@ -28570,7 +28570,7 @@ const QB={
         "Eagle",
         "Dove"
       ],
-      "a": "Sparrow",
+      "a": 0,
       "e": "Matthew 10:29 and Luke 12:6 speak of God's care for sparrows.",
       "d": "easy"
     },
@@ -28582,7 +28582,7 @@ const QB={
         "Wolf",
         "Hyena"
       ],
-      "a": "Serpent",
+      "a": 0,
       "e": "Gen 3:1 — The serpent was more crafty than any other beast of the field that the Lord God had made.",
       "d": "easy"
     },
@@ -28594,7 +28594,7 @@ const QB={
         "Elephant",
         "Hippo"
       ],
-      "a": "Behemoth",
+      "a": 0,
       "e": "Job 40:15-18 — Behemoth's strength is in its loins, and its power is in the muscles of its belly.",
       "d": "medium"
     },
@@ -28606,7 +28606,7 @@ const QB={
         "One pair",
         "Twelve pairs"
       ],
-      "a": "Seven pairs",
+      "a": 0,
       "e": "Genesis 7:2-3 specifies seven pairs of every clean animal.",
       "d": "medium"
     },
@@ -28618,7 +28618,7 @@ const QB={
         "Seven pairs",
         "None"
       ],
-      "a": "One pair",
+      "a": 0,
       "e": "Genesis 7:2 specifies one pair of every unclean animal.",
       "d": "medium"
     },
@@ -28630,7 +28630,7 @@ const QB={
         "Wolf",
         "Leopard"
       ],
-      "a": "Lion",
+      "a": 0,
       "e": "Judges 14:5-6 records Samson tearing a lion apart.",
       "d": "easy"
     },
@@ -28642,7 +28642,7 @@ const QB={
         "Jackals",
         "Dogs"
       ],
-      "a": "Foxes",
+      "a": 0,
       "e": "Judges 15:4 says Samson caught 300 foxes (or jackals).",
       "d": "medium"
     },
@@ -28654,7 +28654,7 @@ const QB={
         "Pigeon",
         "Sparrow"
       ],
-      "a": "Dove",
+      "a": 0,
       "e": "Matthew 3:16 and Mark 1:10 describe the Spirit descending like a dove.",
       "d": "easy"
     },
@@ -28666,7 +28666,7 @@ const QB={
         "Sheep",
         "Cows"
       ],
-      "a": "Pigs",
+      "a": 0,
       "e": "Luke 15:15-16 records the son working for a pig farmer.",
       "d": "easy"
     },
@@ -28678,7 +28678,7 @@ const QB={
         "Venomous snake",
         "Crafty fox"
       ],
-      "a": "Roaring lion",
+      "a": 0,
       "e": "The verse warns to be alert because the devil prowls like a roaring lion.",
       "d": "easy"
     },
@@ -28690,7 +28690,7 @@ const QB={
         "Oxen",
         "Donkeys"
       ],
-      "a": "Horses",
+      "a": 0,
       "e": "1 Kings 4:26 mentions Solomon's 40,000 stalls for chariot horses.",
       "d": "hard"
     },
@@ -28702,7 +28702,7 @@ const QB={
         "Bull",
         "Eagle"
       ],
-      "a": "Snake",
+      "a": 0,
       "e": "Numbers 21:8-9 describes the bronze snake made to heal the people.",
       "d": "easy"
     },
@@ -28714,7 +28714,7 @@ const QB={
         "Sheep",
         "Wolf"
       ],
-      "a": "Camel",
+      "a": 0,
       "e": "Matthew 3:4 and Mark 1:6 say his clothes were made of camel's hair.",
       "d": "easy"
     },
@@ -28726,7 +28726,7 @@ const QB={
         "Bull",
         "Ram"
       ],
-      "a": "Goat",
+      "a": 0,
       "e": "Leviticus 16:8-10 describes the lot for the scapegoat.",
       "d": "medium"
     },
@@ -28738,7 +28738,7 @@ const QB={
         "Dove",
         "Sparrow"
       ],
-      "a": "Hen",
+      "a": 0,
       "e": "Matthew 23:37 and Luke 13:34 express Jesus' desire to gather Jerusalem.",
       "d": "easy"
     },
@@ -28750,7 +28750,7 @@ const QB={
         "Lamb",
         "Dove"
       ],
-      "a": "Serpent",
+      "a": 0,
       "e": "Genesis 3:1 is the first specific animal name (nachash).",
       "d": "hard"
     },
@@ -28762,7 +28762,7 @@ const QB={
         "Locusts",
         "Fish"
       ],
-      "a": "Manna (not an animal)",
+      "a": 0,
       "e": "Exodus 16:31 describes manna; though not an animal, it's a common trick question.",
       "d": "medium"
     },
@@ -28774,7 +28774,7 @@ const QB={
         "Gnat",
         "Flea"
       ],
-      "a": "Mustard seed (not an animal)",
+      "a": 0,
       "e": "Matthew 13:31-32; often confused with animal metaphors.",
       "d": "easy"
     },
@@ -28786,7 +28786,7 @@ const QB={
         "Dragon, Beast, False Prophet, Horse",
         "Seven-headed monster"
       ],
-      "a": "Lion, Ox, Man, Eagle",
+      "a": 0,
       "e": "Revelation 4:7 describes the appearance of the four living creatures.",
       "d": "hard"
     },
@@ -28798,7 +28798,7 @@ const QB={
         "Door",
         "Window"
       ],
-      "a": "Needle",
+      "a": 0,
       "e": "Matt 19:24 — Jesus said it is easier for a camel to go through the eye of a needle than for a rich man to enter heaven.",
       "d": "easy"
     },
@@ -28810,7 +28810,7 @@ const QB={
         "Silver Lion",
         "Stone Eagle"
       ],
-      "a": "Golden Calf",
+      "a": 0,
       "e": "Exod 32 — While Moses was on Sinai, the Israelites made and worshiped a golden calf as their god.",
       "d": "easy"
     },
@@ -28822,7 +28822,7 @@ const QB={
         "Sheep",
         "Cattle"
       ],
-      "a": "Pigs",
+      "a": 0,
       "e": "Mark 5:11-13 records the demons entering a herd of about 2,000 pigs.",
       "d": "easy"
     },
@@ -28834,7 +28834,7 @@ const QB={
         "Dove",
         "Raven"
       ],
-      "a": "Eagle",
+      "a": 0,
       "e": "The verse says 'your youth is renewed like the eagle’s'.",
       "d": "medium"
     },
@@ -28846,7 +28846,7 @@ const QB={
         "Sheep",
         "Bull"
       ],
-      "a": "Cow",
+      "a": 0,
       "e": "Numbers 19 describes the sacrifice of the red heifer.",
       "d": "hard"
     },
@@ -28858,7 +28858,7 @@ const QB={
         "Ram",
         "Deer"
       ],
-      "a": "Goat",
+      "a": 0,
       "e": "Genesis 27:16 says Rebekah put goat skins on Jacob's hands.",
       "d": "medium"
     },
@@ -28870,7 +28870,7 @@ const QB={
         "Locusts",
         "Ants"
       ],
-      "a": "Flies",
+      "a": 0,
       "e": "Beelzebub is often translated as 'Lord of the Flies'.",
       "d": "hard"
     },
@@ -28882,7 +28882,7 @@ const QB={
         "Bee",
         "Sheep"
       ],
-      "a": "None, it was a jar of oil",
+      "a": 0,
       "e": "2 Kings 4:1-7; a common misconception that an animal was involved.",
       "d": "medium"
     },
@@ -28894,7 +28894,7 @@ const QB={
         "Deer",
         "Ox"
       ],
-      "a": "Wolf",
+      "a": 0,
       "e": "Genesis 49:27 says 'Benjamin is a ravenous wolf'.",
       "d": "hard"
     },
@@ -28906,7 +28906,7 @@ const QB={
         "Goat",
         "Deer"
       ],
-      "a": "Ram",
+      "a": 0,
       "e": "Gen 22:13 — Abraham saw a ram caught in a thicket by its horns and sacrificed it instead of his son Isaac.",
       "d": "easy"
     },
@@ -28918,7 +28918,7 @@ const QB={
         "Leviathan",
         "Eagle"
       ],
-      "a": "Lion",
+      "a": 0,
       "e": "Proverbs 30:30 refers to the lion as mighty among beasts.",
       "d": "medium"
     },
@@ -28930,7 +28930,7 @@ const QB={
         "Lions",
         "Wolves"
       ],
-      "a": "Snakes",
+      "a": 0,
       "e": "Num 21:6 — Because the people spoke against God and Moses, the Lord sent fiery serpents among them.",
       "d": "easy"
     },
@@ -28942,7 +28942,7 @@ const QB={
         "Foxes, Wolves, Dogs, Cats",
         "Fish, Birds, Reptiles, Mammals"
       ],
-      "a": "Ants, Rock badgers, Locusts, Lizards",
+      "a": 0,
       "e": "Proverbs 30:24-28 lists these four small but wise creatures.",
       "d": "hard"
     },
@@ -28954,7 +28954,7 @@ const QB={
         "Only camels",
         "Only dogs"
       ],
-      "a": "All animals (herds and flocks)",
+      "a": 0,
       "e": "Jonah 3:7-8 says neither man nor beast should taste anything.",
       "d": "hard"
     },
@@ -28966,7 +28966,7 @@ const QB={
         "Eagle",
         "Sparrow"
       ],
-      "a": "Rooster",
+      "a": 0,
       "e": "Matthew 26:34, Mark 14:30, Luke 22:34, John 13:38.",
       "d": "easy"
     },
@@ -28978,7 +28978,7 @@ const QB={
         "Viper",
         "Lion"
       ],
-      "a": "Fox",
+      "a": 0,
       "e": "Luke 13:32 records Jesus calling Herod 'that fox'.",
       "d": "medium"
     },
@@ -28990,7 +28990,7 @@ const QB={
         "Donkeys",
         "Elephants"
       ],
-      "a": "Horses",
+      "a": 0,
       "e": "Exodus 14:9 and 23 mention horses and chariots.",
       "d": "easy"
     },
@@ -29002,7 +29002,7 @@ const QB={
         "Fish",
         "Whale"
       ],
-      "a": "Snake",
+      "a": 0,
       "e": "Proverbs 30:19 mentions the way of a serpent on a rock, but many versions also mention the path of a ship.",
       "d": "hard"
     },
@@ -29014,7 +29014,7 @@ const QB={
         "Two wolves",
         "Two leopards"
       ],
-      "a": "Two female bears",
+      "a": 0,
       "e": "2 Kings 2:23-24 records two bears coming out of the woods.",
       "d": "medium"
     },
@@ -29026,7 +29026,7 @@ const QB={
         "Eagle",
         "Moth"
       ],
-      "a": "Bear",
+      "a": 0,
       "e": "Job 9:9 and 38:32 (Arcturus, Orion, Pleiades).",
       "d": "hard"
     },
@@ -29038,7 +29038,7 @@ const QB={
         "Goat",
         "Ram"
       ],
-      "a": "Ewe lamb",
+      "a": 0,
       "e": "2 Samuel 12:1-4 describes the poor man's little ewe lamb.",
       "d": "easy"
     },
@@ -29050,7 +29050,7 @@ const QB={
         "Flies",
         "Worms"
       ],
-      "a": "Bees (and honey)",
+      "a": 0,
       "e": "Judges 14:8 records Samson finding a swarm of bees and honey.",
       "d": "medium"
     },
@@ -29062,7 +29062,7 @@ const QB={
         "Beetle",
         "Caterpillar"
       ],
-      "a": "Worm",
+      "a": 0,
       "e": "Jonah 4:7 says God provided a worm at dawn the next day.",
       "d": "medium"
     },
@@ -29074,7 +29074,7 @@ const QB={
         "Wolves",
         "Lions"
       ],
-      "a": "Leopards",
+      "a": 0,
       "e": "Habakkuk 1:8 says their horses are swifter than leopards.",
       "d": "hard"
     },
@@ -29086,7 +29086,7 @@ const QB={
         "Eagle",
         "Gazelle"
       ],
-      "a": "Deer (Hind's feet)",
+      "a": 0,
       "e": "Habakkuk 3:19 says 'He makes my feet like the feet of a deer'.",
       "d": "medium"
     },
@@ -29098,7 +29098,7 @@ const QB={
         "Wolf",
         "Badger"
       ],
-      "a": "Fox",
+      "a": 0,
       "e": "Song 2:15 — The speaker asks to catch the little foxes that spoil the vines while the vineyards are in blossom.",
       "d": "medium"
     },
@@ -29110,7 +29110,7 @@ const QB={
         "A sorcerer",
         "A prophet"
       ],
-      "a": "A murderer (then a god)",
+      "a": 0,
       "e": "Acts 28:3-6; the viper's bite led to their conclusion.",
       "d": "medium"
     },
@@ -29122,7 +29122,7 @@ const QB={
         "Horse and Camel",
         "All livestock"
       ],
-      "a": "All livestock",
+      "a": 3,
       "e": "Exod 20:10 — The Fourth Commandment states that on the Sabbath, no work shall be done by people or their animals.",
       "d": "medium"
     },
@@ -29134,7 +29134,7 @@ const QB={
         "Fish",
         "Bread"
       ],
-      "a": "Quail",
+      "a": 0,
       "e": "Numbers 11:33 says the Lord's anger was kindled while the meat was between their teeth.",
       "d": "medium"
     },
@@ -29146,7 +29146,7 @@ const QB={
         "Swift deer",
         "Ravenous wolf"
       ],
-      "a": "Rawboned donkey",
+      "a": 0,
       "e": "Gen 49:14 — In his blessing, Jacob describes Issachar as a strong donkey crouching between two saddlebags.",
       "d": "hard"
     },
@@ -29158,7 +29158,7 @@ const QB={
         "Living ant",
         "Living man"
       ],
-      "a": "Living dog",
+      "a": 0,
       "e": "Eccl 9:4 — The Preacher says that a living dog is better than a dead lion because there is still hope for the living.",
       "d": "medium"
     },
@@ -29170,7 +29170,7 @@ const QB={
         "Horse",
         "Camel"
       ],
-      "a": "Ox",
+      "a": 0,
       "e": "The metaphor comes from an ox refusing the yoke.",
       "d": "hard"
     },
@@ -29182,7 +29182,7 @@ const QB={
         "Lions",
         "Eagles"
       ],
-      "a": "Horses",
+      "a": 0,
       "e": "Zechariah 6:1-3 describes red, black, white, and dappled horses.",
       "d": "hard"
     },
@@ -29194,7 +29194,7 @@ const QB={
         "Sheep",
         "Goat"
       ],
-      "a": "Deer",
+      "a": 0,
       "e": "Psalm 42:1 'As the hart panteth after the water brooks'.",
       "d": "medium"
     },
@@ -29206,7 +29206,7 @@ const QB={
         "Wolf",
         "Ox"
       ],
-      "a": "Lion's cub",
+      "a": 0,
       "e": "Deuteronomy 33:22; Genesis 49:17 says a serpent.",
       "d": "hard"
     },
@@ -29218,7 +29218,7 @@ const QB={
         "Nero",
         "None of the above"
       ],
-      "a": "Lion",
+      "a": 0,
       "e": "Paul says he was delivered from the lion's mouth.",
       "d": "medium"
     },
@@ -29230,7 +29230,7 @@ const QB={
         "Reptiles",
         "Fish"
       ],
-      "a": "Birds",
+      "a": 0,
       "e": "Luke 2:24 — Mary and Joseph offered a sacrifice of two turtledoves, as required for those who could not afford a lamb.",
       "d": "easy"
     },
@@ -29242,7 +29242,7 @@ const QB={
         "Lion",
         "Leviathan"
       ],
-      "a": "Serpent",
+      "a": 0,
       "e": "Revelation 12:9 calls him 'that ancient serpent called the devil'.",
       "d": "easy"
     },
@@ -29254,7 +29254,7 @@ const QB={
         "Leopard",
         "Bear"
       ],
-      "a": "Wolf",
+      "a": 0,
       "e": "Isaiah 11:6 'The wolf will live with the lamb'.",
       "d": "easy"
     },
@@ -29266,7 +29266,7 @@ const QB={
         "Wolf, Fox, Jackal",
         "Eagle, Hawk, Falcon"
       ],
-      "a": "Leopard, Bear, Lion",
+      "a": 0,
       "e": "Revelation 13:2 says the beast resembled a leopard, with feet like a bear and mouth like a lion.",
       "d": "hard"
     },
@@ -29278,7 +29278,7 @@ const QB={
         "Donkeys",
         "Elephants"
       ],
-      "a": "Camels",
+      "a": 0,
       "e": "Tradition and geography suggest camels for their journey from the East.",
       "d": "easy"
     },
@@ -29290,7 +29290,7 @@ const QB={
         "Insects",
         "Fish"
       ],
-      "a": "Birds",
+      "a": 0,
       "e": "Psalm 102:6 uses these birds to describe loneliness.",
       "d": "hard"
     },
@@ -29302,7 +29302,7 @@ const QB={
         "Doves",
         "Both A and B"
       ],
-      "a": "Both A and B",
+      "a": 3,
       "e": "Matthew 10:16 (sheep) and Luke 10:3 (lambs).",
       "d": "medium"
     },
@@ -29314,7 +29314,7 @@ const QB={
         "Cow",
         "Sheep"
       ],
-      "a": "Pig",
+      "a": 0,
       "e": "2 Pet 2:22 — False teachers are compared to a sow that is washed only to return to wallowing in the mud.",
       "d": "medium"
     },
@@ -29326,7 +29326,7 @@ const QB={
         "Pearl",
         "Insect"
       ],
-      "a": "Manna (not an animal)",
+      "a": 0,
       "e": "Numbers 11:7 compares manna to bdellium (a resin).",
       "d": "hard"
     },
@@ -29338,7 +29338,7 @@ const QB={
         "Mammals",
         "Fish"
       ],
-      "a": "Birds",
+      "a": 0,
       "e": "Isa 34:11 — The desert owl and the screech owl (or bittern) would possess the ruins of the judged nations.",
       "d": "hard"
     },
@@ -29350,7 +29350,7 @@ const QB={
         "Dragon, Beast, Snake, Scorpion",
         "None of the above"
       ],
-      "a": "Man, Lion, Ox, Eagle",
+      "a": 0,
       "e": "Ezek 1:10 — The four living creatures each had the faces of a man, a lion, an ox, and an eagle.",
       "d": "hard"
     },
@@ -29362,7 +29362,7 @@ const QB={
         "Reptiles",
         "Insects"
       ],
-      "a": "Mammals",
+      "a": 0,
       "e": "Isaiah 2:20 says idols will be thrown to moles and bats.",
       "d": "hard"
     },
@@ -29374,7 +29374,7 @@ const QB={
         "Lion",
         "Man"
       ],
-      "a": "Horse",
+      "a": 0,
       "e": "Ps 147:10 — God's pleasure is not in the strength of the horse, nor does He delight in the legs of a man.",
       "d": "hard"
     },
@@ -29386,7 +29386,7 @@ const QB={
         "Whale",
         "Sea monster"
       ],
-      "a": "Jackal",
+      "a": 0,
       "e": "Many modern translations use 'jackal' where KJV uses 'dragon' in certain OT passages.",
       "d": "hard"
     },
@@ -29398,7 +29398,7 @@ const QB={
         "One goat",
         "One bull"
       ],
-      "a": "Two pigeons or two turtledoves",
+      "a": 0,
       "e": "Lev 5:7 — A poor person could bring two turtledoves or two young pigeons as a sin offering to the Lord.",
       "d": "medium"
     },
@@ -29410,7 +29410,7 @@ const QB={
         "Horse",
         "Narwhal"
       ],
-      "a": "Wild ox",
+      "a": 0,
       "e": "Modern scholars agree the 're'em' was a wild ox or aurochs.",
       "d": "hard"
     },
@@ -29422,7 +29422,7 @@ const QB={
         "Cow",
         "Donkey"
       ],
-      "a": "Sheep (two leg bones or a piece of an ear)",
+      "a": 0,
       "e": "Amos 3:12 — Amos compares Israel's rescue to a shepherd saving two leg bones or a piece of an ear from a lion.",
       "d": "hard"
     },
@@ -29434,7 +29434,7 @@ const QB={
         "Dinosaur",
         "Sea monster"
       ],
-      "a": "Crocodile",
+      "a": 0,
       "e": "Many scholars identify the description in Job 41 with a crocodile.",
       "d": "medium"
     },
@@ -29446,7 +29446,7 @@ const QB={
         "Eagle, Hawk, Vulture",
         "Snake, Scorpion, Spider"
       ],
-      "a": "Lion, Leopard, Bear",
+      "a": 0,
       "e": "Hos 13:7-8 — God warned that He would be like a lion, a leopard, or a bear to the rebellious people of Israel.",
       "d": "hard"
     },
@@ -29458,7 +29458,7 @@ const QB={
         "Spider",
         "Ant"
       ],
-      "a": "Lizard",
+      "a": 0,
       "e": "Proverbs 30:28 is often translated as 'lizard' today.",
       "d": "hard"
     },
@@ -29470,7 +29470,7 @@ const QB={
         "Vipers",
         "Lions"
       ],
-      "a": "Dogs",
+      "a": 0,
       "e": "Philippians 3:2 'Watch out for those dogs'.",
       "d": "medium"
     },
@@ -29482,7 +29482,7 @@ const QB={
         "Snake",
         "None, it's a metaphor"
       ],
-      "a": "Worm",
+      "a": 0,
       "e": "Jesus quotes Isaiah 66:24 regarding the final judgment.",
       "d": "medium"
     },
@@ -29494,7 +29494,7 @@ const QB={
         "Trees",
         "Hills"
       ],
-      "a": "Lebanon and Sirion",
+      "a": 0,
       "e": "Ps 29:6 — The voice of the Lord makes Lebanon skip like a calf and Mount Hermon like a young wild ox.",
       "d": "hard"
     },
@@ -29506,7 +29506,7 @@ const QB={
         "Spiders",
         "Scorpions"
       ],
-      "a": "Snakes",
+      "a": 0,
       "e": "Ps 91:13 — The Lord promises that the faithful will tread on the lion and the cobra, trampling the great lion and serpent.",
       "d": "medium"
     },
@@ -29518,7 +29518,7 @@ const QB={
         "Ostrich",
         "Both A and C"
       ],
-      "a": "Both A and C",
+      "a": 3,
       "e": "Micah 1:8 says 'I will wail like jackals and moan like owls (ostriches)'.",
       "d": "hard"
     },
@@ -29530,7 +29530,7 @@ const QB={
         "Brachiosaurus",
         "Rhino"
       ],
-      "a": "Hippopotamus",
+      "a": 0,
       "e": "The description in Job 40:15-24 strongly resembles a hippo.",
       "d": "medium"
     },
@@ -29542,7 +29542,7 @@ const QB={
         "Lions",
         "Giants"
       ],
-      "a": "Grasshoppers (the spies felt like)",
+      "a": 1,
       "e": "Numbers 13:33 'We seemed like grasshoppers in our own eyes'.",
       "d": "medium"
     },
@@ -29554,7 +29554,7 @@ const QB={
         "Solomon",
         "Jacob"
       ],
-      "a": "Jesus",
+      "a": 0,
       "e": "Rev 5:5 — One of the elders told John that the Lion of the tribe of Judah has triumphed and can open the scroll.",
       "d": "easy"
     },
@@ -29566,7 +29566,7 @@ const QB={
         "Deer on the mountain",
         "Birds in the sky"
       ],
-      "a": "Calves released from the stall",
+      "a": 0,
       "e": "Mal 4:2 — For those who revere God's name, the sun of righteousness will rise with healing in its rays.",
       "d": "hard"
     },
@@ -29578,7 +29578,7 @@ const QB={
         "The Gentiles",
         "The Jews"
       ],
-      "a": "The wicked",
+      "a": 0,
       "e": "Matt 25:31-46 — In the final judgment, the goats represent those who failed to care for the 'least of these'.",
       "d": "easy"
     },
@@ -29590,7 +29590,7 @@ const QB={
         "Ship",
         "Man"
       ],
-      "a": "Serpent",
+      "a": 0,
       "e": "Prov 30:19 — Agur lists the way of a serpent on a rock as one of the four things too amazing for him to understand.",
       "d": "medium"
     }

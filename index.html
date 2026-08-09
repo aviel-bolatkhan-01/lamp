@@ -7575,15 +7575,17 @@ function renderAISummary(){
     const pct=Math.round(right/total*100);
     let local;
     if(pct===100){
-      local='Flawless — '+right+' of '+total+'. Your diligence in the Word shows. Try a harder difficulty for your next challenge.';
+      local='Flawless '+right+'/'+total+' — even Solomon would be impressed 👑 Time to try a harder difficulty!';
     }else if(missed.length){
-      local='You got '+right+' of '+total+' ('+pct+'%). Worth another look: “'+missed[0]+'”.';
+      local='You got '+right+' of '+total+' ('+pct+'%). “'+missed[0]+'” got away this time — it won\'t next time 🎯';
     }else{
-      local='You answered '+right+' of '+total+' ('+pct+'%). Strong effort — keep building your streak.';
+      local='Solid '+right+' of '+total+' ('+pct+'%) — keep the flame burning 🔥';
     }
     txt.textContent=local;
     box.style.display='block';
-    const prompt='You are an encouraging Bible study coach inside a trivia game. Player scored '+right+' of '+total+'.'+(missed.length?' They missed: '+missed.slice(0,2).join(' | ')+'.':' Perfect game.')+' Reply in EXACTLY 2 short sentences, 35 words max total: one warm sentence about the result, then ONE specific Bible passage to study next with a very brief reason. Plain text, no greeting, no markdown.';
+    const personas=['a playful Bible-study buddy who loves a gentle tease','an excitable sports commentator calling Bible trivia like a championship','a wise old scribe with a dry sense of humor','a joyful Sunday-school teacher who celebrates every little win'];
+    const persona=personas[Math.floor(Math.random()*personas.length)];
+    const prompt='You are '+persona+', inside a Bible trivia game. Player scored '+right+' of '+total+'.'+(missed.length?' They missed: '+missed.slice(0,2).join(' | ')+'.':' Perfect game!')+' Reply in EXACTLY 2 short sentences, 35 words max total: react to the score in your voice (a playful nod to one missed topic is great — never mean-spirited), then send them to ONE specific Bible passage with a fun hook for why. Up to 2 emoji. Plain text, no greeting, no markdown.';
     // Key loads from ai-key.js — served by Firebase Hosting but gitignored, because Google
     // auto-disables Gemini keys found in public GitHub repos even when referrer-locked.
     // Key itself is restricted to the Gemini API + thelampgame.com referrers.
@@ -7592,7 +7594,7 @@ function renderAISummary(){
     const ctl=new AbortController(); const timer=setTimeout(()=>ctl.abort(),12000);
     fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent?key='+encodeURIComponent(aiKey),{
       method:'POST', headers:{'Content-Type':'application/json'}, signal:ctl.signal,
-      body:JSON.stringify({contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{maxOutputTokens:120,temperature:0.7}})
+      body:JSON.stringify({contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{maxOutputTokens:120,temperature:0.95}})
     })
       .then(r=>{ if(!r.ok) throw new Error('bad status'); return r.json(); })
       .then(j=>{ clearTimeout(timer); const c=j&&j.candidates&&j.candidates[0]; const s=((c&&c.content&&c.content.parts)||[]).map(p=>p.text||'').join(' ').trim(); if(s.length<20||s.length>500) return; txt.textContent=s; })
