@@ -22,6 +22,7 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="icon.png">
 <link rel="apple-touch-icon" href="icon.png">
+<script src="ai-key.js"></script>
 <title>Lamp: Free Bible Trivia Game — 9,000+ Scripture Quiz Questions</title>
 <script type="application/ld+json">
 {
@@ -7577,10 +7578,13 @@ function renderAISummary(){
     txt.textContent=local;
     box.style.display='block';
     const prompt='You are an encouraging Bible study coach inside a trivia game. Player scored '+right+' of '+total+'.'+(missed.length?' They missed: '+missed.slice(0,2).join(' | ')+'.':' Perfect game.')+' Reply in EXACTLY 2 short sentences, 35 words max total: one warm sentence about the result, then ONE specific Bible passage to study next with a very brief reason. Plain text, no greeting, no markdown.';
-    // Key is referrer-locked to thelampgame.com and restricted to the Gemini API only —
-    // safe in public code by design. On any failure the local summary above stays.
+    // Key loads from ai-key.js — served by Firebase Hosting but gitignored, because Google
+    // auto-disables Gemini keys found in public GitHub repos even when referrer-locked.
+    // Key itself is restricted to the Gemini API + thelampgame.com referrers.
+    // Missing key or any failure → the local summary above stays.
+    const aiKey=window.LAMP_AI_KEY||''; if(!aiKey) return;
     const ctl=new AbortController(); const timer=setTimeout(()=>ctl.abort(),12000);
-    fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent?key=AIzaSyCXhzwrVC44tRnX3Y4ibnoWgTLMvO0M_K8',{
+    fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent?key='+encodeURIComponent(aiKey),{
       method:'POST', headers:{'Content-Type':'application/json'}, signal:ctl.signal,
       body:JSON.stringify({contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{maxOutputTokens:120,temperature:0.7}})
     })

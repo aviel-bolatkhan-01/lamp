@@ -9,6 +9,10 @@
 entities.json
 mempalace.yaml
 
+# AI key — served by Firebase Hosting, NEVER in the GitHub repo
+# (Google auto-disables Gemini keys found in public repos, even restricted ones)
+ai-key.js
+
 # Session test harness (transient)
 _*.py
 _*.html
