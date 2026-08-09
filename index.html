@@ -3527,6 +3527,7 @@ html.feat-gameHeader .g-nm { font-weight: 800 !important; max-width: 100px; over
   <div style="padding:14px 0 10px;flex-shrink:0;display:flex;align-items:center;gap:10px;">
     <div style="flex:1;">
       <div class="home-greeting" id="home-greeting"></div>
+      <div id="daily-streak-info" style="margin-top:3px;"></div>
       <div class="h1" style="font-size:clamp(24px,6.5vw,38px);line-height:1.05;"><em>Lamp</em></div>
     </div>
     <!-- Animated oil lamp SVG icon -->
@@ -4012,7 +4013,7 @@ html.feat-gameHeader .g-nm { font-weight: 800 !important; max-width: 100px; over
       <div id="w-ds-emoji" style="font-size:32px;line-height:1;margin-bottom:4px;">🔥</div>
       <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;margin-bottom:2px;">Daily Streak</div>
       <div id="w-ds-label" style="font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:800;color:var(--gold1);line-height:1.1;margin-bottom:10px;">1 Day</div>
-      <button class="btn btn-gold btn-sm" style="width:100%;" onclick="shareStreakText()">🔥 Share Your Streak</button>
+      <button class="btn btn-gold btn-sm" style="width:100%;" onclick="shareDailyResult()">↗ Share Today's Result</button>
     </div>
     <button id="w-share-btn" class="btn btn-share btn-sm" onclick="postMatchShareResult()" style="margin-bottom:8px;">↗ Share Result</button>
     <button class="btn btn-ghost btn-sm" style="margin-bottom:8px;" onclick="postMatchGoHome()">Home</button>
@@ -4140,6 +4141,10 @@ html.feat-gameHeader .g-nm { font-weight: 800 !important; max-width: 100px; over
       </div>
     </div>
 
+    <div class="divider"><span>✦</span></div>
+    <div class="eyebrow" style="margin-bottom:7px;">📖 Scripture Mastery</div>
+    <div id="mastery-head" style="font-family:'Cinzel',serif;font-size:12px;color:var(--gold1);margin:0 0 8px;text-align:center;"></div>
+    <div id="mastery-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px;"></div>
     <div class="divider"><span>✦</span></div>
     <div class="eyebrow" style="margin-bottom:7px;">Progress Snapshot</div>
     <div class="stat-grid" style="margin-bottom:12px;">
@@ -6992,6 +6997,7 @@ function answerQ(btn,isOk,q,order){
     try{ const sc=document.getElementById('g-score'); if(sc){ sc.classList.remove('score-pop'); void sc.offsetWidth; sc.classList.add('score-pop'); } }catch(e){}
     G.streaks[p.name]++;
     try{ if(G.players.length===1){(G._alog=G._alog||[]).push({t:(G._curQ&&(G._curQ.q||G._curQ.b)||'').slice(0,90),ok:true});} }catch(e){}
+    try{ if(G.players.length===1 && G.profile && G._curQ && G._curQ.cat){ const cm=G.profile.catMastery=G.profile.catMastery||{}; cm[G._curQ.cat]=(cm[G._curQ.cat]||0)+1; } }catch(e){}
     if (p.team) {
       G.teamScores[p.team]++;
       const teamKeys=Object.keys(G.teamScores||{});
@@ -7637,11 +7643,24 @@ function endGame(){
       if (G.mode === 'daily' && hasAnyCorrect) {
         const today = new Date().toISOString().split('T')[0];
         const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-        if (G.profile.lastDaily === yesterday) {
+        const twoAgo = new Date(Date.now() - 2*86400000).toISOString().split('T')[0];
+        if (G.profile.lastDaily === today) {
+          // replay same day — streak unchanged
+        } else if (G.profile.lastDaily === yesterday) {
           G.profile.dailyStreak = (G.profile.dailyStreak || 0) + 1;
+        } else if (G.profile.lastDaily === twoAgo && (G.profile.streakShields||0) > 0 && (G.profile.dailyStreak||0) > 0) {
+          G.profile.streakShields--;
+          G.profile.dailyStreak = (G.profile.dailyStreak || 0) + 1;
+          setTimeout(()=>toast('🛡️ Shield of Faith used — your streak is preserved!'),900);
         } else {
           G.profile.dailyStreak = 1;
         }
+        try{
+          if(G._alog && G._alog.length>=10 && G._alog.every(a=>a.ok) && (G.profile.streakShields||0)<2){
+            G.profile.streakShields=(G.profile.streakShields||0)+1;
+            setTimeout(()=>toast('🛡️ Shield of Faith earned — a perfect Daily protects your streak!'),1600);
+          }
+        }catch(e){}
         G.profile.lastDaily = today;
         addXP(100); // Daily bonus
         toast(`☀️ Daily Challenge Complete! +100 XP`);
@@ -7945,6 +7964,20 @@ function shareStreakText(){
   const text=`${emoji} Day ${streak} streak on Lamp Bible Trivia!\n\nI'm testing my scripture knowledge daily — can you keep up? 📖\n\nPlay free: https://thelampgame.com`;
   if(navigator.share){ navigator.share({title:'Lamp Bible Trivia',text}).catch(()=>{}); }
   else{ navigator.clipboard.writeText(text).then(()=>toast('Copied to clipboard! Share with friends 📋')).catch(()=>{}); }
+}
+function shareDailyResult(){
+  sfx.tap();
+  const log=G._alog||[];
+  if(!log.length){ shareStreakText(); return; }
+  const streak=G.profile&&G.profile.dailyStreak||0;
+  const day=Math.floor((Date.now()-new Date('2026-01-01T00:00:00').getTime())/86400000)+1;
+  const right=log.filter(a=>a.ok).length;
+  const cells=log.map(a=>a.ok?'🟩':'🟥');
+  const rows=[]; for(let i=0;i<cells.length;i+=5) rows.push(cells.slice(i,i+5).join(''));
+  const emoji=streak>=7?'👑':streak>=3?'🔥':'⚡';
+  const text='🪔 Lamp Daily #'+day+' — '+right+'/'+log.length+'\n'+rows.join('\n')+(streak>0?'\n'+emoji+' '+streak+'-day streak':'')+'\n\nPlay free: https://thelampgame.com';
+  if(navigator.share){ navigator.share({title:'Lamp Bible Trivia',text}).catch(()=>{}); }
+  else{ navigator.clipboard.writeText(text).then(()=>toast('Copied! Paste it to your friends 📋')).catch(()=>{}); }
 }
 function postMatchShareResult(){
   if((G.mode==='online'||G.onlineGame) && G.roomRef && G.roomId){
@@ -9937,7 +9970,34 @@ async function saveEditName(){
   toast('Name updated!');
 }
 
+function renderMastery(){
+  const grid=document.getElementById('mastery-grid'), head=document.getElementById('mastery-head');
+  if(!grid||!head) return;
+  const cm=(G.profile&&G.profile.catMastery)||{};
+  const TIERS=[10,40,100];
+  const cats=Object.keys(QB);
+  let earned=0;
+  grid.innerHTML='';
+  cats.forEach(function(c){
+    const n=cm[c]||0;
+    const stars=n>=100?3:n>=40?2:n>=10?1:0;
+    earned+=stars;
+    const next=stars>=3?null:TIERS[stars];
+    const pct=next?Math.min(100,Math.round(n/next*100)):100;
+    const d=document.createElement('div');
+    d.style.cssText='background:rgba(255,255,255,.03);border:1px solid rgba(180,140,60,.14);border-radius:12px;padding:9px 11px;';
+    d.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;gap:6px;">'
+      +'<span style="font-size:11px;font-weight:700;color:var(--ink2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+escHtml(c)+'</span>'
+      +'<span style="font-size:10px;letter-spacing:.05em;color:var(--gold1);flex-shrink:0;">'+('★'.repeat(stars)+'☆'.repeat(3-stars))+'</span></div>'
+      +'<div style="height:4px;border-radius:2px;background:rgba(255,255,255,.06);margin-top:6px;overflow:hidden;"><div style="height:100%;width:'+pct+'%;background:var(--gold1);border-radius:2px;"></div></div>'
+      +'<div style="font-size:9px;color:var(--ink3);margin-top:3px;">'+(next?(n+' / '+next+' correct'):'Mastered — '+n+' correct')+'</div>';
+    grid.appendChild(d);
+  });
+  head.textContent='✨ '+earned+' / '+(cats.length*3)+' stars earned';
+}
+
 function renderProfile(){
+  try{ renderMastery(); }catch(e){}
   if(!G.profile){ go('auth'); buildAvGrid(); return; }
   const p=G.profile, l=lvl(p.xp||0);
   setAvatarEl(document.getElementById('prof-av'),p.avatar,p.photo);
@@ -11509,17 +11569,27 @@ function updateDailyStreak(){
   const el=document.getElementById('daily-streak-info');
   if(!el||!G.profile) return;
   const streak=G.profile.dailyStreak||0;
+  const shields=G.profile.streakShields||0;
   const last=G.profile.lastDaily||'';
   const today=new Date().toISOString().split('T')[0];
   const yesterday=new Date(Date.now()-86400000).toISOString().split('T')[0];
-  // Reset streak if last play was before yesterday
+  const twoAgo=new Date(Date.now()-2*86400000).toISOString().split('T')[0];
+  el.style.cursor='pointer';
+  el.onclick=function(){ try{ sfx.tap(); openChallengesMenu(); }catch(e){} };
   if(last && last!==today && last!==yesterday){
+    if(last===twoAgo && shields>0 && streak>0){
+      el.textContent='🛡️ Shield ready — play today to save your '+streak+'-day streak!';
+      el.style.color='var(--gold1)'; el.style.fontSize='13px'; el.style.fontWeight='700';
+      return;
+    }
     G.profile.dailyStreak=0; saveProfile(); if(G.fbOk) pushProfile();
     el.textContent='Streak: 0 days — play today to start!';
+    el.style.color='var(--ink3)'; el.style.fontSize='11px'; el.style.fontWeight='400';
     return;
   }
   const fire=streak>=7?'👑':streak>=3?'🔥':'⚡';
-  el.textContent=streak>0?fire+' '+streak+'-day streak'+(last===today?' · done today!':' · play to keep it!'):
+  const shieldTag=shields>0?' · 🛡️'+shields:'';
+  el.textContent=streak>0?fire+' '+streak+'-day streak'+shieldTag+(last===today?' · done today!':' · play to keep it!'):
     'Play daily to build your streak!';
   el.style.color=streak>0?'var(--gold1)':'var(--ink3)';
   el.style.fontSize=streak>0?'13px':'11px';
