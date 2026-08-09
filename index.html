@@ -7057,7 +7057,7 @@ function timeOut(q,pfx){
     G.hearts[p.name]=Math.max(0,(G.hearts[p.name]||0)-1);
     renderHearts(`${pfx}-hearts`,G.hearts[p.name]);
     if(G.hearts[p.name]===0){
-      fb.innerHTML += `<br><span style="color:#e08080;">${p.name} has been eliminated!</span>`;
+      fb.innerHTML += `<br><span style="color:#e08080;">${escHtml(p.name)} has been eliminated!</span>`;
       showElim(p.name);
       if(shouldEndByHearts()){ setTimeout(endGame, 1500); return; }
     }
@@ -7417,7 +7417,8 @@ function saveMatchResult(winner, players) {
       myName: G.profile ? G.profile.name : null,
       id: Date.now()
     };
-    let history = JSON.parse(localStorage.getItem('bgn_history') || '[]');
+    let history; try { history = JSON.parse(localStorage.getItem('bgn_history') || '[]'); } catch(e) {}
+    if (!Array.isArray(history)) history = [];
     history.unshift(match);
     localStorage.setItem('bgn_history', JSON.stringify(history.slice(0, 50)));
     if (G.uid && G.db) {
@@ -7441,7 +7442,8 @@ function saveMatchResult(winner, players) {
 function renderMatchHistory(expanded) {
   const el = document.getElementById('match-history-list');
   if (!el) return;
-  let history = JSON.parse(localStorage.getItem('bgn_history') || '[]');
+  let history; try { history = JSON.parse(localStorage.getItem('bgn_history') || '[]'); } catch(e) {}
+  if (!Array.isArray(history)) history = [];
   if (!history.length) {
     el.innerHTML = '<div class="empty" style="padding:10px 0;">No matches played yet.</div>';
     return;
@@ -9891,7 +9893,8 @@ function renderProfile(){
         if (snap.exists()) {
           const fbHistory = snap.val() || [];
           // Use Firebase as source of truth, but keep local matches that aren't in Firebase
-          let local = JSON.parse(localStorage.getItem('bgn_history') || '[]');
+          let local; try { local = JSON.parse(localStorage.getItem('bgn_history') || '[]'); } catch(e) {}
+          if (!Array.isArray(local)) local = [];
           const fbIds = new Set(fbHistory.map(m => m.id));
           const newLocal = fbHistory.concat(local.filter(m => !fbIds.has(m.id)));
           newLocal.sort((a, b) => b.id - a.id);
