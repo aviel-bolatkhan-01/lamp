@@ -1,5 +1,32 @@
 # STATUS.md — Lamp: Bible Trivia Online
 
+## Session 2026-08-09 (part 4): Growth features ✅ (sw lamp-v13, DEPLOYED — commit f05b1ba, tag release-2026-08-09-growth)
+User approved the ideas list: *"apply these then, prompt urself"*. Building in order:
+1. **Streak visibility + Shield of Faith** (`_spec_streak.md`, cdx applying now): home chip
+   gains shield count + tap→openChallengesMenu + "🛡️ Shield ready" state for a 1-day gap;
+   endGame daily block bridges one missed day by consuming a shield (earned via perfect
+   10/10 Daily via G._alog, cap 2). KEY INTERACTION FOUND: updateDailyStreak() on home
+   RESETS broken streaks on load — shield logic must live there too, not just endGame.
+2. **Wordle-style share** (same spec): shareDailyResult() — 🟩🟥 grid rows of 5 from G._alog,
+   day # from epoch 2026-01-01, replaces streak-only button on the daily winner banner.
+3. **Scripture Mastery** (`_spec_mastery.md`, next): per-category correct counts in
+   G.profile.catMastery via G._curQ.cat (MCQ pools all tag cat — verified 6 build sites;
+   TF/verse banks have no categories, excluded by design). Stars at 10/40/100, 19-cat grid
+   + "X/57 stars" on profile above Progress Snapshot. DB rules only validate xp — new
+   profile fields sync fine.
+Test harness _inject4.py ready (shield states, share format, mastery grid). Then SW v13,
+deploy, live verify.
+
+**SHIPPED & VERIFIED.** Bonus real-bug find: **`daily-streak-info` element never existed in
+the HTML** — `updateDailyStreak()` (and the home streak display) has silently no-oped since it
+was written; element added under home-greeting, streak text now renders for the first time.
+All feature tests green: shield-ready msg, chip with 🛡️ count, share format
+(`🪔 Lamp Daily #221 — 7/10` + 🟩🟥 rows + streak line), 19 mastery cells, exact star math
+(5/57 for 45/7/120 test data), 0 console errors. Live: sw lamp-v13, 11 feature markers in
+prod HTML. Rollback: tag release-2026-08-09-game-feel = state before this pass.
+Still open from the ideas list (next sessions): onboarding flow, weekly leagues, Team Mode
+online, push notifications (needs Blaze).
+
 ## Session 2026-08-09 (part 3): Shorter AI summary + key-leak recovery ✅ (sw lamp-v12, commit 5ba07d6)
 User feedback on the live game: *"make the ai summary shorter"* + *"forget about groq doing a
 research... do it yourself"* (research directive recorded in memory + CLAUDE.md table updated).
