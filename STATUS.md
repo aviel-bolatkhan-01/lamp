@@ -1,5 +1,21 @@
 # STATUS.md — Lamp: Bible Trivia Online
 
+## Session 2026-08-09 (part 3): Shorter AI summary + key-leak recovery ✅ (sw lamp-v12, commit 5ba07d6)
+User feedback on the live game: *"make the ai summary shorter"* + *"forget about groq doing a
+research... do it yourself"* (research directive recorded in memory + CLAUDE.md table updated).
+
+1. **Summary shortened to a 2-sentence contract** — prompt demands "EXACTLY 2 short sentences,
+   35 words max"; maxOutputTokens 220→120; responses >500 chars rejected (keeps local); local
+   fallback now one line with a single missed question. Verified on prod: ~190-char summary.
+2. **Key-leak incident + fix:** Google auto-disabled the Gemini key ("reported as leaked") —
+   GitHub secret scanning found it in index.html in the PUBLIC repo; referrer locks don't
+   exempt custom keys (Firebase config keys ARE exempt). Old key deleted via API, new key
+   minted (same restrictions), and moved to **`ai-key.js` — gitignored but deployed by hosting**
+   (hosting uploads from the working dir, not git). index.html reads `window.LAMP_AI_KEY`,
+   missing → silent local fallback. Verified: hosting serves it, GitHub raw = 404, prod AI
+   replaced text again. ⚠️ ai-key.js exists ONLY on this Mac + hosting — a fresh clone must
+   recreate it (see memory `project_lamp_ai_summary`).
+
 ## Session 2026-08-09 (part 2): Design + sound polish pass ✅ (sw lamp-v10, DEPLOYED — commit 254f476, tag release-2026-08-09-game-feel)
 User: *"improve the design and sound design... use best cases from other quiz games. add more
 animations... be creative and surprise me. make it like the most played/downloaded quiz games."*
