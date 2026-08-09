@@ -1,5 +1,36 @@
 # STATUS.md — Lamp: Bible Trivia Online
 
+## Session 2026-08-09 (part 2): Design + sound polish pass — IN PROGRESS at this save
+User: *"improve the design and sound design... use best cases from other quiz games. add more
+animations... be creative and surprise me. make it like the most played/downloaded quiz games."*
+
+**Audit findings (why it feels plain despite 28 existing keyframes):** wrong answers never shake
+on the main screen (only tf-btn has shake); verdict colors SNAP instead of bloom; score never
+pops on change; timer danger = color swap only, no motion; streak overlay identical at 3 and 10;
+winner screen appears all at once; **correct chime is identical at streak 1 and streak 9** (the
+Duolingo-style escalation is the single biggest missing juice lever). FEATURES.answerAnim etc.
+are all ON — base layer exists, escalation/wiring is what's missing.
+
+**Research (grq):** rising pitch ladder for combo chimes (fifths→thirds), ≤3-4 simultaneous
+layers, anticipation via silence, timer heartbeat, floating points, 100ms press feedback.
+(`or`/nemotron returned empty — flagged in tooling memory.)
+
+**Plan (specs written, cdx applying):** SPEC A `_spec_motion.md` — verdict bloom + green ring /
+red shake+glow, score-pop, question entrance, timer danger pulse+beat, streak overlay t5/t7/t10
+tiers, winner ceremony staggered entrance, prefers-reduced-motion guard, NO color/layout changes.
+SPEC B `_spec_sound.md` — sfx.correct rises on a major-scale ladder with the CURRENT player's
+streak (reads G.streaks internally, call sites unchanged), sparkle bell at 5+, sfx.streak(n)
+rises by tier (+3/+5/+7 semitones at 5/7/10). Then: headless smoke + uniform-window level
+measurement, SW → lamp-v10, deploy, live verify.
+
+**Progress at this save:** SPEC A applied by cdx (all 5 edits) + 3 integration fixes by hand:
+duplicate transition props cleaned (press stays .1s, verdict bloom .22s) and the answerRing had
+to be merged into the LATER `html.feat-answerAnim .opt.correct` rule at ~line 3375 — cdx's new
+block sat earlier in the cascade and was overridden (lesson: when ADDING a competing rule,
+check for an existing same-specificity rule later in the file). SPEC B applied by cdx (diff
+verified: _steps ladder + f*_lift in correct, sparkle at st>=5, streak(n) tier lift, showStreak
+passes n) — awaiting final validation + 3-phase harness (pitch-lift a/b + DOM/sfx smoke c).
+
 ## Session 2026-08-09: AI Study Insight + bug fixes + PWA + Android app ✅ (sw lamp-v9, DEPLOYED)
 
 **Rollback points:** tag `checkpoint-2026-08-09-before-session` (state before session), tag `release-2026-08-09-ai-summary` (this session shipped). `git checkout <tag>` or Firebase console → Hosting → release history → rollback.
