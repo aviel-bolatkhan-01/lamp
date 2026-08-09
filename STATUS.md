@@ -1,5 +1,77 @@
 # STATUS.md — Lamp: Bible Trivia Online
 
+## Session 2026-08-09: AI Study Insight + bug fixes + PWA + Android app ✅ (sw lamp-v9, DEPLOYED)
+
+**Rollback points:** tag `checkpoint-2026-08-09-before-session` (state before session), tag `release-2026-08-09-ai-summary` (this session shipped). `git checkout <tag>` or Firebase console → Hosting → release history → rollback.
+
+### 1. Bug audit → 4 real fixes (commit 4ab191e)
+- **Stored XSS (missed spot from the 2026-07-18 sweep):** `${p.name}` unescaped in the elimination
+  message innerHTML in `timeOut()` — now `escHtml(p.name)`. Sweep-verified: no other unescaped
+  name/avatar innerHTML sites remain (avatarMarkup escapes internally; showElim uses textContent).
+- **3× unguarded `JSON.parse(localStorage bgn_history)`** (saveMatchResult, renderMatchHistory,
+  profile FB-merge) — corrupt value used to kill match saving/history *permanently and silently*.
+  Now try/catch + `Array.isArray` → self-heals by overwriting with good data.
+- False alarms re-confirmed: line 9930 Notification (guarded upstream), JULES report items (all
+  resolved or stale). eslint is misconfigured (ignores index.html — has never linted; `node --check`
+  remains the real gate; not fixed, low value).
+
+### 2. Sound imbalance — INVESTIGATED, PREMISE STALE, NO CHANGE (deliberate)
+The "streak/levelUp ~2x quiet" note from 2026-07-28 no longer holds: fresh uniform-window
+measurement shows streak 1.049 / levelUp 0.904 peaks vs correct 0.255 / win 0.319 — the v3
+limiter back-off already fixed it. A celebration-bypass-bus was built (via cdx), measured
+(peaks → 1.144 = clipping territory), and **reverted**. Lesson applied: validate the measurement
+before "fixing". Do not re-attempt without fresh evidence of a real problem.
+
+### 3. ✨ AI Study Insight after solo quizzes (commit f7cdbf1) — VERIFIED ON PROD
+- Winner-screen card for solo runs (`G.players.length===1`, ≥3 answers): instant LOCAL summary
+  (accuracy + up to 3 missed questions, from new `G._alog` tracking; `G._curQ` captured in renderQ
+  because the verse-mode handler `q` is synthetic/textless), then a **real Gemini-written coaching
+  summary replaces it when it arrives** (recommends a passage based on what was missed). Offline
+  or any failure → local text stays. All via textContent (no XSS surface).
+- Backend: `gemini-flash-lite-latest` (rolling alias — pinned 2.5-flash-lite is retired for new
+  users), key `AIzaSy…M_K8` restricted to the Gemini API + `https://thelampgame.com/*` referrers —
+  public-by-design browser key. **Localhost always shows the local fallback (referrer lock);
+  AI text verified live on prod via puppeteer (aiReplaced:true, 0 page errors).**
+- APIs enabled + key created WITHOUT console access via firebase-tools refresh-token → REST
+  (serviceusage + apikeys). Pollinations text API is DEAD for real prompts (402) — do not revisit.
+
+### 4. PWA hardening (same commit)
+- manifest.json: added `id`/`scope`; icons now truthful — new `icon-192.png` (real 192px), new
+  `icon-maskable.png` (512px, padded to safe zone via sips), icon.png as 512 any.
+- sw.js → **lamp-v9**; precache + new icons + `assets/img/home-bg-texture.png` (was 404-risk-free
+  verified — file exists; cache.addAll is atomic).
+- firebase.json hosting ignores: *.md, database.rules.json, gen scripts, package files, android/
+  — STATUS.md etc. are no longer publicly served (verified live).
+- iOS meta tags were already present.
+
+### 5. Deployed + verified live (GitHub `main` f7cdbf1 + Firebase Hosting)
+Checklist run: node --check ✔ → SW bump ✔ → push ✔ → `npx firebase-tools deploy --only hosting` ✔
+→ live-bytes verification: sw lamp-v9 ✔, AI markers in prod HTML ✔, manifest icons ✔,
+`/.well-known/assetlinks.json` live ✔, icon-192 200 ✔, STATUS.md now rewrites to app ✔.
+
+### 6. Android app (TWA via Bubblewrap) — ✅ BUILT & SIGNED
+- `android/`: twa-manifest.json (package `com.thelampgame.app`), **keystore + signing-info.txt
+  (passwords) — LOCAL ONLY, gitignored, USER MUST BACK UP**, PLAY_STORE_GUIDE.md (full
+  plain-language Play Console walkthrough incl. store copy from cohere).
+- Toolchain installed user-space: `~/.bubblewrap/` JDK 17.0.20 + Android SDK (platform-34,
+  build-tools, licenses). Bubblewrap gotchas that each broke a build (jdkPath WITHOUT
+  /Contents/Home; bin+lib symlinks so androidSdkPath validates; `update --skipVersionUpgrade`;
+  password env vars; a piped-stdin run set versionName to "n" — fixed back to 1.0.0) —
+  full recipe in memory `project_lamp_android_twa`.
+- assetlinks.json live with upload-key fingerprint DE:49:4A:F4…; after first Play upload the
+  **Play App Signing SHA-256 must be appended** + redeploy (guide Part 3).
+- **Artifacts (android/, NOT in git):** `app-release-bundle.aab` 3.4MB (Play upload) +
+  `app-release-signed.apk` 3.3MB (direct install). apksigner-verified: cert SHA-256 de494af4…
+  matches keystore AND live assetlinks.json. Store screenshots at `android/store-assets/`
+  (home + live question screen, 1179×2553). USER SIDE remaining: Play Console account ($25),
+  upload AAB, then bring back the Play App Signing SHA-256 for assetlinks (guide Part 3).
+
+### Orchestration note (honest)
+cdx (unlocked since Aug 6) wrote the two big code chunks (celeb bus — later reverted on evidence;
+AI summary — shipped) from exact specs and applied them cleanly; mistral returned empty copy once
+(cohere fallback delivered); surgical 1-line integration edits in fragile spots were done directly
+where delegation round-trips added breakage risk over token savings.
+
 ## Session 2026-07-28 (part 3): Challenges → Disciple only + richer synthesis ✅ (sw lamp-v8)
 
 ### 1. Daily + Weekly challenges forced to Disciple (easy)

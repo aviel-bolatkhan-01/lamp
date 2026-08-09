@@ -20,6 +20,11 @@ android/*.keystore
 android/*.jks
 android/keystore*
 android/signing-info.txt
+
+# Android build outputs (rebuildable; keep out of git)
+android/*.aab
+android/*.apk
+android/*.idsig
 android/build/
 android/app/build/
 android/.gradle/
