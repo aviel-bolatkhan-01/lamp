@@ -7570,22 +7570,22 @@ function renderAISummary(){
     if(pct===100){
       local='Flawless — '+right+' of '+total+'. Your diligence in the Word shows. Try a harder difficulty for your next challenge.';
     }else if(missed.length){
-      local='You answered '+right+' of '+total+' ('+pct+'%). Worth revisiting: '+missed.map(m=>'“'+m+'”').join(' · ')+'. A short study on these will make your next run stronger.';
+      local='You got '+right+' of '+total+' ('+pct+'%). Worth another look: “'+missed[0]+'”.';
     }else{
       local='You answered '+right+' of '+total+' ('+pct+'%). Strong effort — keep building your streak.';
     }
     txt.textContent=local;
     box.style.display='block';
-    const prompt='You are an encouraging Bible study coach inside a trivia game. A player finished a quiz: '+right+' of '+total+' correct.'+(missed.length?' They missed questions about: '+missed.join(' | ')+'.':' They had a perfect game.')+' In 2-3 warm sentences: assess their performance and recommend ONE specific Bible passage to study next, with a brief reason. Plain text only, no markdown, no greeting, under 75 words.';
+    const prompt='You are an encouraging Bible study coach inside a trivia game. Player scored '+right+' of '+total+'.'+(missed.length?' They missed: '+missed.slice(0,2).join(' | ')+'.':' Perfect game.')+' Reply in EXACTLY 2 short sentences, 35 words max total: one warm sentence about the result, then ONE specific Bible passage to study next with a very brief reason. Plain text, no greeting, no markdown.';
     // Key is referrer-locked to thelampgame.com and restricted to the Gemini API only —
     // safe in public code by design. On any failure the local summary above stays.
     const ctl=new AbortController(); const timer=setTimeout(()=>ctl.abort(),12000);
     fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent?key=AIzaSyCXhzwrVC44tRnX3Y4ibnoWgTLMvO0M_K8',{
       method:'POST', headers:{'Content-Type':'application/json'}, signal:ctl.signal,
-      body:JSON.stringify({contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{maxOutputTokens:220,temperature:0.7}})
+      body:JSON.stringify({contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{maxOutputTokens:120,temperature:0.7}})
     })
       .then(r=>{ if(!r.ok) throw new Error('bad status'); return r.json(); })
-      .then(j=>{ clearTimeout(timer); const c=j&&j.candidates&&j.candidates[0]; const s=((c&&c.content&&c.content.parts)||[]).map(p=>p.text||'').join(' ').trim(); if(s.length<20||s.length>900) return; txt.textContent=s; })
+      .then(j=>{ clearTimeout(timer); const c=j&&j.candidates&&j.candidates[0]; const s=((c&&c.content&&c.content.parts)||[]).map(p=>p.text||'').join(' ').trim(); if(s.length<20||s.length>500) return; txt.textContent=s; })
       .catch(()=>{ clearTimeout(timer); });
   }catch(e){}
 }
