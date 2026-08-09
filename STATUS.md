@@ -1,5 +1,24 @@
 # STATUS.md — Lamp: Bible Trivia Online
 
+## Session 2026-08-09 (part 5): 330 broken answer keys + playful Insight ✅ (sw lamp-v14, commit be74dc8, tag release-2026-08-09-answer-fix)
+User report: *"zipporah is moses' wife for example, but it shows incorrect"* + *"make the insight more fun/playful"*.
+
+1. **ROOT CAUSE — systemic, not one bad key: 330 of 3,012 MCQ questions (11%) stored `a` as
+   the answer STRING instead of the option INDEX.** The scorer compares selected index to
+   `q.a`, so on those questions EVERY answer was marked wrong (and no reveal highlight).
+   Scripted repair: each string mapped to its exact option index (329 exact matches + 1
+   Eutychus paraphrase → option 0 per Acts 20:9-12). Verified: 0 string answers remain,
+   0 out-of-range indexes, bank still 3,012, all Moses-wife questions → Zipporah, live
+   mcq.js clean. **This also likely inflated past "too difficult" complaints.**
+2. **Schema truths for future data work:** MCQ `a` MUST be a numeric index. VERSE bank:
+   `blank` = the answer word, `a` = the text AFTER the blank (NOT the answer — the format
+   note in CONTEXT.md was misleading; all 3,000 verse entries are healthy). TF bank clean.
+3. **Playful Study Insight:** 4 rotating personas (study buddy w/ gentle tease, sports
+   commentator, dry-humor scribe, joyful Sunday-school teacher), playful quip about a missed
+   topic invited, up to 2 emoji, temp 0.7→0.95; local fallbacks got personality too
+   ("even Solomon would be impressed 👑"). Live-tested tone: *"Six for fifteen is a bit
+   rough, but hey, even Moses had to dodge a few questions in the desert!"*
+
 ## Session 2026-08-09 (part 4): Growth features ✅ (sw lamp-v13, DEPLOYED — commit f05b1ba, tag release-2026-08-09-growth)
 User approved the ideas list: *"apply these then, prompt urself"*. Building in order:
 1. **Streak visibility + Shield of Faith** (`_spec_streak.md`, cdx applying now): home chip

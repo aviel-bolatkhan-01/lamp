@@ -18,7 +18,8 @@
 - Arrays: `];` never `]];`
 - Question format MCQ: `{"q":"...","o":[...],"a":0,"e":"...","d":"easy"}`
 - Question format TF: `{q:"...",a:true,d:"easy"}`
-- Question format Verse: `{"b":"...","blank":"...","a":"...","r":"...","o":[...],"d":"easy"}`
+- Question format Verse: `{"b":text-before-blank,"blank":ANSWER-word,"a":text-AFTER-blank,"r":ref,"o":[options],"d":"easy"}` — `blank` is the answer; `a` is NOT
+- MCQ `a` MUST be a numeric option index — 330 string-`a` entries broke scoring until 2026-08-09; validate `typeof a==='number'` on any new questions
 
 ## Question Banks
 - QB (MCQ): 3,012 — 19 categories: Genesis, Exodus, Judges, Kings, Psalms, Prophets, Gospels, Parables, Acts, Epistles, Revelation, Miracles, Women of the Bible, Animals in the Bible, Bible Geography, Numbers & Dates, Old Testament Law, Worship & Music, Who Am I?
